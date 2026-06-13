@@ -14,11 +14,9 @@
     <div class="max-w-md w-full bg-slate-900 rounded-3xl p-10 border border-slate-800">
         
         <div class="text-center mb-8">
-            <div class="flex justify-center mb-4">
-                <span class="text-5xl">👑</span>
-            </div>
+            <img src="logo.png" alt="MyHeredo" class="h-16 mx-auto mb-4">
             <h1 class="text-3xl font-bold text-amber-400">MyHeredo</h1>
-            <p class="text-slate-400 mt-2">Tworzenie konta — Krok 2 z 2</p>
+            <p class="text-slate-400 mt-1">Tworzenie konta — Krok 2 z 2</p>
         </div>
 
         <div class="bg-slate-800 rounded-2xl p-8">
@@ -57,7 +55,6 @@
         </div>
     </div>
 
-    <!-- Biblioteka QR Code -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
     <script>
         let backupCode = "";
@@ -66,23 +63,24 @@
             backupCode = "J7K9-M4P2-Q8X5-R3T6-W9V1-L2B8";
             document.getElementById('backupCode').textContent = backupCode;
 
-            // Generowanie QR Code
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
-            
-            new QRCode(qrContainer, {
-                text: "otpauth://totp/MyHeredo:user@myheredo.pl?secret=J7K9M4P2Q8X5R3T6W9V1L2B8&issuer=MyHeredo",
-                width: 220,
-                height: 220,
-                colorDark: "#111827",
-                colorLight: "#ffffff"
-            });
+
+            setTimeout(() => {
+                new QRCode(qrContainer, {
+                    text: "otpauth://totp/MyHeredo:user@myheredo.pl?secret=J7K9M4P2Q8X5R3T6W9V1L2B8&issuer=MyHeredo",
+                    width: 230,
+                    height: 230,
+                    colorDark: "#111827",
+                    colorLight: "#ffffff"
+                });
+            }, 100);
         }
 
         function copyBackupCode() {
             const clean = backupCode.replace(/-/g, '');
             navigator.clipboard.writeText(clean).then(() => {
-                alert("✅ Kod backup skopiowany do schowka!");
+                alert("✅ Kod backup został skopiowany!");
             });
         }
 
@@ -92,11 +90,10 @@
                 alert("✅ Konto zostało pomyślnie utworzone!");
                 setTimeout(() => window.location.href = "login.html", 1000);
             } else {
-                alert("❌ Niepoprawny kod. W trybie demo użyj kodu: 123456");
+                alert("❌ Niepoprawny kod.\n\nW trybie demo użyj: 123456");
             }
         }
 
-        // Uruchomienie
         window.onload = generate2FA;
     </script>
 </body>
