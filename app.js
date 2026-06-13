@@ -1,5 +1,5 @@
 // =============================================
-// MYHEREDO - Pełna działająca wersja na Vercel
+// MYHEREDO - Pełna wersja na Vercel + Ładny Certyfikat
 // =============================================
 
 let vaultData = {
@@ -76,7 +76,7 @@ function getIcon(key) {
     return '📁';
 }
 
-// ==================== MODAL ====================
+// ==================== MODAL SKRYTKI ====================
 function openVaultModal(key) {
     const content = vaultData[key] || '';
     const modalHTML = `
@@ -178,26 +178,90 @@ function setupDMS() {
     }
 }
 
-// ==================== CERTYFIKAT ====================
+// ==================== ŁADNY CERTYFIKAT ====================
 function showCertificate() {
-    const dmsDays = document.getElementById('dmsSlider').value || 45;
-    const email = localStorage.getItem('myheredo_user_email') || "jan.kowalski@example.com";
-    alert(`✅ CERTYFIKAT SUKCESJI\n\nNumer: MH-${Date.now().toString().slice(-8)}\nWłaściciel: ${email}\nDead Man’s Switch: ${dmsDays} dni\n\nSpadkobierców: ${heirs.length}`);
+    const dmsDays = document.getElementById('dmsSlider') ? document.getElementById('dmsSlider').value : 45;
+    const userEmail = localStorage.getItem('myheredo_user_email') || "jan.kowalski@myheredo.pl";
+
+    const certificateHTML = `
+    <div id="certificateOverlay" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] p-6 overflow-auto">
+        <div class="max-w-3xl w-full bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 p-10 text-center">
+                <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-4">
+                <h1 class="text-4xl font-bold">CERTYFIKAT SUKCESJI</h1>
+                <p class="text-xl mt-2 opacity-90">MyHeredo • Cyfrowy Sejf Sukcesyjny</p>
+            </div>
+
+            <div class="p-10 space-y-8">
+                <div class="grid grid-cols-2 gap-6 text-sm">
+                    <div><strong>Właściciel:</strong><br>${userEmail}</div>
+                    <div><strong>Data wystawienia:</strong><br>${new Date().toLocaleDateString('pl-PL')}</div>
+                    <div><strong>Dead Man’s Switch:</strong><br>${dmsDays} dni</div>
+                    <div><strong>Numer certyfikatu:</strong><br>MH-${Date.now().toString().slice(-8)}</div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-lg mb-4 border-b pb-2">Zawartość Sejfu</h3>
+                    <div class="space-y-4">
+                        ${Object.keys(vaultData).map(key => `
+                            <div class="flex justify-between bg-slate-50 p-4 rounded-2xl">
+                                <div class="font-medium">${categoryNames[key] || key}</div>
+                                <div class="${vaultData[key] ? 'text-emerald-600' : 'text-slate-400'}">
+                                    ${vaultData[key] ? '✓ Zawiera dane' : 'Pusta'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-lg mb-4 border-b pb-2">Zaufani Spadkobiercy</h3>
+                    ${heirs.length ? 
+                        `<div class="grid gap-3">` + 
+                        heirs.map(h => `
+                            <div class="flex justify-between bg-slate-50 p-4 rounded-2xl">
+                                <div><strong>${h.name}</strong></div>
+                                <div class="text-slate-600">${h.email}</div>
+                            </div>
+                        `).join('') + `</div>` : 
+                        `<p class="text-slate-500 italic">Brak spadkobierców</p>`}
+                </div>
+            </div>
+
+            <div class="border-t p-8 flex gap-4 bg-slate-50">
+                <button onclick="printCertificate()" class="flex-1 bg-slate-900 text-white py-5 rounded-2xl font-semibold hover:bg-black transition">🖨️ Drukuj / Zapisz jako PDF</button>
+                <button onclick="closeCertificate()" class="flex-1 border border-slate-300 py-5 rounded-2xl font-semibold">Zamknij</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', certificateHTML);
 }
 
+function closeCertificate() {
+    const overlay = document.getElementById('certificateOverlay');
+    if (overlay) overlay.remove();
+}
+
+function printCertificate() {
+    window.print();
+}
+
+// ==================== SYMULACJA ====================
 function simulateDeath() {
     if (heirs.length === 0) return alert("Dodaj przynajmniej jednego spadkobiercę.");
     const days = document.getElementById('dmsSlider').value;
     let msg = `⚰️ SYMULACJA PO ŚMIERCI\n\n`;
     msg += `Dead Man’s Switch aktywowany po ${days} dniach.\n\n`;
-    msg += "Dostęp przekazany:\n";
+    msg += "Pełny dostęp do sejfu otrzymują:\n\n";
     heirs.forEach(h => msg += `• ${h.name} (${h.email})\n`);
     alert(msg);
 }
 
 // ==================== POZOSTAŁE ====================
 function handleLogout() {
-    if (confirm("Wylogować się?")) {
+    if (confirm("Wylogować się z MyHeredo?")) {
+        localStorage.clear();
         window.location.href = "index.html";
     }
 }
@@ -207,7 +271,7 @@ function showSuccessMessage(text) {
 }
 
 function loadDemoData() {
-    if (!confirm("Wczytać przykładowe dane?")) return;
+    if (!confirm("Wczytać przykładowe dane demonstracyjne?")) return;
 
     vaultData = {
         banki: "ING Bank Śląski\nLogin: jan.kowalski\nHasło: SuperTajne123!",
