@@ -22,10 +22,10 @@
         <div class="bg-slate-800 rounded-3xl p-8">
             <p class="text-center text-slate-400 mb-6">Zabezpiecz konto dwuskładnikowym uwierzytelnianiem (2FA)</p>
             
-            <!-- QR Code - większe miejsce -->
+            <!-- QR Code - duże miejsce -->
             <div class="bg-slate-900 rounded-2xl p-8 text-center mb-8">
                 <p class="text-sm text-slate-400 mb-5">Zeskanuj kod QR w aplikacji Authenticator</p>
-                <div id="qrcode" class="mx-auto bg-white p-5 inline-block rounded-2xl"></div>
+                <div id="qrcode" class="mx-auto bg-white p-6 inline-block rounded-2xl shadow-inner"></div>
             </div>
 
             <!-- Backup Code -->
@@ -55,7 +55,8 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
+    <!-- Nowsza, bardziej stabilna biblioteka -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         let backupCode = "";
 
@@ -66,21 +67,23 @@
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
 
+            // Nowa biblioteka + opóźnienie
             setTimeout(() => {
                 new QRCode(qrContainer, {
                     text: "otpauth://totp/MyHeredo:user@myheredo.pl?secret=J7K9M4P2Q8X5R3T6W9V1L2B8&issuer=MyHeredo",
                     width: 260,
                     height: 260,
                     colorDark: "#111827",
-                    colorLight: "#ffffff"
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
                 });
-            }, 150);
+            }, 200);
         }
 
         function copyBackupCode() {
             const clean = backupCode.replace(/-/g, '');
             navigator.clipboard.writeText(clean).then(() => {
-                alert("✅ Kod backup skopiowany!");
+                alert("✅ Kod backup skopiowany do schowka!");
             });
         }
 
@@ -97,4 +100,5 @@
         window.onload = generate2FA;
     </script>
 </body>
+</html>
 </html>
