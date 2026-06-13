@@ -1,5 +1,5 @@
 // =============================================
-// MYHEREDO - Wersja na Vercel (Działająca + skrytki)
+// MYHEREDO - Pełna działająca wersja na Vercel
 // =============================================
 
 let vaultData = {
@@ -44,7 +44,7 @@ function renderSkrytki() {
     const grid = document.getElementById('skrytkiGrid');
     grid.innerHTML = '';
 
-    Object.keys(vaultData).forEach((key, index) => {
+    Object.keys(vaultData).forEach((key) => {
         const isFilled = vaultData[key] && vaultData[key].trim() !== '';
         const isCustom = !['banki', 'krypto'].includes(key);
 
@@ -180,14 +180,22 @@ function setupDMS() {
 
 // ==================== CERTYFIKAT ====================
 function showCertificate() {
-    alert("✅ Certyfikat Sukcesji został wygenerowany! (wersja testowa)");
+    const dmsDays = document.getElementById('dmsSlider').value || 45;
+    const email = localStorage.getItem('myheredo_user_email') || "jan.kowalski@example.com";
+    alert(`✅ CERTYFIKAT SUKCESJI\n\nNumer: MH-${Date.now().toString().slice(-8)}\nWłaściciel: ${email}\nDead Man’s Switch: ${dmsDays} dni\n\nSpadkobierców: ${heirs.length}`);
 }
 
 function simulateDeath() {
-    if (heirs.length === 0) return alert("Dodaj spadkobierców");
-    alert("✅ Symulacja Po Śmierci uruchomiona!");
+    if (heirs.length === 0) return alert("Dodaj przynajmniej jednego spadkobiercę.");
+    const days = document.getElementById('dmsSlider').value;
+    let msg = `⚰️ SYMULACJA PO ŚMIERCI\n\n`;
+    msg += `Dead Man’s Switch aktywowany po ${days} dniach.\n\n`;
+    msg += "Dostęp przekazany:\n";
+    heirs.forEach(h => msg += `• ${h.name} (${h.email})\n`);
+    alert(msg);
 }
 
+// ==================== POZOSTAŁE ====================
 function handleLogout() {
     if (confirm("Wylogować się?")) {
         window.location.href = "index.html";
