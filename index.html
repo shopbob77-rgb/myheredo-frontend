@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+
+    <meta charset="UTF-8">
+    ...
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyHeredo • Cyfrowy Sejf Sukcesji</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(180deg, #0a0a0a 0%, #111827 100%);
+            color: #e2e8f0;
+            scroll-behavior: smooth;
+        }
+        section { scroll-margin-top: 100px; }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link.active {
+            color: #fbbf24;
+        }
+        .nav-link.active:after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="MyHeredo" class="h-9 w-auto">
+                <span class="text-2xl font-bold text-amber-400">MyHeredo</span>
+            </div>
+            
+            <div class="flex items-center gap-8 text-sm font-medium">
+                <a href="#jak-dziala" id="link1" class="nav-link active">Jak działa</a>
+                <a href="#bezpieczenstwo" id="link2" class="nav-link">Bezpieczeństwo</a>
+                <a href="#dla-agentow" id="link3" class="nav-link">Dla Agentów</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="login.html" class="px-6 py-3 border border-slate-600 hover:border-slate-400 rounded-2xl">Zaloguj się</a>
+                <a href="register.html" class="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-2xl">Załóż Sejf</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="min-h-screen flex items-center pt-20">
+        <div class="max-w-5xl mx-auto px-6 text-center">
+            <img src="logo.png" alt="MyHeredo" class="h-52 mx-auto mb-10 drop-shadow-2xl">
+            <h1 class="text-6xl md:text-7xl font-bold leading-tight mb-6">
+                Twój cyfrowy majątek.<br>
+                <span class="text-amber-400">Dziedzictwo na pokolenia.</span>
+            </h1>
+            <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-12">
+                Bezpieczny sejf sukcesyjny z Dead Man’s Switch. 
+                Automatycznie przekaż hasła, krypto i konta najbliższym.
+            </p>
+            <a href="register.html" class="inline-block px-10 py-5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold text-lg rounded-3xl">
+                Załóż darmowe konto demo
+            </a>
+        </div>
+    </section>
+
+    <!-- Jak działa -->
+    <section id="jak-dziala" class="py-20 bg-slate-900">
+        <div class="max-w-5xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12">Jak działa MyHeredo?</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-slate-800 rounded-3xl p-8 text-center">
+                    <div class="text-6xl mb-6">🔐</div>
+                    <h3 class="text-2xl font-semibold mb-4">1. Tworzysz Sejf</h3>
+                    <p class="text-slate-400">Dodajesz hasła, klucze kryptowalut, konta bankowe i ważne dokumenty.</p>
+                </div>
+                <div class="bg-slate-800 rounded-3xl p-8 text-center">
+                    <div class="text-6xl mb-6">👥</div>
+                    <h3 class="text-2xl font-semibold mb-4">2. Wyznaczasz Spadkobierców</h3>
+                    <p class="text-slate-400">Wskazujesz zaufane osoby, które mają otrzymać dostęp.</p>
+                </div>
+                <div class="bg-slate-800 rounded-3xl p-8 text-center">
+                    <div class="text-6xl mb-6">⏳</div>
+                    <h3 class="text-2xl font-semibold mb-4">3. Dead Man’s Switch</h3>
+                    <p class="text-slate-400">Ustawiasz czas braku aktywności. System automatycznie przekazuje dostęp.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bezpieczeństwo -->
+    <section id="bezpieczenstwo" class="py-20">
+        <div class="max-w-5xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12">Bezpieczeństwo na najwyższym poziomie</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-slate-800 rounded-3xl p-8">
+                    <div class="text-5xl mb-6">🔒</div>
+                    <h3 class="text-2xl font-semibold mb-4">End-to-End Encryption</h3>
+                    <p class="text-slate-400">Wszystkie dane są szyfrowane bezpośrednio na Twoim urządzeniu.</p>
+                </div>
+                <div class="bg-slate-800 rounded-3xl p-8">
+                    <div class="text-5xl mb-6">🛡️</div>
+                    <h3 class="text-2xl font-semibold mb-4">Zero-Knowledge</h3>
+                    <p class="text-slate-400">Nawet MyHeredo nie ma dostępu do Twoich haseł i kluczy.</p>
+                </div>
+                <div class="bg-slate-800 rounded-3xl p-8">
+                    <div class="text-5xl mb-6">⚡</div>
+                    <h3 class="text-2xl font-semibold mb-4">Dead Man’s Switch</h3>
+                    <p class="text-slate-400">Zaawansowany mechanizm automatycznej sukcesji.</p>
+                </div>
+                <div class="bg-slate-800 rounded-3xl p-8">
+                    <div class="text-5xl mb-6">📜</div>
+                    <h3 class="text-2xl font-semibold mb-4">Certyfikat Sukcesji</h3>
+                    <p class="text-slate-400">Profesjonalny dokument potwierdzający Twoją wolę.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dla Agentów -->
+    <section id="dla-agentow" class="py-20 bg-slate-900">
+        <div class="max-w-5xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12">Dla Agentów Ubezpieczeniowych</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-slate-800 rounded-3xl p-8 text-center">
+                    <div class="text-6xl mb-6">💰</div>
+                    <h3 class="text-2xl font-semibold mb-4">Zwiększ wartość polisy</h3>
+                    <p class="text-slate-400">Oferuj klientom kompleksową ochronę majątku cyfrowego.</p>
+                </div>
+                <div class="bg-slate-800 rounded-3xl p-8 text-center">
+                    <div class="text-6xl mb-6">🤝</div>
+                    <h3 class="text-2xl font-semibold mb-4">Dodatkowe prowizje</h3>
+                    <p class="text-slate-400">Nowy, atrakcyjny produkt do sprzedaży razem z polisą na życie.</p>
+                </div>
+                <div class="bg-slate-800 rounded-3xl p-8 text-center">
+                    <div class="text-6xl mb-6">📈</div>
+                    <h3 class="text-2xl font-semibold mb-4">Wyróżnij się</h3>
+                    <p class="text-slate-400">Bądź jednym z pierwszych agentów oferujących cyfrową sukcesję.</p>
+                </div>
+            </div>
+            <div class="text-center mt-12">
+                <a href="dla-partnerow.html" class="inline-block px-10 py-5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold text-lg rounded-3xl">
+                    Dowiedz się więcej i zacznij współpracę →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STOPKA -->
+    <footer class="bg-black border-t border-slate-800 py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-10">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="logo.png" alt="MyHeredo" class="h-8">
+                        <span class="text-2xl font-bold text-amber-400">MyHeredo</span>
+                    </div>
+                    <p class="text-slate-400 text-sm">
+                        Cyfrowy sejf sukcesyjny z mechanizmem Dead Man’s Switch.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Nawigacja</h4>
+                    <div class="space-y-2 text-sm">
+                        <a href="#jak-dziala" class="block text-slate-400 hover:text-white">Jak działa</a>
+                        <a href="#bezpieczenstwo" class="block text-slate-400 hover:text-white">Bezpieczeństwo</a>
+                        <a href="#dla-agentow" class="block text-slate-400 hover:text-white">Dla Agentów</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Kontakt</h4>
+                    <a href="mailto:kontakt@myheredo.pl" class="flex items-center gap-3 text-slate-400 hover:text-amber-400">
+                        <i class="fas fa-envelope"></i>
+                        kontakt@myheredo.pl
+                    </a>
+                    <p class="text-xs text-slate-500 mt-6">
+                        © 2026 MyHeredo • Wersja Demo
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script>
+    // Aktywne podkreślenie zakładek
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+</script>
+
+</body>
+</html>
