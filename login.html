@@ -2,100 +2,75 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    ...
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyHeredo - Logowanie</title>
+    <title>MyHeredo • Logowanie</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        body {
-            background: linear-gradient(180deg, #0a0a0a 0%, #111827 100%);
-            color: #e2e8f0;
-        }
+        body { background-color: #0a0a0a; color: #e2e8f0; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-
-<div class="max-w-lg w-full">
-
-    <!-- Nagłówek -->
-    <div class="text-center mb-10">
-        <img src="logo.png" alt="MyHeredo" class="h-16 md:h-20 mx-auto mb-6">
-        <h1 class="text-4xl font-bold text-amber-400">MyHeredo</h1>
-        <p class="text-slate-400 mt-2">Zaloguj się do swojego sejfu</p>
-    </div>
-
-    <div class="bg-slate-900 rounded-3xl p-8 md:p-10 border border-slate-700">
+<body class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-950 to-black">
+    <div class="max-w-md w-full bg-slate-900 rounded-3xl p-10 border border-slate-800">
+        
+        <div class="text-center mb-10">
+            <img src="logo.png" alt="MyHeredo" class="h-16 mx-auto mb-4">
+            <h1 class="text-3xl font-bold text-amber-400">MyHeredo</h1>
+            <p class="text-slate-400 mt-2">Zaloguj się do swojego sejfu sukcesyjnego</p>
+        </div>
 
         <div class="space-y-6">
             <div>
-                <label class="block text-sm text-slate-400 mb-2">Adres e-mail</label>
-                <input type="email" id="loginEmail" 
-                       class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-6 py-5 focus:border-amber-400 outline-none text-base"
-                       placeholder="twoj@email.pl">
+                <label class="block text-sm text-slate-400 mb-2">Adres email</label>
+                <input type="email" id="email" 
+                       class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-amber-400"
+                       placeholder="jan.kowalski@email.pl">
             </div>
 
             <div>
-                <label class="block text-sm text-slate-400 mb-2">Hasło główne</label>
-                <input type="password" id="loginPassword" 
-                       class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-6 py-5 focus:border-amber-400 outline-none text-base"
-                       placeholder="Twoje hasło">
+                <label class="block text-sm text-slate-400 mb-2">Hasło główne (Master Password)</label>
+                <input type="password" id="masterPassword" 
+                       class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-amber-400"
+                       placeholder="Twoje główne hasło">
             </div>
 
-            <div class="flex items-center justify-between text-sm">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" class="accent-amber-400">
-                    <span>Zapamiętaj mnie</span>
-                </label>
-                <a href="#" class="text-amber-400 hover:text-amber-300">Zapomniałem hasła</a>
-            </div>
-
-            <button onclick="handleLogin()" 
-                    class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-5 rounded-2xl text-lg transition-all">
+            <button onclick="loginUser()" 
+                    class="w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-semibold py-5 rounded-3xl text-lg hover:brightness-110 transition">
                 Zaloguj się
             </button>
         </div>
 
         <div class="text-center mt-8">
-            <p class="text-slate-400">
-                Nie masz jeszcze konta? 
-                <a href="register.html" class="text-amber-400 hover:text-amber-300 font-medium">Załóż Sejf</a>
-            </p>
+            <a href="register.html" class="text-amber-400 hover:text-amber-300 text-sm">
+                Nie masz jeszcze konta? Zarejestruj się
+            </a>
         </div>
     </div>
 
-</div>
+    <script>
+        function loginUser() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('masterPassword').value.trim();
 
-<script>
-    function handleLogin() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
+            if (!email || !password) {
+                alert("❌ Wypełnij wszystkie pola");
+                return;
+            }
 
-        if (!email || !password) {
-            alert("Wprowadź email i hasło");
-            return;
-        }
-
-        // Sprawdzenie czy konto istnieje (demo)
-        const savedEmail = localStorage.getItem('myheredo_user_email');
-        
-        if (savedEmail && savedEmail.toLowerCase() === email.toLowerCase()) {
+            // Zapis danych logowania
             localStorage.setItem('myheredo_user_email', email);
-            alert("✅ Zalogowano pomyślnie!");
+            sessionStorage.setItem('myheredo_master_password', password);
+
+            alert("✅ Logowanie pomyślne!");
             window.location.href = "dashboard.html";
-        } else {
-            alert("Nie znaleziono konta o podanym emailu.\n\nUżyj konta, które wcześniej zarejestrowałeś.");
         }
-    }
 
-    // Enter klawiszem też loguje
-    document.addEventListener('keydown', function(e) {
-        if (e.key === "Enter") {
-            handleLogin();
-        }
-    });
-</script>
-
+        // Enter na polu hasła też loguje
+        document.getElementById('masterPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginUser();
+            }
+        });
+    </script>
 </body>
 </html>
