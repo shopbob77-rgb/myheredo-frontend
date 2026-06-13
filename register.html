@@ -10,28 +10,28 @@
         body { background-color: #0a0a0a; color: #e2e8f0; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-950 to-black">
-    <div class="max-w-md w-full bg-slate-900 rounded-3xl p-10 border border-slate-800">
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-slate-950 to-black">
+    <div class="max-w-md w-full bg-slate-900 rounded-3xl p-6 sm:p-10 border border-slate-800">
         
         <div class="text-center mb-8">
-            <img src="logo.png" alt="MyHeredo" class="h-16 mx-auto mb-4">
+            <img src="logo.png" alt="MyHeredo" class="h-14 sm:h-16 mx-auto mb-4">
             <h1 class="text-3xl font-bold text-amber-400">MyHeredo</h1>
             <p class="text-slate-400 mt-1">Tworzenie konta — Krok 2 z 2</p>
         </div>
 
-        <div class="bg-slate-800 rounded-3xl p-8">
-            <p class="text-center text-slate-400 mb-6">Zabezpiecz konto dwuskładnikowym uwierzytelnianiem (2FA)</p>
+        <div class="bg-slate-800 rounded-3xl p-6 sm:p-8">
+            <p class="text-center text-slate-400 mb-6 text-sm sm:text-base">Zabezpiecz konto dwuskładnikowym uwierzytelnianiem (2FA)</p>
             
-            <!-- QR Code - duże miejsce -->
-            <div class="bg-slate-900 rounded-2xl p-8 text-center mb-8">
+            <!-- QR Code -->
+            <div class="bg-slate-900 rounded-2xl p-6 sm:p-8 text-center mb-8">
                 <p class="text-sm text-slate-400 mb-5">Zeskanuj kod QR w aplikacji Authenticator</p>
-                <div id="qrcode" class="mx-auto bg-white p-6 inline-block rounded-2xl shadow-inner"></div>
+                <div id="qrcode" class="mx-auto bg-white p-4 sm:p-6 inline-block rounded-2xl"></div>
             </div>
 
             <!-- Backup Code -->
             <div class="mb-8">
                 <p class="text-sm text-slate-400 mb-3">Kod backup (do ręcznego wpisania):</p>
-                <div id="backupCode" class="bg-slate-950 border border-slate-700 rounded-2xl p-5 font-mono text-lg tracking-widest text-center mb-4">
+                <div id="backupCode" class="bg-slate-950 border border-slate-700 rounded-2xl p-5 font-mono text-base sm:text-lg tracking-widest text-center mb-4">
                     GENEROWANIE...
                 </div>
                 <button onclick="copyBackupCode()" 
@@ -55,7 +55,6 @@
         </div>
     </div>
 
-    <!-- Nowsza, bardziej stabilna biblioteka -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         let backupCode = "";
@@ -67,23 +66,21 @@
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
 
-            // Nowa biblioteka + opóźnienie
             setTimeout(() => {
                 new QRCode(qrContainer, {
                     text: "otpauth://totp/MyHeredo:user@myheredo.pl?secret=J7K9M4P2Q8X5R3T6W9V1L2B8&issuer=MyHeredo",
-                    width: 260,
-                    height: 260,
+                    width: 240,
+                    height: 240,
                     colorDark: "#111827",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
+                    colorLight: "#ffffff"
                 });
-            }, 200);
+            }, 150);
         }
 
         function copyBackupCode() {
             const clean = backupCode.replace(/-/g, '');
             navigator.clipboard.writeText(clean).then(() => {
-                alert("✅ Kod backup skopiowany do schowka!");
+                alert("✅ Kod backup skopiowany!");
             });
         }
 
@@ -100,5 +97,4 @@
         window.onload = generate2FA;
     </script>
 </body>
-</html>
 </html>
