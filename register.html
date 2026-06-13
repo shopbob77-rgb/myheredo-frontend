@@ -8,13 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         body { background-color: #0a0a0a; color: #e2e8f0; }
-        .step { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-950 to-black">
-    <div class="max-w-md w-full bg-slate-900 rounded-3xl p-10 border border-slate-800 shadow-2xl">
+    <div class="max-w-md w-full bg-slate-900 rounded-3xl p-10 border border-slate-800">
         
-        <!-- Nagłówek -->
         <div class="text-center mb-8">
             <div class="flex justify-center mb-4">
                 <span class="text-5xl">👑</span>
@@ -23,96 +21,82 @@
             <p class="text-slate-400 mt-2">Tworzenie konta — Krok 2 z 2</p>
         </div>
 
-        <div class="bg-slate-800/50 rounded-2xl p-8 mb-8">
+        <div class="bg-slate-800 rounded-2xl p-8">
             <p class="text-center text-slate-400 mb-6">Zabezpiecz konto dwuskładnikowym uwierzytelnianiem (2FA)</p>
             
             <!-- QR Code -->
-            <div class="bg-slate-900 rounded-2xl p-6 text-center">
+            <div class="bg-slate-900 rounded-2xl p-6 text-center mb-8">
                 <p class="text-sm text-slate-400 mb-4">Zeskanuj kod QR w aplikacji Authenticator</p>
-                <div id="qrcode" class="mx-auto bg-white p-4 inline-block rounded-2xl"></div>
+                <div id="qrcode" class="mx-auto bg-white p-4 inline-block rounded-xl"></div>
             </div>
 
             <!-- Backup Code -->
-            <div class="mt-8">
-                <div class="flex justify-between items-center mb-3">
-                    <p class="text-sm text-slate-400">Kod backup (do ręcznego wpisania):</p>
-                </div>
-                <div id="backupCode" 
-                     class="bg-slate-950 border border-slate-700 rounded-2xl p-6 font-mono text-xl tracking-[4px] text-center select-all cursor-pointer hover:border-amber-400 transition">
+            <div class="mb-8">
+                <p class="text-sm text-slate-400 mb-3">Kod backup (do ręcznego wpisania):</p>
+                <div id="backupCode" class="bg-slate-950 border border-slate-700 rounded-2xl p-6 font-mono text-xl tracking-widest text-center">
                     GENEROWANIE...
                 </div>
                 <button onclick="copyBackupCode()" 
-                        class="mt-4 w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 transition">
-                    <i class="fas fa-copy"></i>
-                    Kopiuj kod backup
+                        class="mt-4 w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-4 rounded-2xl flex items-center justify-center gap-2">
+                    <i class="fas fa-copy"></i> Kopiuj kod backup
                 </button>
             </div>
-        </div>
 
-        <!-- Weryfikacja kodu -->
-        <div class="space-y-6">
+            <!-- Weryfikacja -->
             <div>
-                <label class="block text-sm text-slate-400 mb-2">Wprowadź kod z aplikacji Authenticator</label>
-                <input type="text" id="verificationCode" 
+                <label class="block text-sm text-slate-400 mb-2">Wprowadź kod z aplikacji (6 cyfr)</label>
+                <input type="text" id="verificationCode" maxlength="6" 
                        class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-6 py-5 text-center text-3xl tracking-widest focus:outline-none focus:border-amber-400"
-                       maxlength="6" placeholder="123456" autocomplete="off">
+                       placeholder="123456">
             </div>
 
             <button onclick="verifyCode()" 
-                    class="w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-semibold py-5 rounded-3xl text-lg hover:brightness-110 transition">
+                    class="mt-6 w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-semibold py-5 rounded-3xl text-lg">
                 Zweryfikuj kod i utwórz konto
             </button>
         </div>
-
-        <p class="text-center text-xs text-slate-500 mt-8">
-            Kod backup jest jednorazowy. Zachowaj go w bezpiecznym miejscu.
-        </p>
     </div>
 
+    <!-- Biblioteka QR Code -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
     <script>
         let backupCode = "";
 
         function generate2FA() {
-            // Symulowany sekret (w produkcji losowy 32-znakowy)
             backupCode = "J7K9-M4P2-Q8X5-R3T6-W9V1-L2B8";
             document.getElementById('backupCode').textContent = backupCode;
 
-            // QR Code
+            // Generowanie QR Code
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
+            
             new QRCode(qrContainer, {
                 text: "otpauth://totp/MyHeredo:user@myheredo.pl?secret=J7K9M4P2Q8X5R3T6W9V1L2B8&issuer=MyHeredo",
-                width: 240,
-                height: 240,
-                colorDark: "#0f172a",
+                width: 220,
+                height: 220,
+                colorDark: "#111827",
                 colorLight: "#ffffff"
             });
         }
 
         function copyBackupCode() {
-            if (!backupCode) return;
-            const cleanCode = backupCode.replace(/-/g, '');
-            navigator.clipboard.writeText(cleanCode).then(() => {
-                const btn = document.querySelector('button[onclick="copyBackupCode()"]');
-                const original = btn.innerHTML;
-                btn.innerHTML = `<i class="fas fa-check"></i> Skopiowano do schowka!`;
-                setTimeout(() => btn.innerHTML = original, 2500);
+            const clean = backupCode.replace(/-/g, '');
+            navigator.clipboard.writeText(clean).then(() => {
+                alert("✅ Kod backup skopiowany do schowka!");
             });
         }
 
         function verifyCode() {
             const code = document.getElementById('verificationCode').value.trim();
-            if (code.length === 6 && !isNaN(code)) {
-                alert("✅ Konto zostało pomyślnie utworzone!\n\n2FA zostało włączone.");
-                // Przekierowanie na login
-                setTimeout(() => window.location.href = "login.html", 1500);
+            if (code === "123456") {
+                alert("✅ Konto zostało pomyślnie utworzone!");
+                setTimeout(() => window.location.href = "login.html", 1000);
             } else {
-                alert("❌ Wprowadź poprawny 6-cyfrowy kod z aplikacji.");
+                alert("❌ Niepoprawny kod. W trybie demo użyj kodu: 123456");
             }
         }
 
-        // Start
+        // Uruchomienie
         window.onload = generate2FA;
     </script>
 </body>
