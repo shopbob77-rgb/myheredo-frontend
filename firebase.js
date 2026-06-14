@@ -4,16 +4,16 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebas
 
 // ==================== TWOJA KONFIGURACJA ====================
 const firebaseConfig = {
-    apiKey: "PASTE_YOUR_API_KEY_HERE",
-    authDomain: "myheredo.firebaseapp.com",   // zmień jeśli inne
+    apiKey: "wpisz_tutaj_api_key",
+    authDomain: "myheredo.firebaseapp.com",
     projectId: "myheredo",
     storageBucket: "myheredo.appspot.com",
-    messagingSenderId: "XXXXXXXXXXXX",
-    appId: "1:XXXXXXXXXXXX:web:XXXXXXXXXXXXXXXX"
+    messagingSenderId: "wpisz_messaging_sender_id",
+    appId: "wpisz_app_id"
 };
 // =========================================================
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-console.log("✅ Firebase MyHeredo initialized");
+console.log("✅ Firebase MyHeredo połączony pomyślnie");
