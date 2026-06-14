@@ -2,7 +2,10 @@
 // MYHEREDO - Hybrydowa Warstwa Sukcesyjna
 // Pełna wersja z E2EE + Certyfikatem Sukcesji
 // =============================================
-
+// ==================== FIREBASE ====================
+import { db } from './firebase.js';
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+// =================================================
 let masterPassword = null;
 let vaultData = {};
 let categoryNames = {};
@@ -286,74 +289,44 @@ function setupDMS() {
 }
 
 // ==================== CERTYFIKAT SUKCESJI ====================
-function showCertificate() {
+async function showCertificate() {
     if (!masterPassword) {
-        alert("Aby wygenerować certyfikat, wymagane jest ponowne wprowadzenie hasła master.");
+        alert("Aby wygenerować certyfikat, wymagane jest hasło master.");
         return;
     }
 
-    const email = localStorage.getItem('myheredo_user_email') || "jan.kowalski@example.com";
-    const currentDate = new Date().toLocaleDateString('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' });
+    const userEmail = localStorage.getItem('myheredo_user_email');
+    if (!userEmail) {
+        alert("Brak zalogowanego użytkownika");
+        return;
+    }
 
-    const certificateHTML = `
-    <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4 overflow-auto">
-        <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none">
-            <div class="bg-gradient-to-br from-slate-900 to-black text-white p-12 text-center border-b-4 border-amber-400">
-                <img src="logo.png" alt="MyHeredo" class="h-28 mx-auto mb-6">
-                <h1 class="text-5xl font-bold tracking-tight">CERTYFIKAT SUKCESJI</h1>
-                <p class="text-amber-400 mt-3 text-xl">MyHeredo • Cyfrowa Warstwa Sukcesyjna</p>
-                <p class="text-sm text-slate-400 mt-6">Numer: MS-${Date.now().toString().slice(-8)}</p>
-            </div>
+    const certificateData = {
+        ownerEmail: userEmail,
+        createdAt: serverTimestamp(),
+        dmsDays: parseInt(document.getElementById('dmsSlider')?.value || 45),
+        heirs: heirs,
+        vaults: Object.keys(vaultData).map(key => ({
+            category: categoryNames[key] || key,
+            preview: vaultData[key] ? vaultData[key].substring(0, 250) + "..." : ""
+        })),
+        status: "generated",
+        version: Date.now()
+    };
 
-            <div class="p-12 space-y-12">
-                <div class="text-center border-b pb-8">
-                    <p class="text-sm uppercase tracking-widest text-slate-500">Właściciel cyfrowego majątku</p>
-                    <p class="text-3xl font-semibold mt-3">${email}</p>
-                    <p class="text-slate-600 mt-1">Data wygenerowania: ${currentDate}</p>
-                </div>
+    try {
+        const docRef = await addDoc(collection(db, "certificates"), certificateData);
+        
+        console.log("Certyfikat zapisany w Firebase! ID:", docRef.id);
+        alert(`✅ Certyfikat został zapisany w bazie!\nID: ${docRef.id}`);
 
-                <div>
-                    <h2 class="text-2xl font-semibold mb-8 flex items-center gap-3">
-                        <span class="text-3xl">📦</span> Aktywa Cyfrowe i Instrukcje Sukcesyjne
-                    </h2>
-                    <div class="space-y-8" id="certVaults"></div>
-                </div>
+        renderCertificateOverlay(certificateData, docRef.id);
 
-                <div>
-                    <h2 class="text-2xl font-semibold mb-8 flex items-center gap-3">
-                        <span class="text-3xl">👥</span> Zaufani Spadkobiercy
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="certHeirs"></div>
-                </div>
-
-                <div class="bg-amber-50 border border-amber-200 p-8 rounded-3xl">
-                    <h3 class="font-semibold text-xl mb-4">Dead Man’s Switch</h3>
-                    <p class="text-slate-700">
-                        Ten certyfikat aktywuje się automatycznie po <strong>${document.getElementById('dmsSlider')?.value || '45'} dniach</strong> braku aktywności właściciela.
-                    </p>
-                </div>
-            </div>
-
-            <div class="bg-slate-100 p-10 text-center text-xs text-slate-500 border-t">
-                <p class="mb-3">Niniejszy dokument stanowi instrukcję sukcesyjną przygotowaną w systemie MyHeredo.</p>
-                <p class="text-[10px]">• Wersja demonstracyjna • Nie stanowi dokumentu prawnego • Tylko do celów prezentacyjnych</p>
-            </div>
-
-            <div class="flex border-t divide-x">
-                <button onclick="printCertificate()" class="flex-1 py-7 bg-slate-900 text-white font-semibold text-lg hover:bg-black transition-all">
-                    🖨️ Drukuj / Zapisz jako PDF
-                </button>
-                <button onclick="closeCertificate()" class="flex-1 py-7 font-semibold text-lg hover:bg-slate-100 transition-all">
-                    Zamknij
-                </button>
-            </div>
-        </div>
-    </div>`;
-
-    document.body.insertAdjacentHTML('beforeend', certificateHTML);
-    renderCertificateContent();
+    } catch (error) {
+        console.error("Błąd zapisu:", error);
+        alert("Nie udało się zapisać certyfikatu do Firebase.");
+    }
 }
-
 function renderCertificateContent() {
     const vaultsContainer = document.getElementById('certVaults');
     if (vaultsContainer) {
