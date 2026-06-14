@@ -6,6 +6,22 @@
 import { db } from './firebase.js';
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 // =================================================
+// Dodaj to zaraz po importach Firebase
+let masterPassword = null;
+let vaultData = {};
+let categoryNames = {};
+let heirs = [];
+let customIcons = {};
+let dmsConfig = { days: 45, lastActivity: Date.now(), isActive: false };
+let inactivityTimer = null;
+
+const defaultCategories = {
+    passwordManager: "Password Manager (Vaultwarden itp.)",
+    banki: "Konta Bankowe i Finansowe",
+    krypto: "Kryptowaluty i Portfele",
+    social: "Konta Cyfrowe i Social Media",
+    instrukcje: "Instrukcje Sukcesyjne"
+};
 let masterPassword = null;
 let vaultData = {};
 let categoryNames = {};
@@ -38,22 +54,35 @@ async function initDashboard() {
     }
 
     document.getElementById('userEmail').textContent = email;
-
     masterPassword = sessionStorage.getItem('myheredo_master_password');
 
+    // === ŁADOWANIE ZASZYFROWANYCH DANYCH ===
     const savedEncryptedVault = localStorage.getItem('myheredo_encrypted_vault');
     
     if (savedEncryptedVault && masterPassword) {
         try {
             vaultData = await decryptData(savedEncryptedVault, masterPassword);
         } catch (e) {
-            console.warn("Nie udało się odszyfrować danych - zaczynamy z pustymi skrytkami");
+            console.warn("Nie udało się odszyfrować danych - rozpoczynamy z pustymi skrytkami");
             vaultData = {};
         }
     } else {
         vaultData = {};
     }
 
+    // === INICJALIZACJA DOMYŚLNYCH SKRYTEK (ważne!) ===
+    if (Object.keys(vaultData).length === 0) {
+        vaultData = {
+            passwordManager: "",
+            banki: "",
+            krypto: "",
+            social: "",
+            instrukcje: ""
+        };
+        categoryNames = { ...defaultCategories };
+    }
+
+    // Ładowanie reszty danych
     const savedHeirs = localStorage.getItem('myheredo_heirs');
     const savedIcons = localStorage.getItem('myheredo_custom_icons');
     const savedDMS = localStorage.getItem('myheredo_dms_config');
