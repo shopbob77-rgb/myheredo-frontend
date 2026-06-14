@@ -2,26 +2,12 @@
 // MYHEREDO - Hybrydowa Warstwa Sukcesyjna
 // Pełna wersja z E2EE + Certyfikatem Sukcesji
 // =============================================
+
 // ==================== FIREBASE ====================
 import { db } from './firebase.js';
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 // =================================================
-// Dodaj to zaraz po importach Firebase
-let masterPassword = null;
-let vaultData = {};
-let categoryNames = {};
-let heirs = [];
-let customIcons = {};
-let dmsConfig = { days: 45, lastActivity: Date.now(), isActive: false };
-let inactivityTimer = null;
 
-const defaultCategories = {
-    passwordManager: "Password Manager (Vaultwarden itp.)",
-    banki: "Konta Bankowe i Finansowe",
-    krypto: "Kryptowaluty i Portfele",
-    social: "Konta Cyfrowe i Social Media",
-    instrukcje: "Instrukcje Sukcesyjne"
-};
 let masterPassword = null;
 let vaultData = {};
 let categoryNames = {};
@@ -46,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('mousemove', resetInactivityTimer);
 document.addEventListener('keypress', resetInactivityTimer);
 
+// ==================== INIT DASHBOARD ====================
 async function initDashboard() {
     const email = localStorage.getItem('myheredo_user_email');
     if (!email) {
@@ -56,21 +43,21 @@ async function initDashboard() {
     document.getElementById('userEmail').textContent = email;
     masterPassword = sessionStorage.getItem('myheredo_master_password');
 
-    // === ŁADOWANIE ZASZYFROWANYCH DANYCH ===
+    // Ładowanie zaszyfrowanych danych
     const savedEncryptedVault = localStorage.getItem('myheredo_encrypted_vault');
     
     if (savedEncryptedVault && masterPassword) {
         try {
             vaultData = await decryptData(savedEncryptedVault, masterPassword);
         } catch (e) {
-            console.warn("Nie udało się odszyfrować danych - rozpoczynamy z pustymi skrytkami");
+            console.warn("Nie udało się odszyfrować - zaczynamy z pustymi skrytkami");
             vaultData = {};
         }
     } else {
         vaultData = {};
     }
 
-    // === INICJALIZACJA DOMYŚLNYCH SKRYTEK (ważne!) ===
+    // === KLUCZOWE: Inicjalizacja domyślnych skrytek ===
     if (Object.keys(vaultData).length === 0) {
         vaultData = {
             passwordManager: "",
@@ -82,7 +69,7 @@ async function initDashboard() {
         categoryNames = { ...defaultCategories };
     }
 
-    // Ładowanie reszty danych
+    // Ładowanie pozostałych danych
     const savedHeirs = localStorage.getItem('myheredo_heirs');
     const savedIcons = localStorage.getItem('myheredo_custom_icons');
     const savedDMS = localStorage.getItem('myheredo_dms_config');
