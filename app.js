@@ -1,18 +1,21 @@
 // =============================================
-// MYHEREDO - Pełna Profesjonalna Wersja z E2EE
+// MYHEREDO - Faza 1: Hybrydowa Warstwa Sukcesyjna
 // =============================================
 
 let masterPassword = null;
-let vaultData = {
-    banki: "",
-    krypto: ""
-};
-let categoryNames = {
-    banki: "Banki & Finanse",
-    krypto: "Kryptowaluty"
-};
+let vaultData = {};
+let categoryNames = {};
 let heirs = [];
 let customIcons = {};
+let dmsConfig = { days: 45, lastActivity: Date.now(), isActive: false };
+
+const defaultCategories = {
+    passwordManager: "Password Manager (Vaultwarden itp.)",
+    banki: "Konta Bankowe i Finansowe",
+    krypto: "Kryptowaluty i Portfele",
+    social: "Konta Cyfrowe i Social Media",
+    instrukcje: "Instrukcje Sukcesyjne"
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
@@ -29,28 +32,34 @@ async function initDashboard() {
 
     masterPassword = sessionStorage.getItem('myheredo_master_password');
 
+    // Inicjalizacja domyślnych skrytek
+    if (Object.keys(vaultData).length === 0) {
+        vaultData = {
+            passwordManager: "",
+            banki: "",
+            krypto: "",
+            social: "",
+            instrukcje: ""
+        };
+        categoryNames = { ...defaultCategories };
+    }
+
     const savedEncryptedVault = localStorage.getItem('myheredo_encrypted_vault');
     const savedHeirs = localStorage.getItem('myheredo_heirs');
     const savedIcons = localStorage.getItem('myheredo_custom_icons');
+    const savedDMS = localStorage.getItem('myheredo_dms_config');
 
     if (savedEncryptedVault && masterPassword) {
         try {
             vaultData = await decryptData(savedEncryptedVault, masterPassword);
         } catch (e) {
             console.error("Błąd deszyfracji:", e);
-            alert("Nie udało się odszyfrować danych. Zaloguj się ponownie.");
-            sessionStorage.clear();
-            window.location.href = "login.html";
-            return;
         }
-    } else if (savedEncryptedVault) {
-        alert("Sesja wygasła. Wpisz hasło główne ponownie.");
-        window.location.href = "login.html";
-        return;
     }
 
     if (savedHeirs) heirs = JSON.parse(savedHeirs);
     if (savedIcons) customIcons = JSON.parse(savedIcons);
+    if (savedDMS) dmsConfig = JSON.parse(savedDMS);
 
     renderSkrytki();
     renderHeirs();
@@ -60,9 +69,7 @@ async function initDashboard() {
 // ==================== SZYFROWANIE E2EE ====================
 async function deriveKey(password, salt) {
     const encoder = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey(
-        "raw", encoder.encode(password), "PBKDF2", false, ["deriveBits", "deriveKey"]
-    );
+    const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits", "deriveKey"]);
     return crypto.subtle.deriveKey(
         { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
         keyMaterial,
@@ -77,11 +84,7 @@ async function encryptData(data, password) {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const key = await deriveKey(password, salt);
     const encoder = new TextEncoder();
-    const encrypted = await crypto.subtle.encrypt(
-        { name: "AES-GCM", iv: iv },
-        key,
-        encoder.encode(JSON.stringify(data))
-    );
+    const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoder.encode(JSON.stringify(data)));
     const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
     combined.set(salt, 0);
     combined.set(iv, salt.length);
@@ -95,22 +98,14 @@ async function decryptData(encryptedData, password) {
     const iv = combined.slice(16, 28);
     const ciphertext = combined.slice(28);
     const key = await deriveKey(password, salt);
-    const decrypted = await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv: iv },
-        key,
-        ciphertext
-    );
+    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
     return JSON.parse(new TextDecoder().decode(decrypted));
 }
 
 async function saveAllData() {
     if (!masterPassword) return;
-    try {
-        const encrypted = await encryptData(vaultData, masterPassword);
-        localStorage.setItem('myheredo_encrypted_vault', encrypted);
-    } catch (e) {
-        console.error("Błąd szyfrowania:", e);
-    }
+    const encrypted = await encryptData(vaultData, masterPassword);
+    localStorage.setItem('myheredo_encrypted_vault', encrypted);
 }
 
 // ==================== SKRYTKI ====================
@@ -120,7 +115,7 @@ function renderSkrytki() {
 
     Object.keys(vaultData).forEach((key) => {
         const isFilled = vaultData[key] && vaultData[key].trim() !== '';
-        const isCustom = !['banki', 'krypto'].includes(key);
+        const isCustom = !Object.keys(defaultCategories).includes(key);
 
         const card = document.createElement('div');
         card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} rounded-3xl p-6 cursor-pointer relative`;
@@ -131,7 +126,7 @@ function renderSkrytki() {
                 <div class="flex-1 min-w-0">
                     <h3 class="font-semibold text-lg truncate">${categoryNames[key] || key}</h3>
                     <p class="text-sm ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
-                        ${isFilled ? '✓ Zaszyfrowane' : 'Skrytka pusta'}
+                        ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
                     </p>
                 </div>
             </div>
@@ -145,9 +140,14 @@ function renderSkrytki() {
 
 function getIcon(key) {
     if (customIcons[key]) return customIcons[key];
-    if (key === 'banki') return '🏦';
-    if (key === 'krypto') return '₿';
-    return '📁';
+    const icons = {
+        passwordManager: "🔑",
+        banki: "🏦",
+        krypto: "₿",
+        social: "📱",
+        instrukcje: "📜"
+    };
+    return icons[key] || "📁";
 }
 
 function openVaultModal(key) {
@@ -187,7 +187,7 @@ function addCustomVault() {
     const key = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
     if (vaultData[key]) return alert("Taka skrytka już istnieje.");
 
-    const icons = ["🪙", "💎"];
+    const icons = ["🪙", "💎", "📄"];
     customIcons[key] = icons[Math.floor(Math.random() * icons.length)];
 
     vaultData[key] = "";
@@ -247,7 +247,11 @@ function setupDMS() {
     const slider = document.getElementById('dmsSlider');
     const value = document.getElementById('dmsValue');
     if (slider && value) {
-        slider.addEventListener('input', () => value.textContent = slider.value + " dni");
+        slider.addEventListener('input', () => {
+            value.textContent = slider.value + " dni";
+            dmsConfig.days = parseInt(slider.value);
+            localStorage.setItem('myheredo_dms_config', JSON.stringify(dmsConfig));
+        });
     }
 }
 
@@ -258,24 +262,25 @@ function showCertificate() {
 
     const certificateHTML = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] p-6 overflow-auto">
-        <div class="max-w-3xl w-full bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden">
-            <div class="bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 p-10 text-center">
-                <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-4">
-                <h1 class="text-4xl font-bold">CERTYFIKAT SUKCESJI</h1>
-                <p class="text-xl mt-2 opacity-90">MyHeredo • Cyfrowy Sejf Sukcesyjny</p>
+        <div class="max-w-4xl w-full bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 p-12 text-center">
+                <img src="logo.png" alt="MyHeredo" class="h-24 mx-auto mb-6">
+                <h1 class="text-5xl font-bold">CERTYFIKAT SUKCESJI</h1>
+                <p class="text-2xl mt-3 opacity-90">MyHeredo • Cyfrowy Sejf Sukcesyjny</p>
             </div>
-            <div class="p-10 space-y-8">
-                <div class="grid grid-cols-2 gap-6 text-sm">
+            <div class="p-12 space-y-10">
+                <div class="grid grid-cols-2 gap-8 text-lg">
                     <div><strong>Właściciel:</strong><br>${userEmail}</div>
-                    <div><strong>Data wystawienia:</strong><br>${new Date().toLocaleDateString('pl-PL')}</div>
+                    <div><strong>Data:</strong><br>${new Date().toLocaleDateString('pl-PL')}</div>
                     <div><strong>Dead Man’s Switch:</strong><br>${dmsDays} dni</div>
-                    <div><strong>Numer certyfikatu:</strong><br>MH-${Date.now().toString().slice(-8)}</div>
+                    <div><strong>Numer:</strong><br>MH-${Date.now().toString().slice(-8)}</div>
                 </div>
+
                 <div>
-                    <h3 class="font-semibold text-lg mb-4 border-b pb-2">Zawartość Sejfu</h3>
+                    <h3 class="font-semibold text-2xl mb-5">Zawartość Sejfu</h3>
                     <div class="space-y-4">
                         ${Object.keys(vaultData).map(key => `
-                            <div class="flex justify-between bg-slate-50 p-4 rounded-2xl">
+                            <div class="flex justify-between bg-slate-100 p-6 rounded-2xl">
                                 <div class="font-medium">${categoryNames[key] || key}</div>
                                 <div class="${vaultData[key] ? 'text-emerald-600' : 'text-slate-400'}">
                                     ${vaultData[key] ? '✓ Zawiera dane' : 'Pusta'}
@@ -284,12 +289,13 @@ function showCertificate() {
                         `).join('')}
                     </div>
                 </div>
+
                 <div>
-                    <h3 class="font-semibold text-lg mb-4 border-b pb-2">Zaufani Spadkobiercy</h3>
+                    <h3 class="font-semibold text-2xl mb-5">Zaufani Spadkobiercy</h3>
                     ${heirs.length ? 
-                        `<div class="grid gap-3">` + 
+                        `<div class="grid gap-4">` + 
                         heirs.map(h => `
-                            <div class="flex justify-between bg-slate-50 p-4 rounded-2xl">
+                            <div class="flex justify-between bg-slate-100 p-6 rounded-2xl">
                                 <div><strong>${h.name}</strong></div>
                                 <div class="text-slate-600">${h.email}</div>
                             </div>
@@ -297,9 +303,10 @@ function showCertificate() {
                         `<p class="text-slate-500 italic">Brak spadkobierców</p>`}
                 </div>
             </div>
-            <div class="border-t p-8 flex gap-4 bg-slate-50">
-                <button onclick="printCertificate()" class="flex-1 bg-slate-900 text-white py-5 rounded-2xl font-semibold hover:bg-black transition">🖨️ Drukuj / Zapisz jako PDF</button>
-                <button onclick="closeCertificate()" class="flex-1 border border-slate-300 py-5 rounded-2xl font-semibold">Zamknij</button>
+
+            <div class="border-t p-10 flex gap-6 bg-slate-50">
+                <button onclick="printCertificate()" class="flex-1 bg-slate-900 text-white py-6 rounded-2xl font-semibold text-xl hover:bg-black transition">🖨️ Drukuj / Zapisz PDF</button>
+                <button onclick="closeCertificate()" class="flex-1 border border-slate-400 py-6 rounded-2xl font-semibold text-xl">Zamknij</button>
             </div>
         </div>
     </div>`;
@@ -316,18 +323,17 @@ function printCertificate() {
     window.print();
 }
 
-// ==================== SYMULACJA ====================
+// ==================== POZOSTAŁE ====================
 function simulateDeath() {
     if (heirs.length === 0) return alert("Dodaj przynajmniej jednego spadkobiercę.");
     const days = document.getElementById('dmsSlider').value;
     let msg = `⚰️ SYMULACJA PO ŚMIERCI\n\n`;
     msg += `Dead Man’s Switch aktywowany po ${days} dniach.\n\n`;
-    msg += "Pełny dostęp do sejfu otrzymują:\n\n";
+    msg += "Dostęp przekazany:\n";
     heirs.forEach(h => msg += `• ${h.name} (${h.email})\n`);
     alert(msg);
 }
 
-// ==================== POZOSTAŁE ====================
 function handleLogout() {
     if (confirm("Wylogować się z MyHeredo?")) {
         sessionStorage.clear();
@@ -343,8 +349,11 @@ function loadDemoData() {
     if (!confirm("Wczytać przykładowe dane demonstracyjne?")) return;
 
     vaultData = {
+        passwordManager: "URL: https://vaultwarden.twojadomena.pl\nLogin: jan.kowalski\nMaster Password: BardzoSilneHaslo123!",
         banki: "ING Bank Śląski\nLogin: jan.kowalski\nHasło: SuperTajne123!",
-        krypto: "Bitcoin Seed:\nwitch blossom aunt accuse black dress purse glass"
+        krypto: "Bitcoin Seed:\nwitch blossom aunt accuse black dress purse glass",
+        social: "Gmail: jan.kowalski@gmail.com\nHasło: Gmail2026!",
+        instrukcje: "1. Sprawdź Dead Man’s Switch\n2. Skontaktuj się z notariuszem\n3. Użyj certyfikatu sukcesji"
     };
 
     saveAllData();
