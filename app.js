@@ -38,33 +38,20 @@ async function initDashboard() {
     }
 
     document.getElementById('userEmail').textContent = email;
+
     masterPassword = sessionStorage.getItem('myheredo_master_password');
 
-    if (!masterPassword) {
-        alert("Sesja wygasła. Zaloguj się ponownie.");
-        window.location.href = "login.html";
-        return;
-    }
-
-    // Domyślne skrytki
-    if (Object.keys(vaultData).length === 0) {
-        vaultData = {
-            passwordManager: "",
-            banki: "",
-            krypto: "",
-            social: "",
-            instrukcje: ""
-        };
-        categoryNames = { ...defaultCategories };
-    }
-
     const savedEncryptedVault = localStorage.getItem('myheredo_encrypted_vault');
-    if (savedEncryptedVault) {
+    
+    if (savedEncryptedVault && masterPassword) {
         try {
             vaultData = await decryptData(savedEncryptedVault, masterPassword);
         } catch (e) {
-            console.error("Błąd deszyfracji:", e);
+            console.warn("Nie udało się odszyfrować danych - zaczynamy z pustymi skrytkami");
+            vaultData = {};
         }
+    } else {
+        vaultData = {};
     }
 
     const savedHeirs = localStorage.getItem('myheredo_heirs');
