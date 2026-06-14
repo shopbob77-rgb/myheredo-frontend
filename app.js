@@ -3,10 +3,27 @@
 // Pełna wersja z E2EE + Certyfikatem Sukcesji
 // =============================================
 
-// ==================== FIREBASE ====================
-import { db } from './firebase.js';
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-// =================================================
+// ==================== FIREBASE (wersja bez import) ====================
+const firebaseScript = document.createElement('script');
+firebaseScript.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js";
+document.head.appendChild(firebaseScript);
+
+const firestoreScript = document.createElement('script');
+firestoreScript.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js";
+document.head.appendChild(firestoreScript);
+
+// Czekamy na załadowanie Firebase
+let db;
+async function initFirebase() {
+    if (typeof firebase === "undefined") {
+        console.warn("Firebase jeszcze się ładuje...");
+        return;
+    }
+    // Tutaj wkleisz swoją konfigurację później
+    console.log("Firebase loaded via compat");
+}
+
+// =============================================
 
 let masterPassword = null;
 let vaultData = {};
