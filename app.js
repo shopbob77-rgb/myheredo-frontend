@@ -4,24 +4,43 @@
 // =============================================
 
 // ==================== FIREBASE (wersja bez import) ====================
-const firebaseScript = document.createElement('script');
-firebaseScript.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js";
-document.head.appendChild(firebaseScript);
+// =============================================
+// MYHEREDO - Hybrydowa Warstwa Sukcesyjna
+// =============================================
 
-const firestoreScript = document.createElement('script');
-firestoreScript.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js";
-document.head.appendChild(firestoreScript);
+// ==================== FIREBASE (Compat) ====================
+let db = null;
 
-// Czekamy na załadowanie Firebase
-let db;
-async function initFirebase() {
-    if (typeof firebase === "undefined") {
-        console.warn("Firebase jeszcze się ładuje...");
-        return;
-    }
-    // Tutaj wkleisz swoją konfigurację później
-    console.log("Firebase loaded via compat");
+function initializeFirebase() {
+    const config = {
+        apiKey: "wpisz_tutaj_api_key",
+        authDomain: "myheredo.firebaseapp.com",
+        projectId: "myheredo",
+        storageBucket: "myheredo.appspot.com",
+        messagingSenderId: "wpisz_sender_id",
+        appId: "wpisz_app_id"
+    };
+
+    firebase.initializeApp(config);
+    db = firebase.firestore();
+    console.log("✅ Firebase został pomyślnie zainicjowany");
 }
+
+// Ładujemy Firebase
+const script1 = document.createElement('script');
+script1.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js";
+document.head.appendChild(script1);
+
+script1.onload = () => {
+    const script2 = document.createElement('script');
+    script2.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js";
+    document.head.appendChild(script2);
+    
+    script2.onload = () => {
+        initializeFirebase();
+    };
+};
+// =======================================================
 
 // =============================================
 
@@ -310,13 +329,18 @@ function setupDMS() {
 
 // ==================== CERTYFIKAT SUKCESJI ====================
 async function showCertificate() {
+    if (!db) {
+        alert("Firebase jeszcze się ładuje... Spróbuj za chwilę.");
+        return;
+    }
+
     if (!masterPassword) {
         alert("Aby wygenerować certyfikat, wymagane jest hasło master.");
         return;
     }
 
     const userEmail = localStorage.getItem('myheredo_user_email');
-    if (!userEmail) return alert("Brak użytkownika");
+    if (!userEmail) return alert("Brak zalogowanego użytkownika");
 
     const certificateData = {
         ownerEmail: userEmail,
@@ -337,7 +361,7 @@ async function showCertificate() {
         renderCertificateOverlay(certificateData, docRef.id);
     } catch (error) {
         console.error(error);
-        alert("Błąd zapisu do Firebase: " + error.message);
+        alert("Błąd zapisu: " + error.message);
     }
 }
 function renderCertificateContent() {
