@@ -256,67 +256,70 @@ function setupDMS() {
 }
 
 function showCertificate() {
-    const email = localStorage.getItem('myheredo_user_email') || "jan.kowalski@gmail.com";
-    const currentDate = new Date().toLocaleDateString('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' });
+    const email = localStorage.getItem('myheredo_user_email') || "jan.kowalski@example.com";
+    const currentDate = new Date().toLocaleDateString('pl-PL', { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric' 
+    });
 
     const certificateHTML = `
-    <div id="certificateOverlay" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[1000] p-4 overflow-auto">
-        <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden">
+    <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4 overflow-auto">
+        <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none">
             
-            <!-- Nagłówek certyfikatu -->
-            <div class="bg-gradient-to-r from-amber-400 to-yellow-600 text-white p-10 text-center">
-                <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-6">
-                <h1 class="text-4xl font-bold tracking-tight">CERTYFIKAT SUKCESJI</h1>
-                <p class="text-xl mt-2 opacity-90">MyHeredo • Cyfrowa Warstwa Sukcesyjna</p>
+            <!-- Nagłówek z logo -->
+            <div class="bg-gradient-to-br from-slate-900 to-black text-white p-12 text-center border-b-4 border-amber-400">
+                <img src="logo.png" alt="MyHeredo" class="h-24 mx-auto mb-6">
+                <h1 class="text-5xl font-bold tracking-tight">CERTYFIKAT SUKCESJI</h1>
+                <p class="text-amber-400 mt-3 text-xl">MyHeredo • Cyfrowa Warstwa Sukcesyjna</p>
+                <p class="text-sm text-slate-400 mt-6">Numer: MS-${Date.now().toString().slice(-8)}</p>
             </div>
 
-            <div class="p-12 space-y-10">
+            <div class="p-12 space-y-12">
                 <!-- Dane właściciela -->
-                <div>
-                    <h2 class="text-sm uppercase tracking-widest text-slate-500 mb-2">Właściciel majątku cyfrowego</h2>
-                    <p class="text-2xl font-semibold">${email}</p>
-                    <p class="text-slate-600">Data wygenerowania: ${currentDate}</p>
+                <div class="text-center border-b pb-8">
+                    <p class="text-sm uppercase tracking-widest text-slate-500">Właściciel cyfrowego majątku</p>
+                    <p class="text-3xl font-semibold mt-3">${email}</p>
+                    <p class="text-slate-600 mt-1">Data wygenerowania: ${currentDate}</p>
                 </div>
 
-                <!-- Skrytki / Aktywa -->
+                <!-- Skrytki -->
                 <div>
-                    <h2 class="text-xl font-semibold mb-6 border-b pb-3">Aktywa Cyfrowe i Instrukcje Dostępu</h2>
-                    <div class="space-y-6" id="certVaults">
-                        <!-- Wypełniane dynamicznie -->
-                    </div>
+                    <h2 class="text-2xl font-semibold mb-8 flex items-center gap-3">
+                        <span class="text-3xl">📦</span> Aktywa Cyfrowe i Instrukcje Sukcesyjne
+                    </h2>
+                    <div class="space-y-8" id="certVaults"></div>
                 </div>
 
                 <!-- Spadkobiercy -->
                 <div>
-                    <h2 class="text-xl font-semibold mb-6 border-b pb-3">Zaufani Spadkobiercy</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="certHeirs">
-                        <!-- Wypełniane dynamicznie -->
-                    </div>
+                    <h2 class="text-2xl font-semibold mb-8 flex items-center gap-3">
+                        <span class="text-3xl">👥</span> Zaufani Spadkobiercy
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="certHeirs"></div>
                 </div>
 
                 <!-- Dead Man’s Switch -->
-                <div class="bg-slate-100 p-6 rounded-2xl">
-                    <h3 class="font-semibold text-lg mb-3">Dead Man’s Switch</h3>
-                    <p class="text-slate-600">
-                        Certyfikat aktywuje się automatycznie po <strong>${document.getElementById('dmsSlider') ? document.getElementById('dmsSlider').value : '45'} dniach</strong> braku aktywności właściciela.
+                <div class="bg-amber-50 border border-amber-200 p-8 rounded-3xl">
+                    <h3 class="font-semibold text-xl mb-4">Dead Man’s Switch</h3>
+                    <p class="text-slate-700">
+                        Ten certyfikat aktywuje się automatycznie po <strong>${document.getElementById('dmsSlider')?.value || '45'} dniach</strong> braku aktywności właściciela i zostanie przekazany wyznaczonym spadkobiercom.
                     </p>
                 </div>
             </div>
 
-            <!-- Stopka -->
-            <div class="border-t p-8 text-center text-sm text-slate-500 bg-slate-50">
-                <p class="mb-4">Niniejszy certyfikat stanowi instrukcję sukcesyjną i ma charakter informacyjny.</p>
-                <p class="text-xs">• Wersja demonstracyjna MyHeredo • Nie stanowi dokumentu prawnego • Tylko do celów prezentacyjnych</p>
+            <!-- Stopka formalna -->
+            <div class="bg-slate-100 p-10 text-center text-xs text-slate-500 border-t">
+                <p class="mb-3">Niniejszy dokument stanowi instrukcję sukcesyjną przygotowaną w systemie MyHeredo.</p>
+                <p class="text-[10px]">• Wersja demonstracyjna • Nie stanowi dokumentu prawnego • Tylko do celów prezentacyjnych</p>
             </div>
 
             <!-- Przyciski -->
-            <div class="flex border-t">
-                <button onclick="printCertificate()" 
-                        class="flex-1 py-6 bg-slate-900 text-white font-semibold text-lg hover:bg-black transition">
+            <div class="flex border-t divide-x">
+                <button onclick="printCertificate()" class="flex-1 py-7 bg-slate-900 text-white font-semibold text-lg hover:bg-black transition-all">
                     🖨️ Drukuj / Zapisz jako PDF
                 </button>
-                <button onclick="closeCertificate()" 
-                        class="flex-1 py-6 border-r font-semibold text-lg hover:bg-slate-100 transition">
+                <button onclick="closeCertificate()" class="flex-1 py-7 font-semibold text-lg hover:bg-slate-100 transition-all">
                     Zamknij
                 </button>
             </div>
@@ -326,26 +329,6 @@ function showCertificate() {
     document.body.insertAdjacentHTML('beforeend', certificateHTML);
     renderCertificateContent();
 }
-
-function renderCertificateContent() {
-    // Skrytki
-    const vaultsContainer = document.getElementById('certVaults');
-    if (vaultsContainer) {
-        let html = '';
-        Object.keys(vaultData).forEach(key => {
-            if (vaultData[key] && vaultData[key].trim() !== '') {
-                html += `
-                <div class="flex justify-between items-start border-b pb-4">
-                    <div>
-                        <p class="font-medium">${categoryNames[key] || key}</p>
-                        <p class="text-sm text-slate-600 whitespace-pre-line">${vaultData[key].substring(0, 180)}${vaultData[key].length > 180 ? '...' : ''}</p>
-                    </div>
-                    <span class="text-emerald-600 text-sm font-medium">• Dostępny</span>
-                </div>`;
-            }
-        });
-        vaultsContainer.innerHTML = html || '<p class="text-slate-500">Brak dodanych skrytek.</p>';
-    }
 
     // Spadkobiercy
     const heirsContainer = document.getElementById('certHeirs');
