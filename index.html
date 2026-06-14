@@ -67,7 +67,7 @@
         </div>
     </section>
 
-    <!-- Dynamiczne treści zakładek -->
+    <!-- Dynamiczne treści -->
     <div id="content" class="max-w-6xl mx-auto px-6 pb-24"></div>
 
     <!-- Stopka -->
@@ -80,8 +80,13 @@
 
     <script>
         function showSection(section) {
+            // Usuwamy active ze wszystkich zakładek
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.getElementById('tab-' + section.substring(0,4)).classList.add('active');
+            
+            // Aktywujemy klikniętą
+            if (section === 'jak-dziala') document.getElementById('tab-jak').classList.add('active');
+            if (section === 'bezpieczenstwo') document.getElementById('tab-bezp').classList.add('active');
+            if (section === 'dla-agentow') document.getElementById('tab-agent').classList.add('active');
 
             const content = document.getElementById('content');
             let html = '';
@@ -93,17 +98,17 @@
                         <div class="bg-slate-900 p-10 rounded-3xl text-center">
                             <div class="text-6xl mb-6">📦</div>
                             <h3 class="text-2xl font-semibold mb-4">1. Tworzysz skrytki</h3>
-                            <p class="text-slate-400">Zapisujesz kluczowe wskazówki do kont bankowych, kryptowalut, maili i innych aktywów cyfrowych – bez przechowywania pełnych haseł.</p>
+                            <p class="text-slate-400">Zapisujesz kluczowe wskazówki do kont bankowych, kryptowalut, maili i innych aktywów cyfrowych.</p>
                         </div>
                         <div class="bg-slate-900 p-10 rounded-3xl text-center">
                             <div class="text-6xl mb-6">👥</div>
                             <h3 class="text-2xl font-semibold mb-4">2. Wyznaczasz spadkobierców</h3>
-                            <p class="text-slate-400">Dodajesz zaufane osoby, które automatycznie otrzymają dostęp po aktywacji Dead Man’s Switch.</p>
+                            <p class="text-slate-400">Dodajesz zaufane osoby, które otrzymają dostęp po Twojej śmierci.</p>
                         </div>
                         <div class="bg-slate-900 p-10 rounded-3xl text-center">
                             <div class="text-6xl mb-6">⏰</div>
                             <h3 class="text-2xl font-semibold mb-4">3. Dead Man’s Switch</h3>
-                            <p class="text-slate-400">System automatycznie przekazuje dostęp po wybranej liczbie dni Twojej bezczynności.</p>
+                            <p class="text-slate-400">Automatyczne przekazanie dostępu po wybranej liczbie dni bezczynności.</p>
                         </div>
                     </div>`;
             } 
@@ -114,12 +119,12 @@
                         <div class="bg-slate-900 p-10 rounded-3xl">
                             <div class="text-6xl mb-6">🔒</div>
                             <h3 class="text-2xl font-semibold mb-4">End-to-End Encryption</h3>
-                            <p class="text-slate-400">Wszystkie dane są szyfrowane bezpośrednio na Twoim urządzeniu. Nikt poza Tobą nie ma do nich dostępu.</p>
+                            <p class="text-slate-400">Wszystkie dane są szyfrowane bezpośrednio na Twoim urządzeniu.</p>
                         </div>
                         <div class="bg-slate-900 p-10 rounded-3xl">
                             <div class="text-6xl mb-6">🛡️</div>
                             <h3 class="text-2xl font-semibold mb-4">2FA + Master Password</h3>
-                            <p class="text-slate-400">Dwustopniowa weryfikacja oraz dodatkowe hasło master chroniące cały sejf sukcesyjny.</p>
+                            <p class="text-slate-400">Dwustopniowa weryfikacja oraz dodatkowe hasło master.</p>
                         </div>
                     </div>`;
             } 
@@ -130,29 +135,31 @@
                         <div class="bg-slate-900 p-10 rounded-3xl text-center">
                             <div class="text-6xl mb-6">💰</div>
                             <h3 class="text-2xl font-semibold mb-4">Zwiększ wartość polisy</h3>
-                            <p class="text-slate-400">MyHeredo idealnie uzupełnia klasyczne ubezpieczenie na życie o ochronę cyfrowego majątku – kont bankowych, krypto, maili i mediów społecznościowych.</p>
+                            <p class="text-slate-400">MyHeredo jest naturalnym dopełnieniem klasycznego ubezpieczenia na życie – chroni to, czego polisa nie obejmuje: cyfrowe aktywa.</p>
                         </div>
                         <div class="bg-slate-900 p-10 rounded-3xl text-center">
                             <div class="text-6xl mb-6">🤝</div>
-                            <h3 class="text-2xl font-semibold mb-4">Buduj głębsze relacje</h3>
-                            <p class="text-slate-400">Pomagasz klientowi nie tylko na wypadek śmierci, ale również dbasz o przyszłość jego rodziny w świecie cyfrowym – to buduje ogromne zaufanie i lojalność.</p>
+                            <h3 class="text-2xl font-semibold mb-4">Buduj długoterminowe relacje</h3>
+                            <p class="text-slate-400">Pomagasz całej rodzinie w trudnym momencie, co znacząco zwiększa lojalność klienta wobec Ciebie jako agenta.</p>
                         </div>
                         <div class="bg-slate-900 p-10 rounded-3xl text-center">
                             <div class="text-6xl mb-6">⭐</div>
                             <h3 class="text-2xl font-semibold mb-4">Wyróżnij się na rynku</h3>
-                            <p class="text-slate-400">Oferujesz innowacyjne, nowoczesne rozwiązanie, którego nie ma większość agentów. To realna wartość dodana do Twojej oferty.</p>
+                            <p class="text-slate-400">Oferujesz innowacyjne rozwiązanie sukcesji cyfrowej, którego nie ma większość agentów ubezpieczeniowych.</p>
                         </div>
                     </div>
-                    <div class="mt-16 bg-gradient-to-br from-slate-900 to-slate-800 p-10 rounded-3xl text-center">
-                        <p class="text-xl text-amber-400 font-medium">MyHeredo nie zastępuje polisy ubezpieczeniowej – ono ją wzmacnia i czyni kompletną.</p>
+                    <div class="mt-16 bg-gradient-to-br from-amber-900/30 to-slate-900 p-10 rounded-3xl text-center border border-amber-400/30">
+                        <p class="text-xl text-amber-400 font-medium">MyHeredo nie konkuruje z polisą ubezpieczeniową – idealnie ją uzupełnia i czyni ofertę kompletną.</p>
                     </div>`;
             }
 
             content.innerHTML = html;
         }
 
-        // Domyślnie pokazujemy pierwszą zakładkę
-        window.onload = () => showSection('jak-dziala');
+        // Uruchomienie przy załadowaniu strony
+        window.onload = function() {
+            showSection('jak-dziala');
+        };
     </script>
 </body>
 </html>
