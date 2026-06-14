@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        body { background-color: #0a0a0a; color: #e2e8f0; }
+        body { background-color: #0a0a0a; color: #e2e8f0; scroll-behavior: smooth; }
         .hero-logo { transition: all 0.4s ease; }
         .nav-tab {
             transition: all 0.3s ease;
@@ -28,6 +28,7 @@
             transition: width 0.3s ease;
         }
         .nav-tab:hover:after, .nav-tab.active:after { width: 100%; }
+        section { scroll-margin-top: 100px; }
     </style>
 </head>
 <body>
@@ -41,9 +42,9 @@
             </div>
             
             <div class="flex items-center gap-10 text-lg">
-                <a href="#" onclick="showSection('jak-dziala')" id="tab-jak" class="nav-tab active cursor-pointer">Jak działa</a>
-                <a href="#" onclick="showSection('bezpieczenstwo')" id="tab-bezp" class="nav-tab cursor-pointer">Bezpieczeństwo</a>
-                <a href="#" onclick="showSection('dla-agentow')" id="tab-agent" class="nav-tab cursor-pointer">Dla Agentów</a>
+                <a href="#jak-dziala" onclick="setActive(this)" class="nav-tab active">Jak działa</a>
+                <a href="#bezpieczenstwo" onclick="setActive(this)" class="nav-tab">Bezpieczeństwo</a>
+                <a href="#dla-agentow" onclick="setActive(this)" class="nav-tab">Dla Agentów</a>
             </div>
 
             <div class="flex items-center gap-4">
@@ -54,7 +55,7 @@
     </nav>
 
     <!-- Hero -->
-    <section class="pt-20 pb-16 text-center">
+    <section class="pt-20 pb-20 text-center">
         <div class="max-w-5xl mx-auto px-6">
             <img src="logo.png" alt="MyHeredo" class="hero-logo mx-auto h-52 mb-8">
             <h1 class="text-6xl font-bold leading-tight mb-6">
@@ -62,13 +63,83 @@
                 <span class="text-amber-400">Dziedzictwo na pokolenia.</span>
             </h1>
             <p class="text-xl text-slate-400 max-w-2xl mx-auto">
-                Bezpieczna platforma sukcesyjna, która uzupełnia Twoje polisy ubezpieczeniowe o ochronę cyfrowych aktywów.
+                Bezpieczna platforma sukcesyjna, która uzupełnia polisy ubezpieczeniowe o ochronę cyfrowych aktywów.
             </p>
         </div>
     </section>
 
-    <!-- Dynamiczne treści -->
-    <div id="content" class="max-w-6xl mx-auto px-6 pb-24"></div>
+    <!-- Jak działa -->
+    <section id="jak-dziala" class="py-20 bg-slate-950">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-16">Jak działa MyHeredo?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="bg-slate-900 p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">📦</div>
+                    <h3 class="text-2xl font-semibold mb-4">1. Tworzysz skrytki</h3>
+                    <p class="text-slate-400">Zapisujesz kluczowe wskazówki do kont bankowych, kryptowalut, maili i innych aktywów cyfrowych.</p>
+                </div>
+                <div class="bg-slate-900 p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">👥</div>
+                    <h3 class="text-2xl font-semibold mb-4">2. Wyznaczasz spadkobierców</h3>
+                    <p class="text-slate-400">Dodajesz zaufane osoby, które otrzymają dostęp po Twojej śmierci.</p>
+                </div>
+                <div class="bg-slate-900 p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">⏰</div>
+                    <h3 class="text-2xl font-semibold mb-4">3. Dead Man’s Switch</h3>
+                    <p class="text-slate-400">Automatyczne przekazanie dostępu po wybranej liczbie dni bezczynności.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bezpieczeństwo -->
+    <section id="bezpieczenstwo" class="py-20">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-16">Bezpieczeństwo na najwyższym poziomie</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="bg-slate-900 p-10 rounded-3xl">
+                    <div class="text-6xl mb-6">🔒</div>
+                    <h3 class="text-2xl font-semibold mb-4">End-to-End Encryption</h3>
+                    <p class="text-slate-400">Wszystkie dane są szyfrowane bezpośrednio na Twoim urządzeniu. Nikt poza Tobą nie ma do nich dostępu.</p>
+                </div>
+                <div class="bg-slate-900 p-10 rounded-3xl">
+                    <div class="text-6xl mb-6">🛡️</div>
+                    <h3 class="text-2xl font-semibold mb-4">2FA + Master Password</h3>
+                    <p class="text-slate-400">Dwustopniowa weryfikacja oraz dodatkowe hasło master chroniące cały sejf.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dla Agentów -->
+    <section id="dla-agentow" class="py-20 bg-slate-950">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-16">Dlaczego warto polecić MyHeredo?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="bg-slate-900 p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">💰</div>
+                    <h3 class="text-2xl font-semibold mb-4">Zwiększ wartość polisy</h3>
+                    <p class="text-slate-400">MyHeredo jest naturalnym dopełnieniem klasycznego ubezpieczenia na życie – chroni cyfrowe aktywa, których polisa nie obejmuje.</p>
+                </div>
+                <div class="bg-slate-900 p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">🤝</div>
+                    <h3 class="text-2xl font-semibold mb-4">Buduj długoterminowe relacje</h3>
+                    <p class="text-slate-400">Pomagasz całej rodzinie w trudnym momencie, co znacząco zwiększa lojalność klienta wobec Ciebie.</p>
+                </div>
+                <div class="bg-slate-900 p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">⭐</div>
+                    <h3 class="text-2xl font-semibold mb-4">Wyróżnij się na rynku</h3>
+                    <p class="text-slate-400">Oferujesz nowoczesne rozwiązanie sukcesji cyfrowej, którego nie ma konkurencja.</p>
+                </div>
+            </div>
+            
+            <div class="mt-16 bg-gradient-to-br from-amber-900/30 to-slate-900 p-12 rounded-3xl text-center border border-amber-400/30">
+                <p class="text-xl text-amber-400 font-medium">
+                    MyHeredo nie konkuruje z polisą ubezpieczeniową – idealnie ją uzupełnia i czyni Twoją ofertę kompletną.
+                </p>
+            </div>
+        </div>
+    </section>
 
     <!-- Stopka -->
     <footer class="bg-black border-t border-slate-800 py-12">
@@ -79,87 +150,10 @@
     </footer>
 
     <script>
-        function showSection(section) {
-            // Usuwamy active ze wszystkich zakładek
+        function setActive(link) {
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            
-            // Aktywujemy klikniętą
-            if (section === 'jak-dziala') document.getElementById('tab-jak').classList.add('active');
-            if (section === 'bezpieczenstwo') document.getElementById('tab-bezp').classList.add('active');
-            if (section === 'dla-agentow') document.getElementById('tab-agent').classList.add('active');
-
-            const content = document.getElementById('content');
-            let html = '';
-
-            if (section === 'jak-dziala') {
-                html = `
-                    <h2 class="text-4xl font-bold text-center mb-16">Jak działa MyHeredo?</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        <div class="bg-slate-900 p-10 rounded-3xl text-center">
-                            <div class="text-6xl mb-6">📦</div>
-                            <h3 class="text-2xl font-semibold mb-4">1. Tworzysz skrytki</h3>
-                            <p class="text-slate-400">Zapisujesz kluczowe wskazówki do kont bankowych, kryptowalut, maili i innych aktywów cyfrowych.</p>
-                        </div>
-                        <div class="bg-slate-900 p-10 rounded-3xl text-center">
-                            <div class="text-6xl mb-6">👥</div>
-                            <h3 class="text-2xl font-semibold mb-4">2. Wyznaczasz spadkobierców</h3>
-                            <p class="text-slate-400">Dodajesz zaufane osoby, które otrzymają dostęp po Twojej śmierci.</p>
-                        </div>
-                        <div class="bg-slate-900 p-10 rounded-3xl text-center">
-                            <div class="text-6xl mb-6">⏰</div>
-                            <h3 class="text-2xl font-semibold mb-4">3. Dead Man’s Switch</h3>
-                            <p class="text-slate-400">Automatyczne przekazanie dostępu po wybranej liczbie dni bezczynności.</p>
-                        </div>
-                    </div>`;
-            } 
-            else if (section === 'bezpieczenstwo') {
-                html = `
-                    <h2 class="text-4xl font-bold text-center mb-16">Bezpieczeństwo na najwyższym poziomie</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <div class="bg-slate-900 p-10 rounded-3xl">
-                            <div class="text-6xl mb-6">🔒</div>
-                            <h3 class="text-2xl font-semibold mb-4">End-to-End Encryption</h3>
-                            <p class="text-slate-400">Wszystkie dane są szyfrowane bezpośrednio na Twoim urządzeniu.</p>
-                        </div>
-                        <div class="bg-slate-900 p-10 rounded-3xl">
-                            <div class="text-6xl mb-6">🛡️</div>
-                            <h3 class="text-2xl font-semibold mb-4">2FA + Master Password</h3>
-                            <p class="text-slate-400">Dwustopniowa weryfikacja oraz dodatkowe hasło master.</p>
-                        </div>
-                    </div>`;
-            } 
-            else if (section === 'dla-agentow') {
-                html = `
-                    <h2 class="text-4xl font-bold text-center mb-16">Dlaczego warto polecić MyHeredo swoim klientom?</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        <div class="bg-slate-900 p-10 rounded-3xl text-center">
-                            <div class="text-6xl mb-6">💰</div>
-                            <h3 class="text-2xl font-semibold mb-4">Zwiększ wartość polisy</h3>
-                            <p class="text-slate-400">MyHeredo jest naturalnym dopełnieniem klasycznego ubezpieczenia na życie – chroni to, czego polisa nie obejmuje: cyfrowe aktywa.</p>
-                        </div>
-                        <div class="bg-slate-900 p-10 rounded-3xl text-center">
-                            <div class="text-6xl mb-6">🤝</div>
-                            <h3 class="text-2xl font-semibold mb-4">Buduj długoterminowe relacje</h3>
-                            <p class="text-slate-400">Pomagasz całej rodzinie w trudnym momencie, co znacząco zwiększa lojalność klienta wobec Ciebie jako agenta.</p>
-                        </div>
-                        <div class="bg-slate-900 p-10 rounded-3xl text-center">
-                            <div class="text-6xl mb-6">⭐</div>
-                            <h3 class="text-2xl font-semibold mb-4">Wyróżnij się na rynku</h3>
-                            <p class="text-slate-400">Oferujesz innowacyjne rozwiązanie sukcesji cyfrowej, którego nie ma większość agentów ubezpieczeniowych.</p>
-                        </div>
-                    </div>
-                    <div class="mt-16 bg-gradient-to-br from-amber-900/30 to-slate-900 p-10 rounded-3xl text-center border border-amber-400/30">
-                        <p class="text-xl text-amber-400 font-medium">MyHeredo nie konkuruje z polisą ubezpieczeniową – idealnie ją uzupełnia i czyni ofertę kompletną.</p>
-                    </div>`;
-            }
-
-            content.innerHTML = html;
+            link.classList.add('active');
         }
-
-        // Uruchomienie przy załadowaniu strony
-        window.onload = function() {
-            showSection('jak-dziala');
-        };
     </script>
 </body>
 </html>
