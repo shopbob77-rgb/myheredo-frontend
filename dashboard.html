@@ -17,7 +17,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 18px;
             max-width: 1600px;
             margin: 0 auto;
         }
@@ -27,14 +27,15 @@
         }
         .skrytka-card {
             transition: all 0.3s ease;
-            min-height: 92px;           /* mniejsze karty */
+            min-height: 78px;           /* znacznie mniejsze */
+            padding: 14px;
         }
         .skrytka-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
         }
         .demo-badge {
             position: absolute;
-            top: 25px;
+            top: 22px;
             right: 50%;
             transform: translateX(50%);
         }
@@ -44,7 +45,7 @@
 <div class="dashboard-container relative">
     
     <!-- Nagłówek -->
-    <div class="flex justify-between items-center pb-6 border-b border-slate-700">
+    <div class="flex justify-between items-center pb-5 border-b border-slate-700">
         <div class="flex items-center gap-4">
             <img src="logo.png" alt="MyHeredo" class="h-9 w-auto">
             <div>
@@ -56,7 +57,7 @@
         <div class="flex items-center gap-6">
             <div id="userEmail" class="text-sm text-slate-400"></div>
             <button onclick="handleLogout()" 
-                    class="px-6 py-2.5 border border-slate-700 hover:border-red-500 rounded-2xl text-sm">
+                    class="px-6 py-2 border border-slate-700 hover:border-red-500 rounded-2xl text-sm">
                 Wyloguj się
             </button>
         </div>
@@ -64,56 +65,59 @@
 
     <!-- DEMO Badge -->
     <div class="demo-badge">
-        <span class="bg-amber-400 text-slate-950 text-xs font-bold px-4 py-1.5 rounded-full tracking-wider">
+        <span class="bg-amber-400 text-slate-950 text-xs font-bold px-4 py-1 rounded-full tracking-wider">
             DEMO
         </span>
     </div>
 
-    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-8 main-content">
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-6 main-content">
         
         <!-- Lewa kolumna - Skrytki -->
         <div class="lg:col-span-7 flex flex-col">
-            <h2 class="text-2xl font-bold mb-5">Twoje Skrytki Sukcesyjne</h2>
-            <div id="skrytkiGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1"></div>
+            <h2 class="text-2xl font-bold mb-4">Twoje Skrytki Sukcesyjne</h2>
+            <div id="skrytkiGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1"></div>
 
-            <!-- Dolny wiersz przycisków - mniejszy -->
-            <div class="mt-6 grid grid-cols-3 gap-3">
+            <!-- Dolny wiersz przycisków -->
+            <div class="mt-5 grid grid-cols-3 gap-3">
                 <button onclick="addCustomVault()" 
-                        class="bg-slate-800 hover:bg-slate-700 py-3.5 rounded-2xl text-sm font-medium">
+                        class="bg-slate-800 hover:bg-slate-700 py-3 rounded-2xl text-sm font-medium">
                     + Nowa skrytka
                 </button>
                 <button onclick="loadDemoData()" 
-                        class="bg-slate-800 hover:bg-slate-700 py-3.5 rounded-2xl text-sm font-medium">
+                        class="bg-slate-800 hover:bg-slate-700 py-3 rounded-2xl text-sm font-medium">
                     Wczytaj demo
                 </button>
                 <button onclick="showCertificate()" 
-                        class="bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-semibold py-3.5 rounded-2xl text-sm">
+                        class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-semibold py-3 rounded-2xl text-sm transition-all">
                     🪶 Generuj Certyfikat
                 </button>
             </div>
         </div>
 
         <!-- Prawa kolumna -->
-        <div class="lg:col-span-5 flex flex-col gap-6">
-            <div class="flex-1">
-                <h2 class="text-2xl font-bold mb-5">Zaufani Spadkobiercy</h2>
-                <div id="heirsList" class="bg-slate-900 rounded-3xl p-6 border border-slate-700 flex-1 overflow-auto min-h-[300px]"></div>
+        <div class="lg:col-span-5 flex flex-col gap-5">
+            
+            <!-- Spadkobiercy - mniejsze okno -->
+            <div>
+                <h2 class="text-2xl font-bold mb-4">Zaufani Spadkobiercy</h2>
+                <div id="heirsList" class="bg-slate-900 rounded-3xl p-5 border border-slate-700 h-64 overflow-auto"></div>
             </div>
 
-            <!-- Dodawanie spadkobiercy -->
-            <div class="bg-slate-900 rounded-3xl p-6 border border-slate-700">
+            <!-- Dodawanie spadkobiercy - mniejsze -->
+            <div class="bg-slate-900 rounded-3xl p-5 border border-slate-700">
                 <div class="grid grid-cols-2 gap-3">
                     <input id="heirName" type="text" class="bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm" placeholder="Imię / relacja">
                     <input id="heirEmail" type="email" class="bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm" placeholder="email@przyklad.pl">
                 </div>
-                <button onclick="addHeir()" class="w-full mt-4 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3 rounded-2xl text-sm">
+                <button onclick="addHeir()" 
+                        class="w-full mt-4 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3 rounded-2xl text-sm">
                     + Dodaj Spadkobiercę
                 </button>
             </div>
 
-            <!-- Dead Man’s Switch + Symulacja -->
-            <div class="bg-slate-900 rounded-3xl p-6 border border-slate-700">
-                <h2 class="text-lg font-semibold mb-4">Dead Man’s Switch</h2>
+            <!-- Dead Man’s Switch -->
+            <div class="bg-slate-900 rounded-3xl p-5 border border-slate-700">
+                <h2 class="text-lg font-semibold mb-3">Dead Man’s Switch</h2>
                 <input type="range" id="dmsSlider" min="14" max="90" value="45" class="w-full accent-amber-400">
                 <div class="flex justify-between text-xs mt-2 text-slate-400">
                     <span>14 dni</span>
