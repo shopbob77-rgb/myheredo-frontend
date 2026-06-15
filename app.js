@@ -500,3 +500,67 @@ window.showCertificate = showCertificate;
 window.simulateDeath = simulateDeath;
 window.loadDemoData = loadDemoData;
 window.handleLogout = logout;
+// ==================== MOJE CERTYFIKATY ====================
+async function loadCertificates() {
+    if (!db) {
+        alert("Firebase nie jest jeszcze gotowy.");
+        return;
+    }
+
+    const userEmail = localStorage.getItem('myheredo_user_email');
+    if (!userEmail) return;
+
+    try {
+        const snapshot = await db.collection("certificates")
+            .where("ownerEmail", "==", userEmail)
+            .orderBy("version", "desc")
+            .get();
+
+        const container = document.getElementById('certificatesList');
+        container.innerHTML = '';
+
+        if (snapshot.empty) {
+            container.innerHTML = `<p class="text-slate-400 text-center py-8">Nie wygenerowałeś jeszcze żadnych certyfikatów.</p>`;
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            const cert = doc.data();
+            const date = cert.generatedDate ? new Date(cert.generatedDate).toLocaleString('pl-PL') : '—';
+
+            const card = document.createElement('div');
+            card.className = "bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-amber-400 transition-colors";
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-sm text-slate-400">Wygenerowano: ${date}</p>
+                        <p class="font-medium mt-1">Wersja ${cert.versionLabel || ''}</p>
+                        <p class="text-sm text-slate-400 mt-2">${cert.heirs ? cert.heirs.length : 0} spadkobierców • ${cert.vaults ? cert.vaults.length : 0} skrytek</p>
+                    </div>
+                    <button onclick="openCertificate('${doc.id}')" 
+                            class="px-5 py-2 bg-amber-400 text-slate-950 rounded-2xl text-sm font-medium hover:bg-amber-300">
+                        Otwórz
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error(error);
+        alert("Błąd podczas wczytywania certyfikatów.");
+    }
+}
+
+async function openCertificate(certId) {
+    try {
+        const doc = await db.collection("certificates").doc(certId).get();
+        if (!doc.exists) return alert("Certyfikat nie istnieje");
+
+        const cert = doc.data();
+        renderCertificateOverlay(cert, certId);
+    } catch (error) {
+        console.error(error);
+        alert("Nie udało się otworzyć certyfikatu.");
+    }
+}
