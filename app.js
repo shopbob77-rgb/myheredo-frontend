@@ -342,26 +342,33 @@ async function showCertificate() {
     const userEmail = localStorage.getItem('myheredo_user_email');
     if (!userEmail) return alert("Brak zalogowanego użytkownika");
 
+    const now = new Date();
     const certificateData = {
         ownerEmail: userEmail,
-        createdAt: firebase.firestore.Timestamp.now(),
+        generatedAt: firebase.firestore.Timestamp.now(),
+        generatedDate: now.toISOString(),
         dmsDays: parseInt(document.getElementById('dmsSlider')?.value || 45),
         heirs: heirs,
         vaults: Object.keys(vaultData).map(key => ({
             category: categoryNames[key] || key,
-            preview: vaultData[key] ? vaultData[key].substring(0, 250) + "..." : ""
+            preview: vaultData[key] ? vaultData[key].substring(0, 280) + (vaultData[key].length > 280 ? '...' : '') : ''
         })),
         status: "generated",
-        version: Date.now()
+        version: now.getTime(),
+        versionLabel: now.toLocaleString('pl-PL')
     };
 
     try {
         const docRef = await db.collection("certificates").add(certificateData);
-        alert(`✅ Certyfikat zapisany w Firebase!\nID: ${docRef.id}`);
+        
+        console.log("✅ Nowy certyfikat zapisany! ID:", docRef.id);
+        alert(`✅ Zapisano nową wersję certyfikatu!\nID: ${docRef.id}\nData: ${certificateData.versionLabel}`);
+
         renderCertificateOverlay(certificateData, docRef.id);
+
     } catch (error) {
-        console.error(error);
-        alert("Błąd zapisu: " + error.message);
+        console.error("Błąd zapisu:", error);
+        alert("Nie udało się zapisać certyfikatu: " + error.message);
     }
 }
 function renderCertificateContent() {
