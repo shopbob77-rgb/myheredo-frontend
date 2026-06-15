@@ -39,6 +39,22 @@
             right: 50%;
             transform: translateX(50%);
         }
+       <!-- Sekcja MOJE CERTYFIKATY - na dole strony -->
+<div class="mt-16 pt-8 border-t border-slate-700">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold flex items-center gap-3">
+            📜 Moje Certyfikaty
+        </h2>
+        <button onclick="loadCertificates()" 
+                class="px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-2xl text-sm flex items-center gap-2">
+            <i class="fas fa-sync"></i> Odśwież
+        </button>
+    </div>
+    
+    <div id="certificatesList" class="space-y-4 min-h-[200px]">
+        <!-- Tutaj będą się pojawiać certyfikaty -->
+    </div>
+</div> 
     </style>
 </head>
 <body>
