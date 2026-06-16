@@ -103,7 +103,7 @@ async function initDashboard() {
     renderSkrytki();
     renderHeirs();
     setupDMS();
-    loadCertificates();
+    setTimeout(() => loadCertificates(), 800); // opóźnienie
 }
 
 // ==================== TIMER ====================
@@ -297,46 +297,43 @@ function setupDMS() {
 }
 
 // ==================== CERTYFIKAT ====================
-function renderCertificateOverlay(certificateData, docId) {
-    const vaults = certificateData.vaultsSummary || [];
-    const html = `
-    <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4 overflow-auto">
-        <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl">
-            <div class="bg-gradient-to-br from-slate-900 to-black text-white p-12 text-center">
-                <img src="logo.png" alt="MyHeredo" class="h-28 mx-auto mb-6">
-                <h1 class="text-5xl font-bold">CERTYFIKAT SUKCESJI</h1>
-                <p class="text-amber-400 mt-2">ID: ${docId}</p>
-            </div>
-            <div class="p-12">
-                <p class="text-center text-lg mb-8">Właściciel: <strong>${certificateData.ownerEmail}</strong></p>
-                
-                <h2 class="text-2xl font-semibold mb-6">Spadkobiercy</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                    ${certificateData.heirs.map(h => `
-                        <div class="bg-slate-100 p-4 rounded-2xl">
-                            <p class="font-medium">${h.name}</p>
-                            <p class="text-sm text-slate-600">${h.email}</p>
-                        </div>
-                    `).join('')}
-                </div>
+async function showCertificate() {
+    if (!db) {
+        alert("Firebase jeszcze się ładuje...");
+        return;
+    }
+    if (!masterPassword) {
+        alert("Wymagane hasło master.");
+        return;
+    }
 
-                <h2 class="text-2xl font-semibold mb-6">Skrytki (Zaszyfrowane)</h2>
-                <div class="space-y-4">
-                    ${vaults.map(v => `
-                        <div class="border-l-4 border-amber-400 pl-4 bg-slate-50 p-4 rounded-2xl">
-                            <p class="font-semibold">${v.category}</p>
-                            <p class="text-sm text-emerald-600 font-medium">● Dane zaszyfrowane end-to-end</p>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-            <div class="flex border-t">
-                <button onclick="printCertificate()" class="flex-1 py-6 bg-slate-900 text-white font-semibold text-lg">🖨️ Drukuj / Zapisz PDF</button>
-                <button onclick="closeCertificate()" class="flex-1 py-6 font-semibold text-lg hover:bg-slate-100">Zamknij</button>
-            </div>
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', html);
+    const userEmail = localStorage.getItem('myheredo_user_email');
+    if (!userEmail) return alert("Brak użytkownika");
+
+    const now = new Date();
+    const certificateData = {
+        ownerEmail: userEmail,
+        generatedAt: firebase.firestore.Timestamp.now(),
+        generatedDate: now.toISOString(),
+        dmsDays: parseInt(document.getElementById('dmsSlider')?.value || 45),
+        heirs: heirs,
+        vaultsSummary: Object.keys(vaultData).map(key => ({
+            category: categoryNames[key] || key,
+            status: "Zaszyfrowane"
+        })),
+        status: "generated",
+        version: now.getTime(),
+        versionLabel: now.toLocaleString('pl-PL')
+    };
+
+    try {
+        const docRef = await db.collection("certificates").add(certificateData);
+        alert(`✅ Zapisano certyfikat!\nID: ${docRef.id}`);
+        renderCertificateOverlay(certificateData, docRef.id);
+    } catch (error) {
+        console.error(error);
+        alert("Błąd zapisu.");
+    }
 }
 
 function renderCertificateOverlay(certificateData, docId) {
@@ -351,7 +348,6 @@ function renderCertificateOverlay(certificateData, docId) {
             </div>
             <div class="p-12">
                 <p class="text-center text-lg mb-8">Właściciel: <strong>${certificateData.ownerEmail}</strong></p>
-                
                 <h2 class="text-2xl font-semibold mb-6">Spadkobiercy</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                     ${certificateData.heirs.map(h => `
@@ -361,7 +357,6 @@ function renderCertificateOverlay(certificateData, docId) {
                         </div>
                     `).join('')}
                 </div>
-
                 <h2 class="text-2xl font-semibold mb-6">Skrytki (Zaszyfrowane)</h2>
                 <div class="space-y-4">
                     ${vaults.map(v => `
@@ -495,19 +490,18 @@ function loadDemoData() {
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
 
-// ==================== GLOBALNE FUNKCJE (MUSI BYĆ NA DOLE) ====================
-window.showCertificate = showCertificate;
-window.loadCertificates = loadCertificates;
-window.openCertificate = openCertificate;
-window.deleteCertificate = deleteCertificate;
-window.renderSkrytki = renderSkrytki;
-window.addCustomVault = addCustomVault;
-window.deleteCustomVault = deleteCustomVault;
+// ==================== GLOBALNE FUNKCJE ====================
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
+window.addCustomVault = addCustomVault;
+window.deleteCustomVault = deleteCustomVault;
+window.showCertificate = showCertificate;
 window.simulateDeath = simulateDeath;
 window.loadDemoData = loadDemoData;
 window.handleLogout = logout;
+window.loadCertificates = loadCertificates;
+window.openCertificate = openCertificate;
+window.deleteCertificate = deleteCertificate;
 window.saveVault = saveVault;
 window.closeVaultModal = closeVaultModal;
 window.openVaultModal = openVaultModal;
