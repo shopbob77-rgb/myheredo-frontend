@@ -1,6 +1,6 @@
 // =============================================
 // MYHEREDO - Hybrydowa Warstwa Sukcesyjna
-// Pełna wersja z E2EE + Certyfikatem Sukcesji
+// Stabilna wersja
 // =============================================
 
 // ==================== FIREBASE COMPAT ====================
@@ -21,14 +21,14 @@ function initializeFirebase() {
 }
 
 const loadFirebaseScripts = () => {
-    const script1 = document.createElement('script');
-    script1.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js";
-    document.head.appendChild(script1);
-    script1.onload = () => {
-        const script2 = document.createElement('script');
-        script2.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js";
-        document.head.appendChild(script2);
-        script2.onload = initializeFirebase;
+    const s1 = document.createElement('script');
+    s1.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js";
+    document.head.appendChild(s1);
+    s1.onload = () => {
+        const s2 = document.createElement('script');
+        s2.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js";
+        document.head.appendChild(s2);
+        s2.onload = initializeFirebase;
     };
 };
 loadFirebaseScripts();
@@ -75,7 +75,6 @@ async function initDashboard() {
         try {
             vaultData = await decryptData(savedEncryptedVault, masterPassword);
         } catch (e) {
-            console.warn("Błąd deszyfracji");
             vaultData = {};
         }
     } else {
@@ -105,59 +104,6 @@ async function initDashboard() {
     renderHeirs();
     setupDMS();
     loadCertificates();
-}
-
-// ==================== TIMER BEZCZYNNOŚCI ====================
-function startInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => logout(true), 20 * 60 * 1000);
-}
-function resetInactivityTimer() {
-    startInactivityTimer();
-}
-function logout(silent = false) {
-    if (!silent && !confirm("Wylogować się?")) return;
-    sessionStorage.clear();
-    window.location.href = "index.html";
-}
-
-// ==================== SZYFROWANIE ====================
-async function deriveKey(password, salt) {
-    const encoder = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits", "deriveKey"]);
-    return crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
-        keyMaterial,
-        { name: "AES-GCM", length: 256 },
-        false,
-        ["encrypt", "decrypt"]
-    );
-}
-async function encryptData(data, password) {
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const key = await deriveKey(password, salt);
-    const encoder = new TextEncoder();
-    const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoder.encode(JSON.stringify(data)));
-    const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
-    combined.set(salt, 0);
-    combined.set(iv, salt.length);
-    combined.set(new Uint8Array(encrypted), salt.length + iv.length);
-    return btoa(String.fromCharCode(...combined));
-}
-async function decryptData(encryptedData, password) {
-    const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
-    const salt = combined.slice(0, 16);
-    const iv = combined.slice(16, 28);
-    const ciphertext = combined.slice(28);
-    const key = await deriveKey(password, salt);
-    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
-    return JSON.parse(new TextDecoder().decode(decrypted));
-}
-async function saveAllData() {
-    if (!masterPassword) return;
-    const encrypted = await encryptData(vaultData, masterPassword);
-    localStorage.setItem('myheredo_encrypted_vault', encrypted);
 }
 
 // ==================== SKRYTKI ====================
@@ -220,9 +166,9 @@ async function saveVault(key) {
     await saveAllData();
     closeVaultModal();
     renderSkrytki();
-    showSuccessMessage("✅ Dane zaszyfrowane i zapisane");
 }
 
+// ==================== NOWA SKRYTKA ====================
 function addCustomVault() {
     const name = prompt("Podaj nazwę nowej skrytki:");
     if (!name || name.trim() === "") return;
@@ -234,7 +180,6 @@ function addCustomVault() {
     saveAllData();
     localStorage.setItem('myheredo_custom_icons', JSON.stringify(customIcons));
     renderSkrytki();
-    showSuccessMessage(`✅ Dodano skrytkę: ${name}`);
 }
 
 function deleteCustomVault(key) {
@@ -334,68 +279,47 @@ async function showCertificate() {
         renderCertificateOverlay(certificateData, docRef.id);
     } catch (error) {
         console.error(error);
-        alert("Błąd zapisu: " + error.message);
+        alert("Błąd zapisu.");
     }
 }
 
 function renderCertificateOverlay(certificateData, docId) {
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4 overflow-auto">
-        <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden">
+        <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl">
             <div class="bg-gradient-to-br from-slate-900 to-black text-white p-12 text-center">
                 <img src="logo.png" alt="MyHeredo" class="h-28 mx-auto mb-6">
                 <h1 class="text-5xl font-bold">CERTYFIKAT SUKCESJI</h1>
                 <p class="text-amber-400 mt-2">ID: ${docId}</p>
             </div>
-            
-            <div class="p-12 space-y-10">
-                <div class="text-center">
-                    <p class="text-slate-500">Właściciel</p>
-                    <p class="text-2xl font-semibold">${certificateData.ownerEmail}</p>
+            <div class="p-12">
+                <p class="text-center text-lg mb-8">Właściciel: <strong>${certificateData.ownerEmail}</strong></p>
+                <h2 class="text-2xl font-semibold mb-6">Spadkobiercy</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                    ${certificateData.heirs.map(h => `
+                        <div class="bg-slate-100 p-4 rounded-2xl">
+                            <p class="font-medium">${h.name}</p>
+                            <p class="text-sm text-slate-600">${h.email}</p>
+                        </div>
+                    `).join('')}
                 </div>
-
-                <div>
-                    <h2 class="text-2xl font-semibold mb-6">Spadkobiercy</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${certificateData.heirs.map(h => `
-                            <div class="bg-slate-100 p-4 rounded-2xl">
-                                <p class="font-medium">${h.name}</p>
-                                <p class="text-sm text-slate-600">${h.email}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div>
-                    <h2 class="text-2xl font-semibold mb-6">Skrytki</h2>
-                    <div class="space-y-4">
-                        ${certificateData.vaults.map(v => `
-                            <div class="border-l-4 border-amber-400 pl-4">
-                                <p class="font-semibold">${v.category}</p>
-                                <p class="text-sm text-slate-600">${v.preview}</p>
-                            </div>
-                        `).join('')}
-                    </div>
+                <h2 class="text-2xl font-semibold mb-6">Skrytki</h2>
+                <div class="space-y-4">
+                    ${certificateData.vaults.map(v => `
+                        <div class="border-l-4 border-amber-400 pl-4">
+                            <p class="font-semibold">${v.category}</p>
+                            <p class="text-sm text-slate-600">${v.preview}</p>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
-
             <div class="flex border-t">
                 <button onclick="printCertificate()" class="flex-1 py-6 bg-slate-900 text-white font-semibold text-lg">🖨️ Drukuj / Zapisz PDF</button>
                 <button onclick="closeCertificate()" class="flex-1 py-6 font-semibold text-lg hover:bg-slate-100">Zamknij</button>
             </div>
         </div>
     </div>`;
-
     document.body.insertAdjacentHTML('beforeend', html);
-}
-
-function closeCertificate() {
-    const overlay = document.getElementById('certificateOverlay');
-    if (overlay) overlay.remove();
-}
-
-function printCertificate() {
-    window.print();
 }
 
 function closeCertificate() {
@@ -428,17 +352,18 @@ async function loadCertificates() {
 
         snapshot.forEach(doc => {
             const cert = doc.data();
+            if (cert.isDeleted) return;
             const date = cert.generatedDate ? new Date(cert.generatedDate).toLocaleString('pl-PL') : '—';
             const card = document.createElement('div');
-            card.className = "bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-amber-400 transition-all";
+            card.className = "bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-amber-400 transition-all flex justify-between items-center";
             card.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-sm text-slate-400">${date}</p>
-                        <p class="font-medium mt-1">Wersja ${cert.versionLabel || ''}</p>
-                        <p class="text-sm text-slate-400 mt-2">${cert.heirs ? cert.heirs.length : 0} spadkobierców</p>
-                    </div>
+                <div>
+                    <p class="text-sm text-slate-400">${date}</p>
+                    <p class="font-medium mt-1">Wersja ${cert.versionLabel || ''}</p>
+                </div>
+                <div class="flex gap-3">
                     <button onclick="openCertificate('${doc.id}')" class="px-5 py-2 bg-amber-400 text-slate-950 rounded-2xl text-sm font-medium hover:bg-amber-300">Otwórz</button>
+                    <button onclick="deleteCertificate('${doc.id}')" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-sm">Usuń</button>
                 </div>
             `;
             container.appendChild(card);
@@ -452,8 +377,7 @@ async function loadCertificates() {
 async function openCertificate(certId) {
     try {
         const doc = await db.collection("certificates").doc(certId).get();
-        if (!doc.exists) return alert("Certyfikat nie istnieje.");
-
+        if (!doc.exists) return alert("Certyfikat nie istnieje");
         const cert = doc.data();
         renderCertificateOverlay(cert, certId);
     } catch (error) {
@@ -461,7 +385,23 @@ async function openCertificate(certId) {
         alert("Nie udało się otworzyć certyfikatu.");
     }
 }
-}// ==================== POZOSTAŁE ====================
+
+async function deleteCertificate(certId) {
+    if (!confirm("Usunąć certyfikat? Zostanie oznaczony jako usunięty.")) return;
+    try {
+        await db.collection("certificates").doc(certId).update({
+            isDeleted: true,
+            deletedAt: firebase.firestore.Timestamp.now()
+        });
+        alert("Certyfikat usunięty.");
+        loadCertificates();
+    } catch (error) {
+        console.error(error);
+        alert("Błąd usuwania.");
+    }
+}
+
+// ==================== POZOSTAŁE ====================
 function simulateDeath() {
     if (heirs.length === 0) return alert("Dodaj spadkobierców");
     const days = document.getElementById('dmsSlider')?.value || 45;
@@ -488,7 +428,7 @@ function loadDemoData() {
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
 
-// ==================== GLOBALNE ====================
+// ==================== GLOBALNE FUNKCJE ====================
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
 window.addCustomVault = addCustomVault;
@@ -499,3 +439,4 @@ window.loadDemoData = loadDemoData;
 window.handleLogout = logout;
 window.loadCertificates = loadCertificates;
 window.openCertificate = openCertificate;
+window.deleteCertificate = deleteCertificate;
