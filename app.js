@@ -348,6 +348,7 @@ function renderCertificateOverlay(certificateData, docId) {
             </div>
             <div class="p-12">
                 <p class="text-center text-lg mb-8">Właściciel: <strong>${certificateData.ownerEmail}</strong></p>
+                
                 <h2 class="text-2xl font-semibold mb-6">Spadkobiercy</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                     ${certificateData.heirs.map(h => `
@@ -357,6 +358,7 @@ function renderCertificateOverlay(certificateData, docId) {
                         </div>
                     `).join('')}
                 </div>
+
                 <h2 class="text-2xl font-semibold mb-6">Skrytki (Zaszyfrowane)</h2>
                 <div class="space-y-4">
                     ${vaults.map(v => `
@@ -369,6 +371,7 @@ function renderCertificateOverlay(certificateData, docId) {
             </div>
             <div class="flex border-t">
                 <button onclick="printCertificate()" class="flex-1 py-6 bg-slate-900 text-white font-semibold text-lg">🖨️ Drukuj / Zapisz PDF</button>
+                <button onclick="decryptCertificate('${docId}')" class="flex-1 py-6 bg-emerald-600 text-white font-semibold text-lg">🔓 Odszyfruj Skrytki</button>
                 <button onclick="closeCertificate()" class="flex-1 py-6 font-semibold text-lg hover:bg-slate-100">Zamknij</button>
             </div>
         </div>
@@ -489,7 +492,31 @@ function loadDemoData() {
     setTimeout(() => loadCertificates(), 800);
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
+async function decryptCertificate(certId) {
+    const masterPass = prompt("Podaj Master Password aby odszyfrować skrytki:");
+    if (!masterPass) return;
 
+    try {
+        const doc = await db.collection("certificates").doc(certId).get();
+        const cert = doc.data();
+
+        if (!cert.encryptedVaults) {
+            alert("Ten certyfikat nie zawiera zaszyfrowanych danych.");
+            return;
+        }
+
+        let decryptedText = "🔓 Odszyfrowane skrytki:\n\n";
+        for (let key in cert.encryptedVaults) {
+            const decrypted = await decryptData(cert.encryptedVaults[key], masterPass);
+            decryptedText += `${key.toUpperCase()}:\n${decrypted}\n\n`;
+        }
+
+        alert(decryptedText);
+    } catch (error) {
+        console.error(error);
+        alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
+    }
+}
 // ==================== GLOBALNE FUNKCJE ====================
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
