@@ -19,7 +19,13 @@ function initializeFirebase() {
     db = firebase.firestore();
     console.log("✅ Firebase zainicjowany");
 }
-
+// Sprawdzenie autoryzacji
+async function checkAuth() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        console.warn("Użytkownik nie jest zalogowany w Firebase Auth");
+    }
+}
 const loadFirebaseScripts = () => {
     const s1 = document.createElement('script');
     s1.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js";
@@ -301,7 +307,6 @@ function setupDMS() {
     }
 }
 
-// ==================== CERTYFIKAT ====================
 async function showCertificate() {
     if (!db) {
         alert("Firebase jeszcze się ładuje...");
@@ -315,6 +320,14 @@ async function showCertificate() {
     const userEmail = localStorage.getItem('myheredo_user_email');
     if (!userEmail) return alert("Brak użytkownika");
 
+    // Szyfrujemy dane skrytek
+    const encryptedVaults = {};
+    for (let key in vaultData) {
+        if (vaultData[key] && vaultData[key].trim() !== '') {
+            encryptedVaults[key] = await encryptData(vaultData[key], masterPassword);
+        }
+    }
+
     const now = new Date();
     const certificateData = {
         ownerEmail: userEmail,
@@ -322,10 +335,7 @@ async function showCertificate() {
         generatedDate: now.toISOString(),
         dmsDays: parseInt(document.getElementById('dmsSlider')?.value || 45),
         heirs: heirs,
-        vaults: Object.keys(vaultData).map(key => ({
-            category: categoryNames[key] || key,
-            preview: vaultData[key] ? vaultData[key].substring(0, 280) + (vaultData[key].length > 280 ? '...' : '') : ''
-        })),
+        encryptedVaults: encryptedVaults,   // <-- zaszyfrowane dane
         status: "generated",
         version: now.getTime(),
         versionLabel: now.toLocaleString('pl-PL')
@@ -333,7 +343,7 @@ async function showCertificate() {
 
     try {
         const docRef = await db.collection("certificates").add(certificateData);
-        alert(`✅ Zapisano certyfikat!\nID: ${docRef.id}`);
+        alert(`✅ Zaszyfrowany certyfikat zapisany!\nID: ${docRef.id}`);
         renderCertificateOverlay(certificateData, docRef.id);
     } catch (error) {
         console.error(error);
