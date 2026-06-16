@@ -495,7 +495,7 @@ function loadDemoData() {
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
 
-// ==================== GLOBALNE FUNKCJE (OBOWIĄZKOWE) ====================
+// ==================== GLOBALNE FUNKCJE (MUSI BYĆ NA DOLE) ====================
 window.showCertificate = showCertificate;
 window.loadCertificates = loadCertificates;
 window.openCertificate = openCertificate;
