@@ -352,9 +352,9 @@ function renderCertificateOverlay(certificateData, docId) {
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4 overflow-auto">
         <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden">
             
-            <!-- Nagłówek z Twoim logo -->
+            <!-- Nagłówek z logo -->
             <div class="bg-gradient-to-br from-slate-900 to-black text-white p-12 text-center relative">
-                <img src="logo.png" alt="MyHeredo" class="h-36 mx-auto mb-8 shadow-lg">
+                <img src="logo.png" alt="MyHeredo" class="h-32 mx-auto mb-8">
                 <h1 class="text-5xl font-bold tracking-wider">CERTYFIKAT SUKCESJI</h1>
                 <p class="text-amber-400 mt-3 text-xl">MyHeredo • Cyfrowy Sejf Sukcesyjny</p>
                 <p class="text-sm text-slate-400 mt-4">ID: ${docId} | Wygenerowano: ${certificateData.versionLabel}</p>
@@ -384,19 +384,17 @@ function renderCertificateOverlay(certificateData, docId) {
                     </div>
                 </div>
 
-                <!-- Skrytki z piktogramami -->
+                <!-- Skrytki -->
                 <div>
                     <h2 class="text-2xl font-semibold mb-6 flex items-center gap-3">
                         🔒 Skrytki Sukcesyjne
                     </h2>
                     <div class="space-y-4">
                         ${vaults.map(v => `
-                            <div class="border-l-4 border-amber-400 pl-6 py-5 bg-slate-50 rounded-r-3xl flex items-center gap-4">
-                                <span class="text-4xl">📁</span>
-                                <div>
-                                    <p class="font-semibold text-lg">${v.category}</p>
-                                    <p class="text-emerald-600 text-sm font-medium">● Dane zaszyfrowane end-to-end</p>
-                                </div>
+                            <div class="border-l-4 border-amber-400 pl-6 py-4 bg-slate-50 rounded-r-3xl">
+                                <p class="font-semibold text-lg">${v.category}</p>
+                                <p class="text-emerald-600 text-sm font-medium mt-1">● Dane zaszyfrowane end-to-end</p>
+                                <p class="text-xs text-slate-500 mt-2">Dostęp po aktywacji Dead Man’s Switch</p>
                             </div>
                         `).join('')}
                     </div>
@@ -412,7 +410,6 @@ function renderCertificateOverlay(certificateData, docId) {
         </div>
     </div>`;
     document.body.insertAdjacentHTML('beforeend', html);
-}
 }
 function closeCertificate() {
     const overlay = document.getElementById('certificateOverlay');
@@ -496,7 +493,7 @@ async function deleteCertificate(certId) {
         console.error(error);
         alert("Błąd usuwania.");
     }
-
+}
 
 // ==================== POZOSTAŁE ====================
 function simulateDeath() {
