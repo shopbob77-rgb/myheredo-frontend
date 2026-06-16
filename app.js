@@ -411,6 +411,7 @@ function renderCertificateOverlay(certificateData, docId) {
     </div>`;
     document.body.insertAdjacentHTML('beforeend', html);
 }
+
 function closeCertificate() {
     const overlay = document.getElementById('certificateOverlay');
     if (overlay) overlay.remove();
