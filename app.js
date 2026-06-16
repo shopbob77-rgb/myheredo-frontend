@@ -106,6 +106,64 @@ async function initDashboard() {
     loadCertificates();
 }
 
+// ==================== TIMER ====================
+function startInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => logout(true), 20 * 60 * 1000);
+}
+
+function resetInactivityTimer() {
+    startInactivityTimer();
+}
+
+function logout(silent = false) {
+    if (!silent && !confirm("Wylogować się?")) return;
+    sessionStorage.clear();
+    window.location.href = "index.html";
+}
+
+// ==================== SZYFROWANIE ====================
+async function deriveKey(password, salt) {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits", "deriveKey"]);
+    return crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+    );
+}
+
+async function encryptData(data, password) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(password, salt);
+    const encoder = new TextEncoder();
+    const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoder.encode(JSON.stringify(data)));
+    const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+    combined.set(salt, 0);
+    combined.set(iv, salt.length);
+    combined.set(new Uint8Array(encrypted), salt.length + iv.length);
+    return btoa(String.fromCharCode(...combined));
+}
+
+async function decryptData(encryptedData, password) {
+    const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+    const salt = combined.slice(0, 16);
+    const iv = combined.slice(16, 28);
+    const ciphertext = combined.slice(28);
+    const key = await deriveKey(password, salt);
+    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
+    return JSON.parse(new TextDecoder().decode(decrypted));
+}
+
+async function saveAllData() {
+    if (!masterPassword) return;
+    const encrypted = await encryptData(vaultData, masterPassword);
+    localStorage.setItem('myheredo_encrypted_vault', encrypted);
+}
+
 // ==================== SKRYTKI ====================
 function renderSkrytki() {
     const grid = document.getElementById('skrytkiGrid');
@@ -428,7 +486,7 @@ function loadDemoData() {
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
 
-// ==================== GLOBALNE FUNKCJE ====================
+// ==================== GLOBALNE ====================
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
 window.addCustomVault = addCustomVault;
