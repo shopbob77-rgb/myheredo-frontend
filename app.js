@@ -428,11 +428,18 @@ async function loadCertificates() {
     }
 }
 
-function openCertificate(certId) {
-    alert(`Otwieranie certyfikatu ID: ${certId}\n(Funkcja w budowie)`);
-}
+async function openCertificate(certId) {
+    try {
+        const doc = await db.collection("certificates").doc(certId).get();
+        if (!doc.exists) return alert("Certyfikat nie istnieje.");
 
-// ==================== POZOSTAŁE ====================
+        const cert = doc.data();
+        renderCertificateOverlay(cert, certId);
+    } catch (error) {
+        console.error(error);
+        alert("Nie udało się otworzyć certyfikatu.");
+    }
+}// ==================== POZOSTAŁE ====================
 function simulateDeath() {
     if (heirs.length === 0) return alert("Dodaj spadkobierców");
     const days = document.getElementById('dmsSlider')?.value || 45;
