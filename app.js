@@ -19,13 +19,7 @@ function initializeFirebase() {
     db = firebase.firestore();
     console.log("✅ Firebase zainicjowany");
 }
-// Sprawdzenie autoryzacji
-async function checkAuth() {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        console.warn("Użytkownik nie jest zalogowany w Firebase Auth");
-    }
-}
+
 const loadFirebaseScripts = () => {
     const s1 = document.createElement('script');
     s1.src = "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js";
@@ -117,11 +111,9 @@ function startInactivityTimer() {
     clearTimeout(inactivityTimer);
     inactivityTimer = setTimeout(() => logout(true), 20 * 60 * 1000);
 }
-
 function resetInactivityTimer() {
     startInactivityTimer();
 }
-
 function logout(silent = false) {
     if (!silent && !confirm("Wylogować się?")) return;
     sessionStorage.clear();
@@ -140,7 +132,6 @@ async function deriveKey(password, salt) {
         ["encrypt", "decrypt"]
     );
 }
-
 async function encryptData(data, password) {
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -153,7 +144,6 @@ async function encryptData(data, password) {
     combined.set(new Uint8Array(encrypted), salt.length + iv.length);
     return btoa(String.fromCharCode(...combined));
 }
-
 async function decryptData(encryptedData, password) {
     const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
     const salt = combined.slice(0, 16);
@@ -163,7 +153,6 @@ async function decryptData(encryptedData, password) {
     const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
     return JSON.parse(new TextDecoder().decode(decrypted));
 }
-
 async function saveAllData() {
     if (!masterPassword) return;
     const encrypted = await encryptData(vaultData, masterPassword);
@@ -307,6 +296,7 @@ function setupDMS() {
     }
 }
 
+// ==================== CERTYFIKAT ====================
 async function showCertificate() {
     if (!db) {
         alert("Firebase jeszcze się ładuje...");
@@ -320,14 +310,6 @@ async function showCertificate() {
     const userEmail = localStorage.getItem('myheredo_user_email');
     if (!userEmail) return alert("Brak użytkownika");
 
-    // Szyfrujemy dane skrytek
-    const encryptedVaults = {};
-    for (let key in vaultData) {
-        if (vaultData[key] && vaultData[key].trim() !== '') {
-            encryptedVaults[key] = await encryptData(vaultData[key], masterPassword);
-        }
-    }
-
     const now = new Date();
     const certificateData = {
         ownerEmail: userEmail,
@@ -335,7 +317,10 @@ async function showCertificate() {
         generatedDate: now.toISOString(),
         dmsDays: parseInt(document.getElementById('dmsSlider')?.value || 45),
         heirs: heirs,
-        encryptedVaults: encryptedVaults,   // <-- zaszyfrowane dane
+        vaults: Object.keys(vaultData).map(key => ({
+            category: categoryNames[key] || key,
+            preview: vaultData[key] ? vaultData[key].substring(0, 280) + (vaultData[key].length > 280 ? '...' : '') : ''
+        })),
         status: "generated",
         version: now.getTime(),
         versionLabel: now.toLocaleString('pl-PL')
@@ -343,7 +328,7 @@ async function showCertificate() {
 
     try {
         const docRef = await db.collection("certificates").add(certificateData);
-        alert(`✅ Zaszyfrowany certyfikat zapisany!\nID: ${docRef.id}`);
+        alert(`✅ Zapisano certyfikat!\nID: ${docRef.id}`);
         renderCertificateOverlay(certificateData, docRef.id);
     } catch (error) {
         console.error(error);
@@ -352,7 +337,7 @@ async function showCertificate() {
 }
 
 function renderCertificateOverlay(certificateData, docId) {
-    const vaults = certificateData.vaults || certificateData.encryptedVaults || [];
+    const vaults = certificateData.vaults || [];
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4 overflow-auto">
         <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl">
@@ -363,7 +348,6 @@ function renderCertificateOverlay(certificateData, docId) {
             </div>
             <div class="p-12">
                 <p class="text-center text-lg mb-8">Właściciel: <strong>${certificateData.ownerEmail}</strong></p>
-                
                 <h2 class="text-2xl font-semibold mb-6">Spadkobiercy</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                     ${certificateData.heirs && certificateData.heirs.length ? certificateData.heirs.map(h => `
@@ -373,13 +357,12 @@ function renderCertificateOverlay(certificateData, docId) {
                         </div>
                     `).join('') : '<p class="text-slate-400">Brak spadkobierców</p>'}
                 </div>
-
                 <h2 class="text-2xl font-semibold mb-6">Skrytki</h2>
                 <div class="space-y-4">
                     ${vaults.length ? vaults.map(v => `
                         <div class="border-l-4 border-amber-400 pl-4">
-                            <p class="font-semibold">${v.category || 'Nieznana skrytka'}</p>
-                            <p class="text-sm text-slate-600">${v.preview || 'Zaszyfrowane dane'}</p>
+                            <p class="font-semibold">${v.category}</p>
+                            <p class="text-sm text-slate-600">${v.preview}</p>
                         </div>
                     `).join('') : '<p class="text-slate-400">Brak skrytek</p>'}
                 </div>
@@ -391,6 +374,15 @@ function renderCertificateOverlay(certificateData, docId) {
         </div>
     </div>`;
     document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function closeCertificate() {
+    const overlay = document.getElementById('certificateOverlay');
+    if (overlay) overlay.remove();
+}
+
+function printCertificate() {
+    window.print();
 }
 
 // ==================== MOJE CERTYFIKATY ====================
@@ -491,15 +483,10 @@ function loadDemoData() {
         instrukcje: "Testament u notariusza"
     };
     saveAllData();
-       renderSkrytki();
+    renderSkrytki();
     renderHeirs();
     setupDMS();
-    
-    // Opóźnienie dla Firebase
-    setTimeout(() => {
-        loadCertificates();
-    }, 800);
-}
+    setTimeout(() => loadCertificates(), 800);
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
 
