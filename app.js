@@ -354,7 +354,7 @@ function renderCertificateOverlay(certificateData, docId) {
             
             <!-- Nagłówek z Twoim logo -->
             <div class="bg-gradient-to-br from-slate-900 to-black text-white p-12 text-center relative">
-                <img src="logo.png" alt="MyHeredo" class="h-36 mx-auto mb-8">
+                <img src="logo.png" alt="MyHeredo" class="h-40 mx-auto mb-8">
                 <h1 class="text-5xl font-bold tracking-wider">CERTYFIKAT SUKCESJI</h1>
                 <p class="text-amber-400 mt-3 text-xl">MyHeredo • Cyfrowy Sejf Sukcesyjny</p>
                 <p class="text-sm text-slate-400 mt-4">ID: ${docId} | Wygenerowano: ${certificateData.versionLabel}</p>
