@@ -393,15 +393,6 @@ function renderCertificateOverlay(certificateData, docId) {
     document.body.insertAdjacentHTML('beforeend', html);
 }
 
-function closeCertificate() {
-    const overlay = document.getElementById('certificateOverlay');
-    if (overlay) overlay.remove();
-}
-
-function printCertificate() {
-    window.print();
-}
-
 // ==================== MOJE CERTYFIKATY ====================
 async function loadCertificates() {
     const container = document.getElementById('certificatesList');
@@ -500,7 +491,15 @@ function loadDemoData() {
         instrukcje: "Testament u notariusza"
     };
     saveAllData();
-    renderSkrytki();
+       renderSkrytki();
+    renderHeirs();
+    setupDMS();
+    
+    // Opóźnienie dla Firebase
+    setTimeout(() => {
+        loadCertificates();
+    }, 800);
+}
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
 
