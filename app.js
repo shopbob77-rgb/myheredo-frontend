@@ -354,7 +354,7 @@ function renderCertificateOverlay(certificateData, docId) {
             
             <!-- Nagłówek z Twoim logo -->
             <div class="bg-gradient-to-br from-slate-900 to-black text-white p-12 text-center relative">
-                <img src="logo.png" alt="MyHeredo" class="h-36 mx-auto mb-8 shadow-2xl">
+                <img src="logo.png" alt="MyHeredo" class="h-36 mx-auto mb-8">
                 <h1 class="text-5xl font-bold tracking-wider">CERTYFIKAT SUKCESJI</h1>
                 <p class="text-amber-400 mt-3 text-xl">MyHeredo • Cyfrowy Sejf Sukcesyjny</p>
                 <p class="text-sm text-slate-400 mt-4">ID: ${docId} | Wygenerowano: ${certificateData.versionLabel}</p>
@@ -384,19 +384,18 @@ function renderCertificateOverlay(certificateData, docId) {
                     </div>
                 </div>
 
-                <!-- Skrytki z piktogramami -->
+                <!-- Skrytki z ikonami z dashboardu -->
                 <div>
                     <h2 class="text-2xl font-semibold mb-6 flex items-center gap-3">
                         🔒 Skrytki Sukcesyjne
                     </h2>
                     <div class="space-y-4">
                         ${vaults.map(v => `
-                            <div class="border-l-4 border-amber-400 pl-6 py-5 bg-slate-50 rounded-r-3xl flex items-center gap-4">
-                                <span class="text-5xl">📁</span>
+                            <div class="border-l-4 border-amber-400 pl-6 py-5 bg-slate-50 rounded-r-3xl flex items-center gap-5">
+                                <span class="text-5xl">${getIcon(v.category.toLowerCase().replace(/[^a-z]/g, ''))}</span>
                                 <div>
                                     <p class="font-semibold text-lg">${v.category}</p>
                                     <p class="text-emerald-600 text-sm font-medium">● Dane zaszyfrowane end-to-end</p>
-                                    <p class="text-xs text-slate-500">Dostęp po aktywacji Dead Man’s Switch</p>
                                 </div>
                             </div>
                         `).join('')}
