@@ -496,7 +496,7 @@ async function deleteCertificate(certId) {
         console.error(error);
         alert("Błąd usuwania.");
     }
-}
+
 
 // ==================== POZOSTAŁE ====================
 function simulateDeath() {
