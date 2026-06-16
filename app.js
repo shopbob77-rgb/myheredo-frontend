@@ -495,15 +495,16 @@ function loadDemoData() {
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
 
-// ==================== GLOBALNE ====================
-window.addHeir = addHeir;
-window.removeHeir = removeHeir;
-window.addCustomVault = addCustomVault;
-window.deleteCustomVault = deleteCustomVault;
+// ==================== GLOBALNE FUNKCJE (ważne!) ====================
 window.showCertificate = showCertificate;
-window.simulateDeath = simulateDeath;
-window.loadDemoData = loadDemoData;
-window.handleLogout = logout;
 window.loadCertificates = loadCertificates;
 window.openCertificate = openCertificate;
 window.deleteCertificate = deleteCertificate;
+window.renderSkrytki = renderSkrytki;
+window.addCustomVault = addCustomVault;
+window.deleteCustomVault = deleteCustomVault;
+window.addHeir = addHeir;
+window.removeHeir = removeHeir;
+window.simulateDeath = simulateDeath;
+window.loadDemoData = loadDemoData;
+window.handleLogout = logout;
