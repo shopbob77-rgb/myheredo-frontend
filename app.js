@@ -352,6 +352,7 @@ async function showCertificate() {
 }
 
 function renderCertificateOverlay(certificateData, docId) {
+    const vaults = certificateData.vaults || certificateData.encryptedVaults || [];
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4 overflow-auto">
         <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl">
@@ -362,6 +363,7 @@ function renderCertificateOverlay(certificateData, docId) {
             </div>
             <div class="p-12">
                 <p class="text-center text-lg mb-8">Właściciel: <strong>${certificateData.ownerEmail}</strong></p>
+                
                 <h2 class="text-2xl font-semibold mb-6">Spadkobiercy</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                     ${certificateData.heirs.map(h => `
@@ -371,12 +373,13 @@ function renderCertificateOverlay(certificateData, docId) {
                         </div>
                     `).join('')}
                 </div>
+
                 <h2 class="text-2xl font-semibold mb-6">Skrytki</h2>
                 <div class="space-y-4">
-                    ${certificateData.vaults.map(v => `
+                    ${vaults.map(v => `
                         <div class="border-l-4 border-amber-400 pl-4">
                             <p class="font-semibold">${v.category}</p>
-                            <p class="text-sm text-slate-600">${v.preview}</p>
+                            <p class="text-sm text-slate-600">${v.preview || 'Zaszyfrowane dane'}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -404,6 +407,11 @@ async function loadCertificates() {
     const container = document.getElementById('certificatesList');
     if (!container) return;
     container.innerHTML = '<p class="text-slate-400">Ładowanie...</p>';
+
+    if (!db) {
+        container.innerHTML = '<p class="text-red-400">Firebase nie jest gotowy.</p>';
+        return;
+    }
 
     try {
         const userEmail = localStorage.getItem('myheredo_user_email');
