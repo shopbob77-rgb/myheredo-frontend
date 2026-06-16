@@ -352,12 +352,12 @@ function renderCertificateOverlay(certificateData, docId) {
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4 overflow-auto">
         <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden">
             
-            <!-- Nagłówek certyfikatu -->
+            <!-- Nagłówek z logo -->
             <div class="bg-gradient-to-br from-slate-900 to-black text-white p-12 text-center relative">
-                <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-6 opacity-90">
+                <img src="logo.png" alt="MyHeredo" class="h-32 mx-auto mb-8">
                 <h1 class="text-5xl font-bold tracking-wider">CERTYFIKAT SUKCESJI</h1>
                 <p class="text-amber-400 mt-3 text-xl">MyHeredo • Cyfrowy Sejf Sukcesyjny</p>
-                <p class="text-sm text-slate-400 mt-2">ID: ${docId} | Wygenerowano: ${certificateData.versionLabel}</p>
+                <p class="text-sm text-slate-400 mt-4">ID: ${docId} | Wygenerowano: ${certificateData.versionLabel}</p>
             </div>
 
             <!-- Treść -->
@@ -401,7 +401,7 @@ function renderCertificateOverlay(certificateData, docId) {
                 </div>
             </div>
 
-            <!-- Przyciski na dole -->
+            <!-- Przyciski -->
             <div class="flex border-t">
                 <button onclick="printCertificate()" class="flex-1 py-7 bg-slate-900 text-white font-semibold text-lg hover:bg-black transition-all">🖨️ Drukuj / Zapisz jako PDF</button>
                 <button onclick="decryptCertificate('${docId}')" class="flex-1 py-7 bg-emerald-600 text-white font-semibold text-lg hover:bg-emerald-700 transition-all">🔓 Odszyfruj Skrytki</button>
