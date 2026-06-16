@@ -366,22 +366,22 @@ function renderCertificateOverlay(certificateData, docId) {
                 
                 <h2 class="text-2xl font-semibold mb-6">Spadkobiercy</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                    ${certificateData.heirs.map(h => `
+                    ${certificateData.heirs && certificateData.heirs.length ? certificateData.heirs.map(h => `
                         <div class="bg-slate-100 p-4 rounded-2xl">
                             <p class="font-medium">${h.name}</p>
                             <p class="text-sm text-slate-600">${h.email}</p>
                         </div>
-                    `).join('')}
+                    `).join('') : '<p class="text-slate-400">Brak spadkobierców</p>'}
                 </div>
 
                 <h2 class="text-2xl font-semibold mb-6">Skrytki</h2>
                 <div class="space-y-4">
-                    ${vaults.map(v => `
+                    ${vaults.length ? vaults.map(v => `
                         <div class="border-l-4 border-amber-400 pl-4">
-                            <p class="font-semibold">${v.category}</p>
+                            <p class="font-semibold">${v.category || 'Nieznana skrytka'}</p>
                             <p class="text-sm text-slate-600">${v.preview || 'Zaszyfrowane dane'}</p>
                         </div>
-                    `).join('')}
+                    `).join('') : '<p class="text-slate-400">Brak skrytek</p>'}
                 </div>
             </div>
             <div class="flex border-t">
