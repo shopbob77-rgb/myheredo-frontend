@@ -311,12 +311,22 @@ async function showCertificate() {
     if (!userEmail) return alert("Brak użytkownika");
 
     const now = new Date();
+
+    // Szyfrujemy dane skrytek
+    const encryptedVaults = {};
+    for (let key in vaultData) {
+        if (vaultData[key] && vaultData[key].trim() !== '') {
+            encryptedVaults[key] = await encryptData(vaultData[key], masterPassword);
+        }
+    }
+
     const certificateData = {
         ownerEmail: userEmail,
         generatedAt: firebase.firestore.Timestamp.now(),
         generatedDate: now.toISOString(),
         dmsDays: parseInt(document.getElementById('dmsSlider')?.value || 45),
         heirs: heirs,
+        encryptedVaults: encryptedVaults,   // <-- zaszyfrowane dane
         vaultsSummary: Object.keys(vaultData).map(key => ({
             category: categoryNames[key] || key,
             status: "Zaszyfrowane"
@@ -328,7 +338,7 @@ async function showCertificate() {
 
     try {
         const docRef = await db.collection("certificates").add(certificateData);
-        alert(`✅ Zapisano certyfikat!\nID: ${docRef.id}`);
+        alert(`✅ Zaszyfrowany certyfikat zapisany!\nID: ${docRef.id}`);
         renderCertificateOverlay(certificateData, docRef.id);
     } catch (error) {
         console.error(error);
