@@ -330,17 +330,24 @@ function setupDMS() {
 // ==================== CERTYFIKAT SUKCESJI ====================
 async function showCertificate() {
     if (!db) {
-        alert("Firebase jeszcze się ładuje... Spróbuj za chwilę.");
+        alert("Firebase jeszcze się ładuje...");
         return;
     }
-
     if (!masterPassword) {
-        alert("Aby wygenerować certyfikat, wymagane jest hasło master.");
+        alert("Wymagane hasło master.");
         return;
     }
 
     const userEmail = localStorage.getItem('myheredo_user_email');
-    if (!userEmail) return alert("Brak zalogowanego użytkownika");
+    if (!userEmail) return alert("Brak użytkownika");
+
+    // Szyfrujemy dane skrytek
+    const encryptedVaults = {};
+    for (let key in vaultData) {
+        if (vaultData[key]) {
+            encryptedVaults[key] = await encryptData(vaultData[key], masterPassword);
+        }
+    }
 
     const now = new Date();
     const certificateData = {
@@ -349,14 +356,21 @@ async function showCertificate() {
         generatedDate: now.toISOString(),
         dmsDays: parseInt(document.getElementById('dmsSlider')?.value || 45),
         heirs: heirs,
-        vaults: Object.keys(vaultData).map(key => ({
-            category: categoryNames[key] || key,
-            preview: vaultData[key] ? vaultData[key].substring(0, 280) + (vaultData[key].length > 280 ? '...' : '') : ''
-        })),
+        encryptedVaults: encryptedVaults,        // <-- zaszyfrowane dane
         status: "generated",
         version: now.getTime(),
         versionLabel: now.toLocaleString('pl-PL')
     };
+
+    try {
+        const docRef = await db.collection("certificates").add(certificateData);
+        alert(`✅ Zaszyfrowany certyfikat zapisany!\nID: ${docRef.id}`);
+        renderCertificateOverlay(certificateData, docRef.id);
+    } catch (error) {
+        console.error(error);
+        alert("Błąd zapisu: " + error.message);
+    }
+}
 
     try {
         const docRef = await db.collection("certificates").add(certificateData);
