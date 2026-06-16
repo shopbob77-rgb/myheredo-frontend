@@ -495,7 +495,7 @@ function loadDemoData() {
     showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
 
-// ==================== GLOBALNE FUNKCJE (ważne!) ====================
+// ==================== GLOBALNE FUNKCJE (OBOWIĄZKOWE) ====================
 window.showCertificate = showCertificate;
 window.loadCertificates = loadCertificates;
 window.openCertificate = openCertificate;
@@ -508,3 +508,6 @@ window.removeHeir = removeHeir;
 window.simulateDeath = simulateDeath;
 window.loadDemoData = loadDemoData;
 window.handleLogout = logout;
+window.saveVault = saveVault;
+window.closeVaultModal = closeVaultModal;
+window.openVaultModal = openVaultModal;
