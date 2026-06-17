@@ -9,9 +9,7 @@
     <style>
         body { background-color: #0a0a0a; color: #e2e8f0; scroll-behavior: smooth; }
         .hero-logo { transition: all 0.4s ease; }
-        .nav-tab {
-            transition: all 0.3s ease;
-        }
+        .nav-tab { transition: all 0.3s ease; }
         section { scroll-margin-top: 80px; }
     </style>
 </head>
@@ -37,7 +35,7 @@
             </div>
 
             <!-- Hamburger -->
-            <button id="hamburger" class="md:hidden text-3xl">
+            <button id="hamburger" class="md:hidden text-3xl text-white">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -56,8 +54,94 @@
         </div>
     </nav>
 
-    <!-- Reszta kodu bez zmian (Hero, sekcje, stopka) -->
-    <!-- ... (wklej resztę swojego kodu z poprzedniej wersji) ... -->
+    <!-- Hero -->
+    <section class="pt-16 pb-16 sm:pt-20 sm:pb-20 text-center">
+        <div class="max-w-5xl mx-auto px-6">
+            <img src="logo.png" alt="MyHeredo" class="hero-logo mx-auto h-40 sm:h-52 mb-8">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-6 px-4">
+                Twój cyfrowy majątek.<br>
+                <span class="text-amber-400">Dziedzictwo na pokolenia.</span>
+            </h1>
+            <p class="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto px-4">
+                Bezpieczna platforma sukcesyjna, która uzupełnia polisy ubezpieczeniowe o ochronę cyfrowych aktywów.
+            </p>
+        </div>
+    </section>
+
+    <!-- Jak działa -->
+    <section id="jak-dziala" class="py-16 sm:py-20 bg-slate-950">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16">Jak działa MyHeredo?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+                <div class="bg-slate-900 p-8 sm:p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">📦</div>
+                    <h3 class="text-2xl font-semibold mb-4">1. Tworzysz skrytki</h3>
+                    <p class="text-slate-400">Zapisujesz kluczowe wskazówki do kont bankowych, kryptowalut, maili i innych aktywów cyfrowych.</p>
+                </div>
+                <div class="bg-slate-900 p-8 sm:p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">👥</div>
+                    <h3 class="text-2xl font-semibold mb-4">2. Wyznaczasz spadkobierców</h3>
+                    <p class="text-slate-400">Dodajesz zaufane osoby, które otrzymają dostęp po Twojej śmierci.</p>
+                </div>
+                <div class="bg-slate-900 p-8 sm:p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">⏰</div>
+                    <h3 class="text-2xl font-semibold mb-4">3. Dead Man’s Switch</h3>
+                    <p class="text-slate-400">Automatyczne przekazanie dostępu po wybranej liczbie dni bezczynności.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bezpieczeństwo -->
+    <section id="bezpieczenstwo" class="py-16 sm:py-20">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16">Bezpieczeństwo na najwyższym poziomie</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
+                <div class="bg-slate-900 p-8 sm:p-10 rounded-3xl">
+                    <div class="text-6xl mb-6">🔒</div>
+                    <h3 class="text-2xl font-semibold mb-4">End-to-End Encryption</h3>
+                    <p class="text-slate-400">Wszystkie dane są szyfrowane bezpośrednio na Twoim urządzeniu.</p>
+                </div>
+                <div class="bg-slate-900 p-8 sm:p-10 rounded-3xl">
+                    <div class="text-6xl mb-6">🛡️</div>
+                    <h3 class="text-2xl font-semibold mb-4">2FA + Master Password</h3>
+                    <p class="text-slate-400">Dwustopniowa weryfikacja oraz dodatkowe hasło master chroniące cały sejf.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dla Agentów -->
+    <section id="dla-agentow" class="py-16 sm:py-20 bg-slate-950">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16">Dlaczego warto polecić MyHeredo?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+                <div class="bg-slate-900 p-8 sm:p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">💰</div>
+                    <h3 class="text-2xl font-semibold mb-4">Zwiększ wartość polisy</h3>
+                    <p class="text-slate-400">MyHeredo jest naturalnym dopełnieniem klasycznego ubezpieczenia na życie.</p>
+                </div>
+                <div class="bg-slate-900 p-8 sm:p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">🤝</div>
+                    <h3 class="text-2xl font-semibold mb-4">Buduj długoterminowe relacje</h3>
+                    <p class="text-slate-400">Pomagasz całej rodzinie w trudnym momencie.</p>
+                </div>
+                <div class="bg-slate-900 p-8 sm:p-10 rounded-3xl text-center">
+                    <div class="text-6xl mb-6">⭐</div>
+                    <h3 class="text-2xl font-semibold mb-4">Wyróżnij się na rynku</h3>
+                    <p class="text-slate-400">Oferujesz nowoczesne rozwiązanie sukcesji cyfrowej.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stopka -->
+    <footer class="bg-black border-t border-slate-800 py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center text-slate-500">
+            <p>© 2026 MyHeredo • Cyfrowa Warstwa Sukcesyjna</p>
+            <p class="mt-2 text-sm">Wersja demonstracyjna • Tylko do celów prezentacyjnych</p>
+        </div>
+    </footer>
 
     <script>
         // Hamburger Menu
@@ -69,16 +153,6 @@
             const icon = hamburger.querySelector('i');
             icon.classList.toggle('fa-bars');
             icon.classList.toggle('fa-times');
-        });
-
-        // Zamknij menu po kliknięciu linku
-        document.querySelectorAll('#mobileMenu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-                const icon = hamburger.querySelector('i');
-                icon.classList.add('fa-bars');
-                icon.classList.remove('fa-times');
-            });
         });
     </script>
 </body>
