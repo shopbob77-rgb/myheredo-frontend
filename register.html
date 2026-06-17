@@ -98,7 +98,7 @@
 
         function generateQRCode(email) {
             const qrcodeDiv = document.getElementById('qrcode');
-            qrcodeDiv.innerHTML = '';
+            qrcodeDiv.innerHTML = '';  // Czyścimy przed generowaniem
            
             new QRCode(qrcodeDiv, {
                 text: `otpauth://totp/MyHeredo:${email}?secret=JVK5K2L2M3N4P5Q6R7S8T9U0V&issuer=MyHeredo`,
