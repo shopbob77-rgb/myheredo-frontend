@@ -13,43 +13,53 @@
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
+        #qrcode {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto;
+        }
+        @media (max-width: 640px) {
+            #qrcode {
+                width: 180px;
+                height: 180px;
+            }
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center">
+<body class="min-h-screen flex items-center justify-center py-8">
     <div class="max-w-md w-full mx-4">
-        
+       
         <!-- Krok 1: Dane logowania -->
-        <div id="step1" class="bg-slate-900 rounded-3xl p-10">
+        <div id="step1" class="bg-slate-900 rounded-3xl p-8 sm:p-10">
             <div class="flex justify-center mb-8">
-                <img src="logo.png" alt="MyHeredo" class="h-16">
+                <img src="logo.png" alt="MyHeredo" class="h-14">
             </div>
             <h1 class="text-3xl font-bold text-center mb-8">Utwórz konto</h1>
-            
+           
             <div class="space-y-6">
                 <input id="email" type="email" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-amber-400" placeholder="Adres e-mail">
                 <input id="password" type="password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-amber-400" placeholder="Hasło">
                 <input id="passwordConfirm" type="password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-amber-400" placeholder="Powtórz hasło">
             </div>
-
             <button onclick="goToStep2()" class="w-full mt-8 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-4 rounded-2xl text-lg">
                 Dalej
             </button>
         </div>
 
         <!-- Krok 2: 2FA -->
-        <div id="step2" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4 modal">
+        <div id="step2" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div class="bg-slate-900 rounded-3xl p-6 sm:p-8 max-w-md w-full modal">
                 <h2 class="text-2xl font-semibold text-center mb-6">Konfiguracja 2FA</h2>
                 <p class="text-center text-slate-400 mb-6">Zeskanuj kod QR aplikacją autentykatora</p>
-                
+               
                 <div class="flex justify-center mb-8">
-                    <div id="qrcode" class="bg-white p-4 rounded-2xl"></div>
+                    <div id="qrcode" class="bg-white p-3 rounded-2xl"></div>
                 </div>
-
-                <!-- Pole do wpisania kodu z aplikacji -->
+                
+                <!-- Pole do wpisania kodu -->
                 <div class="mb-6">
-                    <p class="text-sm text-slate-400 mb-2">Wpisz kod z aplikacji autentykatora:</p>
-                    <input id="verificationCode" type="text" maxlength="6" 
+                    <p class="text-sm text-slate-400 mb-2">Wpisz kod z aplikacji:</p>
+                    <input id="verificationCode" type="text" maxlength="6"
                            class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 text-center text-2xl tracking-widest focus:outline-none focus:border-amber-400"
                            placeholder="123456">
                 </div>
@@ -64,9 +74,7 @@
                         </button>
                     </div>
                 </div>
-
-                <button onclick="verifyCode()" 
-                        class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-4 rounded-2xl text-lg">
+                <button onclick="verifyCode()" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-4 rounded-2xl text-lg">
                     Zweryfikuj i zakończ rejestrację
                 </button>
             </div>
@@ -79,25 +87,23 @@
             const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value;
             const passConfirm = document.getElementById('passwordConfirm').value;
-
             if (!email || !pass || !passConfirm) return alert("Wypełnij wszystkie pola");
             if (pass !== passConfirm) return alert("Hasła nie są identyczne");
             if (pass.length < 8) return alert("Hasło musi mieć co najmniej 8 znaków");
-
+            
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.remove('hidden');
-
             generateQRCode(email);
         }
 
         function generateQRCode(email) {
             const qrcodeDiv = document.getElementById('qrcode');
             qrcodeDiv.innerHTML = '';
-            
+           
             new QRCode(qrcodeDiv, {
                 text: `otpauth://totp/MyHeredo:${email}?secret=JVK5K2L2M3N4P5Q6R7S8T9U0V&issuer=MyHeredo`,
-                width: 260,
-                height: 260,
+                width: 220,
+                height: 220,
                 colorDark: "#000000",
                 colorLight: "#ffffff"
             });
@@ -106,21 +112,18 @@
         function copyBackupCode() {
             const code = document.getElementById('backupCode').textContent;
             navigator.clipboard.writeText(code).then(() => {
-                alert("Kod backup skopiowany do schowka!");
+                alert("Kod backup skopiowany!");
             });
         }
 
         function verifyCode() {
             const code = document.getElementById('verificationCode').value.trim();
-            
             if (code.length !== 6) {
                 alert("Kod musi składać się z 6 cyfr");
                 return;
             }
-
-            // Demo - akceptujemy kod 123456
             if (code === "123456") {
-                alert("✅ Rejestracja zakończona pomyślnie!\n\n2FA zostało włączone.");
+                alert("✅ Rejestracja zakończona pomyślnie!");
                 window.location.href = "login.html";
             } else {
                 alert("Niepoprawny kod. W demo użyj: 123456");
