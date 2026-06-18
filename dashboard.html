@@ -16,6 +16,25 @@
     <style>
         body { background-color: #0a0a0a; color: #e2e8f0; }
         .dashboard-container { min-height: 100vh; max-width: 1480px; margin: 0 auto; padding: 24px; }
+       <style>
+    /* ... istniejące style ... */
+
+    #skrytkiGrid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+        #skrytkiGrid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .skrytka-card {
+            padding: 18px !important;
+        }
+    }
+</style> 
     </style>
 
     <!-- INLINE MANIFEST -->
