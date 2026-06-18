@@ -624,24 +624,31 @@ async function decryptCertificate(certId) {
         alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
     }
 }
-// ==================== FINALNA NAPRAWA GLOBALNYCH FUNKCJI ====================
+// ==================== FINAL GLOBAL REGISTRATION ====================
+// To musi być na samym dole pliku app.js
 
-// Bezpieczne przypisanie wszystkich funkcji
-const globalFunctions = {
-    addHeir, removeHeir, addCustomVault, deleteCustomVault,
-    saveRecoveryPassword, showCertificate, decryptCertificate,
-    simulateDeath, loadDemoData, handleLogout, loadCertificates,
-    openCertificate, closeCertificate, printCertificate,
-    openVaultModal, closeVaultModal, saveVault
-};
+window.addHeir = addHeir;
+window.removeHeir = removeHeir;
+window.addCustomVault = addCustomVault;
+window.deleteCustomVault = deleteCustomVault;
+window.saveRecoveryPassword = saveRecoveryPassword;
+window.showCertificate = showCertificate;
+window.decryptCertificate = decryptCertificate;
+window.simulateDeath = simulateDeath;
+window.loadDemoData = loadDemoData;
+window.handleLogout = handleLogout;
+window.loadCertificates = loadCertificates;
+window.openCertificate = openCertificate;
+window.closeCertificate = closeCertificate;
+window.printCertificate = printCertificate;
+window.openVaultModal = openVaultModal;
+window.closeVaultModal = closeVaultModal;
+window.saveVault = saveVault;
 
-Object.keys(globalFunctions).forEach(key => {
-    if (typeof globalFunctions[key] === 'function') {
-        window[key] = globalFunctions[key];
-    }
+// Bezpieczna wersja na wypadek błędów
+window.addEventListener('load', () => {
+    console.log("✅ Wszystkie funkcje globalne zostały zarejestrowane");
 });
-
-console.log("✅ Globalne funkcje zostały zarejestrowane");
 // ==================== RECOVERY PASSWORD ====================
 let recoveryPassword = null;
 
