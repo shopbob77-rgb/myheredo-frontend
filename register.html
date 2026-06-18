@@ -46,23 +46,49 @@
             </button>
         </div>
 
-        <!-- Krok 2: 2FA -->
-        <div id="step2" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div class="bg-slate-900 rounded-3xl p-6 sm:p-8 max-w-md w-full modal">
-                <h2 class="text-2xl font-semibold text-center mb-6">Konfiguracja 2FA</h2>
-                <p class="text-center text-slate-400 mb-6">Zeskanuj kod QR aplikacją autentykatora</p>
-               
-                <div class="flex justify-center mb-8">
-                    <div id="qrcode" class="bg-white p-3 rounded-2xl"></div>
-                </div>
-                
-                <!-- Pole do wpisania kodu -->
-                <div class="mb-6">
-                    <p class="text-sm text-slate-400 mb-2">Wpisz kod z aplikacji:</p>
-                    <input id="verificationCode" type="text" maxlength="6"
-                           class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 text-center text-2xl tracking-widest focus:outline-none focus:border-amber-400"
-                           placeholder="123456">
-                </div>
+      <!-- Krok 2: 2FA -->
+<div id="step2" class="hidden bg-slate-900 rounded-3xl p-6 sm:p-10 max-w-md w-full mx-auto">
+    <div class="flex justify-center mb-6">
+        <img src="logo.png" alt="MyHeredo" class="h-14">
+    </div>
+    
+    <h1 class="text-2xl font-bold text-center mb-2">Włącz 2FA</h1>
+    <p class="text-center text-slate-400 mb-8">Zeskanuj kod QR w aplikacji autentykatorowej</p>
+
+    <!-- QR Code -->
+    <div class="flex justify-center mb-6 bg-white p-4 rounded-2xl">
+        <div id="qrcode" class="p-2"></div>
+    </div>
+
+    <!-- Backup Code -->
+    <div class="mb-8">
+        <p class="text-sm text-slate-400 mb-2 text-center">Kod backup (zachowaj go!)</p>
+        <div id="backupCode" 
+             class="font-mono bg-slate-800 p-4 rounded-2xl text-center text-amber-400 text-sm break-all cursor-pointer hover:bg-slate-700"
+             onclick="copyBackupCode()">
+        </div>
+    </div>
+
+    <!-- Wpisz kod -->
+    <div class="space-y-3">
+        <p class="text-sm text-slate-400 text-center">Wpisz kod z aplikacji autentykatora</p>
+        <input id="verificationCode" 
+               type="text" 
+               maxlength="6" 
+               class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 text-center text-2xl tracking-widest focus:outline-none focus:border-amber-400"
+               placeholder="123456"
+               onkeypress="if(event.key === 'Enter') verifyCode()">
+        
+        <button onclick="verifyCode()" 
+                class="w-full mt-4 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-4 rounded-2xl transition-all">
+            Zweryfikuj kod
+        </button>
+    </div>
+
+    <p class="text-center text-xs text-slate-500 mt-8">
+        Nie masz aplikacji? Użyj Google Authenticator, Microsoft Authenticator lub Authy.
+    </p>
+</div>
 
                 <!-- Backup Code -->
                 <div class="bg-slate-800 rounded-2xl p-5 mb-8">
