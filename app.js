@@ -624,26 +624,24 @@ async function decryptCertificate(certId) {
         alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
     }
 }
-// ==================== GLOBALNE FUNKCJE - FINALNA NAPRAWA ====================
+// ==================== FINALNA NAPRAWA GLOBALNYCH FUNKCJI ====================
 
-window.addHeir = typeof addHeir !== 'undefined' ? addHeir : () => {};
-window.removeHeir = typeof removeHeir !== 'undefined' ? removeHeir : () => {};
-window.addCustomVault = typeof addCustomVault !== 'undefined' ? addCustomVault : () => {};
-window.deleteCustomVault = typeof deleteCustomVault !== 'undefined' ? deleteCustomVault : () => {};
-window.saveRecoveryPassword = typeof saveRecoveryPassword !== 'undefined' ? saveRecoveryPassword : () => {};
-window.showCertificate = typeof showCertificate !== 'undefined' ? showCertificate : () => {};
-window.decryptCertificate = typeof decryptCertificate !== 'undefined' ? decryptCertificate : () => {};
-window.simulateDeath = typeof simulateDeath !== 'undefined' ? simulateDeath : () => {};
-window.loadDemoData = typeof loadDemoData !== 'undefined' ? loadDemoData : () => {};
-window.handleLogout = typeof handleLogout !== 'undefined' ? handleLogout : () => {};
-window.loadCertificates = typeof loadCertificates !== 'undefined' ? loadCertificates : () => {};
-window.openCertificate = typeof openCertificate !== 'undefined' ? openCertificate : () => {};
-window.closeCertificate = typeof closeCertificate !== 'undefined' ? closeCertificate : () => {};
-window.printCertificate = typeof printCertificate !== 'undefined' ? printCertificate : () => {};
-window.openVaultModal = typeof openVaultModal !== 'undefined' ? openVaultModal : () => {};
-window.closeVaultModal = typeof closeVaultModal !== 'undefined' ? closeVaultModal : () => {};
-window.saveVault = typeof saveVault !== 'undefined' ? saveVault : () => {};
+// Bezpieczne przypisanie wszystkich funkcji
+const globalFunctions = {
+    addHeir, removeHeir, addCustomVault, deleteCustomVault,
+    saveRecoveryPassword, showCertificate, decryptCertificate,
+    simulateDeath, loadDemoData, handleLogout, loadCertificates,
+    openCertificate, closeCertificate, printCertificate,
+    openVaultModal, closeVaultModal, saveVault
+};
 
+Object.keys(globalFunctions).forEach(key => {
+    if (typeof globalFunctions[key] === 'function') {
+        window[key] = globalFunctions[key];
+    }
+});
+
+console.log("✅ Globalne funkcje zostały zarejestrowane");
 // ==================== RECOVERY PASSWORD ====================
 let recoveryPassword = null;
 
