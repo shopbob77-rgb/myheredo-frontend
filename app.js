@@ -624,8 +624,7 @@ async function decryptCertificate(certId) {
         alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
     }
 }
-// ==================== GLOBALNE FUNKCJE - NAPRAWA (NA SAMYM DOLE) ====================
-
+// ==================== GLOBALNE FUNKCJE - NAPRAWA ====================
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
 window.addCustomVault = addCustomVault;
@@ -643,11 +642,10 @@ window.printCertificate = printCertificate;
 window.openVaultModal = openVaultModal;
 window.closeVaultModal = closeVaultModal;
 window.saveVault = saveVault;
-// ==================== RECOVERY PASSWORD & ODSZYFROWYWANIE ====================
 
+// ==================== RECOVERY PASSWORD ====================
 let recoveryPassword = null;
 
-// Zapisywanie Recovery Password
 function saveRecoveryPassword() {
     const input = document.getElementById('recoveryPassword');
     if (!input) return;
@@ -661,25 +659,14 @@ function saveRecoveryPassword() {
     alert("✅ Recovery Password został zapisany pomyślnie!\n\nPrzekaż go spadkobiercom w testamencie lub u notariusza.");
 }
 
-// Ładowanie przy uruchomieniu (dodaj do initDashboard)
-function initDashboard() {
-    // ... Twój istniejący kod initDashboard ...
-
-    const savedRecovery = localStorage.getItem('myheredo_recovery_password');
-    if (savedRecovery) recoveryPassword = savedRecovery;
-}
-
-// Odszyfrowywanie na certyfikacie
 async function decryptCertificate(certId) {
     const inputPass = prompt("Wpisz Recovery Password aby odszyfrować dane spadkobierców:");
     if (!inputPass) return;
 
     if (inputPass === recoveryPassword || inputPass === localStorage.getItem('myheredo_recovery_password')) {
         alert("✅ Poprawny Recovery Password!\n\nDane skrytek zostały odszyfrowane.");
-        // Tutaj w przyszłości można wyświetlić pełne dane
     } else {
         alert("❌ Niepoprawny Recovery Password.");
     }
 }
-
 
