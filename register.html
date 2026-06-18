@@ -46,28 +46,51 @@
             </button>
         </div>
 
-      <!-- Krok 2: 2FA -->
+  <!-- Krok 2: 2FA -->
 <div id="step2" class="hidden bg-slate-900 rounded-3xl p-6 sm:p-10 max-w-md w-full mx-auto">
     <div class="flex justify-center mb-6">
         <img src="logo.png" alt="MyHeredo" class="h-14">
     </div>
     
     <h1 class="text-2xl font-bold text-center mb-2">Włącz 2FA</h1>
-    <p class="text-center text-slate-400 mb-8">Zeskanuj kod QR w aplikacji autentykatorowej</p>
+    <p class="text-center text-slate-400 mb-6">Zeskanuj kod QR w aplikacji autentykatorowej</p>
 
-    <!-- QR Code -->
-    <div class="flex justify-center mb-6 bg-white p-4 rounded-2xl">
-        <div id="qrcode" class="p-2"></div>
+    <!-- QR Code - poprawione centrowanie -->
+    <div class="flex justify-center mb-8 bg-white p-4 rounded-2xl shadow-inner">
+        <div id="qrcode" class="p-3"></div>
     </div>
 
     <!-- Backup Code -->
     <div class="mb-8">
-        <p class="text-sm text-slate-400 mb-2 text-center">Kod backup (zachowaj go!)</p>
-        <div id="backupCode" 
-             class="font-mono bg-slate-800 p-4 rounded-2xl text-center text-amber-400 text-sm break-all cursor-pointer hover:bg-slate-700"
-             onclick="copyBackupCode()">
+        <p class="text-sm text-slate-400 mb-3 text-center">Kod backup (zachowaj go!)</p>
+        <div id="backupCodeContainer" class="hidden">
+            <div id="backupCode" 
+                 class="font-mono bg-slate-800 p-4 rounded-2xl text-center text-amber-400 text-sm break-all cursor-pointer hover:bg-slate-700"
+                 onclick="copyBackupCode()">
+            </div>
         </div>
     </div>
+
+    <!-- Wpisz kod -->
+    <div>
+        <p class="text-sm text-slate-400 text-center mb-3">Wpisz kod z aplikacji autentykatora</p>
+        <input id="verificationCode" 
+               type="text" 
+               maxlength="6" 
+               class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 text-center text-2xl tracking-widest focus:outline-none focus:border-amber-400"
+               placeholder="123456"
+               onkeypress="if(event.key === 'Enter') verifyCode()">
+        
+        <button onclick="verifyCode()" 
+                class="w-full mt-6 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-4 rounded-2xl transition-all">
+            Zweryfikuj kod
+        </button>
+    </div>
+
+    <p class="text-center text-xs text-slate-500 mt-8">
+        Nie masz aplikacji? Użyj Google Authenticator, Microsoft Authenticator lub Authy.
+    </p>
+</div>
 
     <!-- Wpisz kod -->
     <div class="space-y-3">
