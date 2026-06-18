@@ -678,7 +678,7 @@ async function decryptCertificate(certId) {
     }
 }
 
-// ==================== GLOBALNE WYWOŁANIA (NA SAMYM DOLE PLIKU) ====================
+// ==================== GLOBALNE FUNKCJE - NAPRAWA (NA SAMYM DOLE) ====================
 
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
