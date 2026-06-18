@@ -355,9 +355,9 @@ function renderCertificateOverlay(certificateData, docId) {
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-6 overflow-auto">
         <div class="bg-white max-w-3xl w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none text-slate-900">
 
-            <!-- Nagłówek -->
+            <!-- Nagłówek z logo -->
             <div class="pt-12 pb-8 text-center border-b border-slate-200">
-                <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-6">
+                <img src="logo.png" alt="MyHeredo" class="h-24 mx-auto mb-6 object-contain">
                 <h1 class="text-4xl font-bold tracking-wider">CERTYFIKAT SUKCESJI</h1>
                 <p class="text-slate-600 mt-2">MyHeredo • Cyfrowy Sejf Spadkowy</p>
             </div>
