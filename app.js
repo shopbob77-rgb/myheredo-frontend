@@ -164,28 +164,35 @@ function renderSkrytki() {
     const grid = document.getElementById('skrytkiGrid');
     if (!grid) return;
     grid.innerHTML = '';
+
     Object.keys(vaultData).forEach((key) => {
         const isFilled = vaultData[key] && vaultData[key].trim() !== '';
         const isCustom = !Object.keys(defaultCategories).includes(key);
+
         const card = document.createElement('div');
-        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} rounded-3xl p-6 cursor-pointer relative`;
+        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
+                          rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
+
+        const icon = getIcon ? getIcon(key) : '📁';
+
         card.innerHTML = `
-            <div class="flex items-center gap-4">
-                <div class="text-4xl">${getIcon(key)}</div>
+            <div class="flex items-start gap-4">
+                <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="font-semibold text-lg truncate">${categoryNames[key] || key}</h3>
-                    <p class="text-sm ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
+                    <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${categoryNames[key] || key}</h3>
+                    <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
                         ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
                     </p>
                 </div>
             </div>
-            ${isCustom ? `<button onclick="event.stopImmediatePropagation(); deleteCustomVault('${key}');" class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>` : ''}
+            ${isCustom ? `<button onclick="event.stopImmediatePropagation(); deleteCustomVault('${key}');" 
+                         class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>` : ''}
         `;
+
         card.onclick = () => openVaultModal(key);
         grid.appendChild(card);
     });
 }
-
 function getIcon(key) {
     if (customIcons[key]) return customIcons[key];
     const icons = { passwordManager: "🔑", banki: "🏦", krypto: "₿", social: "📱", instrukcje: "📜" };
