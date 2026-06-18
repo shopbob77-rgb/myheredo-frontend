@@ -624,24 +624,25 @@ async function decryptCertificate(certId) {
         alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
     }
 }
-// ==================== GLOBALNE FUNKCJE - NAPRAWA ====================
-window.addHeir = addHeir;
-window.removeHeir = removeHeir;
-window.addCustomVault = addCustomVault;
-window.deleteCustomVault = deleteCustomVault;
-window.saveRecoveryPassword = saveRecoveryPassword;
-window.showCertificate = showCertificate;
-window.decryptCertificate = decryptCertificate;
-window.simulateDeath = simulateDeath;
-window.loadDemoData = loadDemoData;
-window.handleLogout = handleLogout;
-window.loadCertificates = loadCertificates;
-window.openCertificate = openCertificate;
-window.closeCertificate = closeCertificate;
-window.printCertificate = printCertificate;
-window.openVaultModal = openVaultModal;
-window.closeVaultModal = closeVaultModal;
-window.saveVault = saveVault;
+// ==================== GLOBALNE FUNKCJE - FINALNA NAPRAWA ====================
+
+window.addHeir = typeof addHeir !== 'undefined' ? addHeir : () => {};
+window.removeHeir = typeof removeHeir !== 'undefined' ? removeHeir : () => {};
+window.addCustomVault = typeof addCustomVault !== 'undefined' ? addCustomVault : () => {};
+window.deleteCustomVault = typeof deleteCustomVault !== 'undefined' ? deleteCustomVault : () => {};
+window.saveRecoveryPassword = typeof saveRecoveryPassword !== 'undefined' ? saveRecoveryPassword : () => {};
+window.showCertificate = typeof showCertificate !== 'undefined' ? showCertificate : () => {};
+window.decryptCertificate = typeof decryptCertificate !== 'undefined' ? decryptCertificate : () => {};
+window.simulateDeath = typeof simulateDeath !== 'undefined' ? simulateDeath : () => {};
+window.loadDemoData = typeof loadDemoData !== 'undefined' ? loadDemoData : () => {};
+window.handleLogout = typeof handleLogout !== 'undefined' ? handleLogout : () => {};
+window.loadCertificates = typeof loadCertificates !== 'undefined' ? loadCertificates : () => {};
+window.openCertificate = typeof openCertificate !== 'undefined' ? openCertificate : () => {};
+window.closeCertificate = typeof closeCertificate !== 'undefined' ? closeCertificate : () => {};
+window.printCertificate = typeof printCertificate !== 'undefined' ? printCertificate : () => {};
+window.openVaultModal = typeof openVaultModal !== 'undefined' ? openVaultModal : () => {};
+window.closeVaultModal = typeof closeVaultModal !== 'undefined' ? closeVaultModal : () => {};
+window.saveVault = typeof saveVault !== 'undefined' ? saveVault : () => {};
 
 // ==================== RECOVERY PASSWORD ====================
 let recoveryPassword = null;
