@@ -356,26 +356,27 @@ function renderCertificateOverlay(certificateData, docId) {
     });
 
     const html = `
-    <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-4 overflow-auto">
-        <div class="bg-white text-slate-900 max-w-3xl w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none">
+    <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-6 overflow-auto">
+        <div class="bg-white text-slate-900 max-w-2xl w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none">
 
-            <!-- Nagłówek z logo -->
-            <div class="pt-12 pb-8 text-center border-b">
+            <!-- Nagłówek -->
+            <div class="pt-10 pb-8 text-center border-b border-slate-200">
                 <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-6">
-                <h1 class="text-4xl font-bold tracking-wider text-slate-900">CERTYFIKAT SUKCESJI</h1>
-                <p class="text-slate-500 mt-2">MyHeredo • Cyfrowy Sejf Spadkowy</p>
+                <h1 class="text-4xl font-bold tracking-widest">CERTYFIKAT SUKCESJI</h1>
+                <p class="text-slate-600 mt-2">MyHeredo • Cyfrowy Sejf Spadkowy</p>
             </div>
 
             <div class="p-10 space-y-10">
+
                 <!-- Numer i data -->
-                <div class="flex justify-between items-start">
+                <div class="flex justify-between">
                     <div>
                         <p class="text-xs uppercase tracking-widest text-slate-500">Numer certyfikatu</p>
-                        <p class="font-mono text-2xl font-semibold text-slate-900">${docId}</p>
+                        <p class="font-mono text-3xl font-bold text-slate-900">${docId}</p>
                     </div>
                     <div class="text-right">
                         <p class="text-xs uppercase tracking-widest text-slate-500">Data wystawienia</p>
-                        <p class="text-xl">${formattedDate}</p>
+                        <p class="text-xl font-medium">${formattedDate}</p>
                     </div>
                 </div>
 
@@ -386,23 +387,23 @@ function renderCertificateOverlay(certificateData, docId) {
                 </div>
 
                 <!-- Dead Man’s Switch -->
-                <div class="bg-amber-50 border border-amber-200 p-6 rounded-2xl">
-                    <p class="text-sm uppercase tracking-widest text-amber-600">Dead Man’s Switch</p>
-                    <p class="text-2xl font-semibold mt-2">${certificateData.dmsDays || 45} dni bezczynności</p>
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+                    <p class="text-amber-600 text-sm uppercase tracking-widest">Dead Man’s Switch</p>
+                    <p class="text-2xl font-semibold mt-1">${certificateData.dmsDays || 45} dni bezczynności</p>
                 </div>
 
                 <!-- Skrytki -->
                 <div>
-                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-4">ZABEZPIECZONE SKRYTKI</p>
-                    <div class="space-y-3">
+                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-5">ZABEZPIECZONE SKRYTKI</p>
+                    <div class="space-y-4">
                         ${vaults.map(v => `
                             <div class="flex items-center justify-between bg-slate-50 border border-slate-200 px-6 py-5 rounded-2xl">
                                 <div class="flex items-center gap-4">
-                                    <span class="text-3xl">${getIcon ? getIcon(v.category.toLowerCase()) : '🔒'}</span>
+                                    <span class="text-4xl">${getIcon ? getIcon(v.category.toLowerCase().replace(/[^a-z0-9]/g, '')) : '🔒'}</span>
                                     <span class="font-medium">${v.category}</span>
                                 </div>
-                                <span class="${v.status.includes('Zaszyfrowane') ? 'text-emerald-600' : 'text-slate-400'} font-medium">
-                                    ${v.status}
+                                <span class="${v.status && v.status.includes('Zaszyfrowane') ? 'text-emerald-600 font-medium' : 'text-slate-400'}">
+                                    ${v.status || (vaults.length > 0 ? 'Pusta' : '')}
                                 </span>
                             </div>
                         `).join('')}
@@ -411,11 +412,11 @@ function renderCertificateOverlay(certificateData, docId) {
 
                 <!-- Spadkobiercy -->
                 <div>
-                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-4">SPADKOBIERCY (${certificateData.heirs.length})</p>
-                    <div class="grid grid-cols-1 gap-4">
-                        ${certificateData.heirs.map(h => `
+                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-5">SPADKOBIERCY (${certificateData.heirs ? certificateData.heirs.length : 0})</p>
+                    <div class="space-y-4">
+                        ${(certificateData.heirs || []).map(h => `
                             <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl">
-                                <p class="font-semibold">${h.name}</p>
+                                <p class="font-semibold text-lg">${h.name}</p>
                                 <p class="text-slate-600">${h.email}</p>
                                 <p class="text-emerald-600 text-sm mt-3">● Pełny dostęp</p>
                             </div>
@@ -425,14 +426,17 @@ function renderCertificateOverlay(certificateData, docId) {
             </div>
 
             <!-- Przyciski -->
-            <div class="border-t p-8 flex flex-col sm:flex-row gap-4 print:hidden">
-                <button onclick="printCertificate()" class="flex-1 py-6 bg-slate-900 text-white font-semibold rounded-2xl text-lg hover:bg-black transition-all">
+            <div class="border-t border-slate-200 p-8 flex flex-col sm:flex-row gap-4 print:hidden">
+                <button onclick="printCertificate()" 
+                        class="flex-1 py-6 bg-slate-900 hover:bg-black text-white font-semibold rounded-2xl text-lg transition-all">
                     🖨️ Drukuj / Zapisz jako PDF
                 </button>
-                <button onclick="decryptCertificate('${docId}')" class="flex-1 py-6 bg-emerald-600 text-white font-semibold rounded-2xl text-lg hover:bg-emerald-700 transition-all">
+                <button onclick="decryptCertificate('${docId}')" 
+                        class="flex-1 py-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl text-lg transition-all">
                     🔓 Odszyfruj Skrytki
                 </button>
-                <button onclick="closeCertificate()" class="flex-1 py-6 border border-slate-300 font-semibold rounded-2xl text-lg hover:bg-slate-100 transition-all">
+                <button onclick="closeCertificate()" 
+                        class="flex-1 py-6 border border-slate-300 hover:bg-slate-100 font-semibold rounded-2xl text-lg transition-all">
                     Zamknij
                 </button>
             </div>
