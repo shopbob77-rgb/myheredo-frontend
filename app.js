@@ -353,25 +353,25 @@ function renderCertificateOverlay(certificateData, docId) {
 
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-6 overflow-auto">
-        <div class="bg-white max-w-2xl w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none text-slate-900">
+        <div class="bg-white max-w-3xl w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none text-slate-900">
 
             <!-- Nagłówek -->
-            <div class="pt-10 pb-8 text-center border-b border-slate-200">
+            <div class="pt-12 pb-8 text-center border-b border-slate-200">
                 <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-6">
                 <h1 class="text-4xl font-bold tracking-wider">CERTYFIKAT SUKCESJI</h1>
                 <p class="text-slate-600 mt-2">MyHeredo • Cyfrowy Sejf Spadkowy</p>
             </div>
 
-            <div class="p-10 space-y-10">
+            <div class="p-12 space-y-10">
 
-                <div class="flex justify-between text-sm">
+                <div class="grid grid-cols-2 gap-10">
                     <div>
-                        <p class="text-slate-500 uppercase tracking-widest">Numer certyfikatu</p>
-                        <p class="font-mono font-bold text-2xl">${docId}</p>
+                        <p class="text-slate-500 uppercase tracking-widest text-sm">Numer certyfikatu</p>
+                        <p class="font-mono font-bold text-2xl mt-1">${docId}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-slate-500 uppercase tracking-widest">Data wystawienia</p>
-                        <p class="text-xl">${formattedDate}</p>
+                        <p class="text-slate-500 uppercase tracking-widest text-sm">Data wystawienia</p>
+                        <p class="text-xl mt-1">${formattedDate}</p>
                     </div>
                 </div>
 
@@ -417,7 +417,7 @@ function renderCertificateOverlay(certificateData, docId) {
                     <div class="space-y-4">
                         ${(certificateData.heirs || []).map(h => `
                             <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl">
-                                <p class="font-semibold text-lg">${h.name}</p>
+                                <p class="font-semibold">${h.name}</p>
                                 <p class="text-slate-600">${h.email}</p>
                                 <p class="text-emerald-600 text-sm mt-3">● Pełny dostęp</p>
                             </div>
@@ -427,10 +427,10 @@ function renderCertificateOverlay(certificateData, docId) {
             </div>
 
             <!-- Przyciski -->
-            <div class="border-t p-8 flex flex-col sm:flex-row gap-4 print:hidden">
-                <button onclick="printCertificate()" class="flex-1 py-6 bg-slate-900 text-white font-semibold rounded-2xl text-lg hover:bg-black">🖨️ Drukuj / Zapisz jako PDF</button>
-                <button onclick="decryptCertificate('${docId}')" class="flex-1 py-6 bg-emerald-600 text-white font-semibold rounded-2xl text-lg hover:bg-emerald-700">🔓 Odszyfruj Skrytki</button>
-                <button onclick="closeCertificate()" class="flex-1 py-6 border border-slate-300 font-semibold rounded-2xl text-lg hover:bg-slate-100">Zamknij</button>
+            <div class="border-t p-10 flex flex-col sm:flex-row gap-4 print:hidden">
+                <button onclick="printCertificate()" class="flex-1 py-6 bg-slate-900 text-white font-semibold rounded-2xl text-lg hover:bg-black transition">🖨️ Drukuj / Zapisz jako PDF</button>
+                <button onclick="decryptCertificate('${docId}')" class="flex-1 py-6 bg-emerald-600 text-white font-semibold rounded-2xl text-lg hover:bg-emerald-700 transition">🔓 Odszyfruj Skrytki</button>
+                <button onclick="closeCertificate()" class="flex-1 py-6 border border-slate-300 font-semibold rounded-2xl text-lg hover:bg-slate-100 transition">Zamknij</button>
             </div>
         </div>
     </div>`;
