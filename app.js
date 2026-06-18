@@ -678,16 +678,16 @@ async function decryptCertificate(certId) {
     }
 }
 
-// ==================== GLOBALNE FUNKCJE (MUSI BYĆ NA SAMYM DOLE PLIKU) ====================
+// ==================== GLOBALNE WYWOŁANIA (NA SAMYM DOLE PLIKU) ====================
 
-window.saveRecoveryPassword = saveRecoveryPassword;
-window.decryptCertificate = decryptCertificate;
-window.showCertificate = showCertificate;
-window.simulateDeath = simulateDeath;
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
 window.addCustomVault = addCustomVault;
 window.deleteCustomVault = deleteCustomVault;
+window.saveRecoveryPassword = saveRecoveryPassword;
+window.showCertificate = showCertificate;
+window.decryptCertificate = decryptCertificate;
+window.simulateDeath = simulateDeath;
 window.loadDemoData = loadDemoData;
 window.handleLogout = handleLogout;
 window.loadCertificates = loadCertificates;
