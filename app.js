@@ -349,62 +349,53 @@ async function showCertificate() {
 function renderCertificateOverlay(certificateData, docId) {
     const vaults = certificateData.vaultsSummary || [];
     const generatedDate = new Date(certificateData.generatedAt?.toDate ? certificateData.generatedAt.toDate() : Date.now());
-    const formattedDate = generatedDate.toLocaleDateString('pl-PL', { 
-        day: '2-digit', 
-        month: 'long', 
-        year: 'numeric' 
-    });
+    const formattedDate = generatedDate.toLocaleDateString('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' });
 
     const html = `
-    <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-6 overflow-auto">
-        <div class="bg-white text-slate-900 max-w-2xl w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none">
+    <div id="certificateOverlay" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[10000] p-4 overflow-auto">
+        <div class="bg-white max-w-lg w-full rounded-3xl shadow-2xl overflow-hidden print:shadow-none">
 
-            <!-- Nagłówek -->
-            <div class="pt-10 pb-8 text-center border-b border-slate-200">
-                <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-6">
-                <h1 class="text-4xl font-bold tracking-widest">CERTYFIKAT SUKCESJI</h1>
-                <p class="text-slate-600 mt-2">MyHeredo • Cyfrowy Sejf Spadkowy</p>
+            <!-- Górne logo + tytuł -->
+            <div class="pt-10 pb-6 text-center border-b">
+                <img src="logo.png" alt="MyHeredo" class="h-16 mx-auto mb-5">
+                <h1 class="text-3xl font-bold">CERTYFIKAT SUKCESJI</h1>
+                <p class="text-slate-600 mt-1">MyHeredo • Cyfrowy Sejf Spadkowy</p>
             </div>
 
-            <div class="p-10 space-y-10">
+            <div class="p-8 space-y-9 text-slate-800">
 
-                <!-- Numer i data -->
-                <div class="flex justify-between">
+                <div class="flex justify-between text-sm">
                     <div>
-                        <p class="text-xs uppercase tracking-widest text-slate-500">Numer certyfikatu</p>
-                        <p class="font-mono text-3xl font-bold text-slate-900">${docId}</p>
+                        <p class="text-slate-500">NUMER CERTYFIKATU</p>
+                        <p class="font-mono text-xl font-bold">${docId}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-xs uppercase tracking-widest text-slate-500">Data wystawienia</p>
-                        <p class="text-xl font-medium">${formattedDate}</p>
+                        <p class="text-slate-500">DATA WYSTAWIENIA</p>
+                        <p class="font-medium">${formattedDate}</p>
                     </div>
                 </div>
 
-                <!-- Właściciel -->
                 <div>
-                    <p class="text-xs uppercase tracking-widest text-slate-500">Właściciel sejfu</p>
-                    <p class="text-2xl font-semibold mt-1">${certificateData.ownerEmail}</p>
+                    <p class="text-slate-500 text-sm">WŁAŚCICIEL SEJFU</p>
+                    <p class="text-xl font-semibold">${certificateData.ownerEmail}</p>
                 </div>
 
-                <!-- Dead Man’s Switch -->
-                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-                    <p class="text-amber-600 text-sm uppercase tracking-widest">Dead Man’s Switch</p>
-                    <p class="text-2xl font-semibold mt-1">${certificateData.dmsDays || 45} dni bezczynności</p>
+                <div>
+                    <p class="text-slate-500 text-sm">DEAD MAN’S SWITCH</p>
+                    <p class="text-xl font-semibold">${certificateData.dmsDays || 45} dni bezczynności</p>
                 </div>
 
                 <!-- Skrytki -->
                 <div>
-                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-5">ZABEZPIECZONE SKRYTKI</p>
-                    <div class="space-y-4">
+                    <p class="text-slate-500 text-sm mb-4">ZABEZPIECZONE SKRYTKI</p>
+                    <div class="space-y-3">
                         ${vaults.map(v => `
-                            <div class="flex items-center justify-between bg-slate-50 border border-slate-200 px-6 py-5 rounded-2xl">
-                                <div class="flex items-center gap-4">
-                                    <span class="text-4xl">${getIcon ? getIcon(v.category.toLowerCase().replace(/[^a-z0-9]/g, '')) : '🔒'}</span>
-                                    <span class="font-medium">${v.category}</span>
+                            <div class="flex justify-between items-center bg-slate-50 px-5 py-4 rounded-2xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">${getIcon ? getIcon(v.category.toLowerCase()) : '🔒'}</span>
+                                    <span>${v.category}</span>
                                 </div>
-                                <span class="${v.status && v.status.includes('Zaszyfrowane') ? 'text-emerald-600 font-medium' : 'text-slate-400'}">
-                                    ${v.status || (vaults.length > 0 ? 'Pusta' : '')}
-                                </span>
+                                <span class="text-emerald-600">${v.status || 'Zaszyfrowane'}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -412,33 +403,22 @@ function renderCertificateOverlay(certificateData, docId) {
 
                 <!-- Spadkobiercy -->
                 <div>
-                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-5">SPADKOBIERCY (${certificateData.heirs ? certificateData.heirs.length : 0})</p>
-                    <div class="space-y-4">
-                        ${(certificateData.heirs || []).map(h => `
-                            <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl">
-                                <p class="font-semibold text-lg">${h.name}</p>
-                                <p class="text-slate-600">${h.email}</p>
-                                <p class="text-emerald-600 text-sm mt-3">● Pełny dostęp</p>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <p class="text-slate-500 text-sm mb-4">SPADKOBIERCY (${certificateData.heirs ? certificateData.heirs.length : 0})</p>
+                    ${(certificateData.heirs || []).map(h => `
+                        <div class="bg-slate-50 p-5 rounded-2xl mb-3">
+                            <p class="font-semibold">${h.name}</p>
+                            <p class="text-slate-600">${h.email}</p>
+                            <p class="text-emerald-600 text-sm mt-2">● Pełny dostęp</p>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
 
             <!-- Przyciski -->
-            <div class="border-t border-slate-200 p-8 flex flex-col sm:flex-row gap-4 print:hidden">
-                <button onclick="printCertificate()" 
-                        class="flex-1 py-6 bg-slate-900 hover:bg-black text-white font-semibold rounded-2xl text-lg transition-all">
-                    🖨️ Drukuj / Zapisz jako PDF
-                </button>
-                <button onclick="decryptCertificate('${docId}')" 
-                        class="flex-1 py-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl text-lg transition-all">
-                    🔓 Odszyfruj Skrytki
-                </button>
-                <button onclick="closeCertificate()" 
-                        class="flex-1 py-6 border border-slate-300 hover:bg-slate-100 font-semibold rounded-2xl text-lg transition-all">
-                    Zamknij
-                </button>
+            <div class="p-8 border-t flex flex-col gap-3 print:hidden">
+                <button onclick="printCertificate()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-semibold">🖨️ Drukuj / Zapisz jako PDF</button>
+                <button onclick="decryptCertificate('${docId}')" class="w-full py-5 bg-emerald-600 text-white rounded-2xl font-semibold">🔓 Odszyfruj Skrytki</button>
+                <button onclick="closeCertificate()" class="w-full py-5 border border-slate-300 rounded-2xl font-semibold">Zamknij</button>
             </div>
         </div>
     </div>`;
