@@ -300,16 +300,10 @@ function setupDMS() {
 
 // ==================== CERTYFIKAT ====================
 async function showCertificate() {
-    if (!db) {
-        alert("Firebase jeszcze się ładuje...");
-        return;
-    }
-    if (!masterPassword) {
-        alert("Wymagane hasło master.");
-        return;
-    }
+    if (!db) return alert("Firebase jeszcze się ładuje...");
+    if (!masterPassword) return alert("Wymagane hasło master.");
+
     const userEmail = localStorage.getItem('myheredo_user_email');
-    if (!userEmail) return alert("Brak użytkownika");
     const now = new Date();
 
     const encryptedVaults = {};
@@ -337,7 +331,6 @@ async function showCertificate() {
 
     try {
         const docRef = await db.collection("certificates").add(certificateData);
-        alert(`✅ Certyfikat zapisany!\nID: ${docRef.id}`);
         renderCertificateOverlay(certificateData, docRef.id);
     } catch (error) {
         console.error(error);
@@ -548,7 +541,13 @@ async function decryptCertificate(certId) {
     const inputPass = prompt("Wpisz Recovery Password aby odszyfrować dane spadkobierców:");
     if (!inputPass) return;
     if (inputPass === recoveryPassword || inputPass === localStorage.getItem('myheredo_recovery_password')) {
-        alert("✅ Poprawny Recovery Password!\n\nDane skrytek zostały odszyfrowane.");
+        let message = "✅ Poprawny Recovery Password!\n\nZawartość skrytek:\n\n";
+        for (let key in vaultData) {
+            if (vaultData[key]) {
+                message += `=== ${categoryNames[key] || key} ===\n${vaultData[key]}\n\n`;
+            }
+        }
+        alert(message);
     } else {
         alert("❌ Niepoprawny Recovery Password.");
     }
