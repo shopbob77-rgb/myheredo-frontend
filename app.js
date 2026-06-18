@@ -274,7 +274,9 @@ async function decryptCertificate(certId) {
     }
 }
 
-// ==================== FINAL GLOBAL REGISTRATION (NA SAMYM DOLE) ====================
+// ==================== OSTATECZNA NAPRAWA GLOBALNYCH FUNKCJI ====================
+// Ten blok musi być absolutnie na samym końcu pliku app.js
+
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
 window.addCustomVault = addCustomVault;
@@ -293,4 +295,4 @@ window.openVaultModal = openVaultModal;
 window.closeVaultModal = closeVaultModal;
 window.saveVault = saveVault;
 
-console.log("✅ MyHeredo - aplikacja powinna teraz działać");
+console.log("✅ Wszystkie funkcje zostały zarejestrowane globalnie");
