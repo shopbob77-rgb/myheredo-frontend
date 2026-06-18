@@ -1,10 +1,11 @@
 // =============================================
 // MYHEREDO - Hybrydowa Warstwa Sukcesyjna
-// Stabilna wersja - NAPRAWIONA
+// Stabilna wersja
 // =============================================
 
 // ==================== FIREBASE COMPAT ====================
 let db = null;
+
 function initializeFirebase() {
     const config = {
         apiKey: "wpisz_tutaj_api_key",
@@ -31,15 +32,14 @@ const loadFirebaseScripts = () => {
     };
 };
 loadFirebaseScripts();
+// =======================================================
 
-// ==================== ZMIENNE GLOBALNE ====================
 let masterPassword = null;
 let vaultData = {};
 let categoryNames = {};
 let heirs = [];
 let customIcons = {};
 let dmsConfig = { days: 45, lastActivity: Date.now(), isActive: false };
-let recoveryPassword = null;
 let inactivityTimer = null;
 
 const defaultCategories = {
@@ -50,7 +50,6 @@ const defaultCategories = {
     instrukcje: "Instrukcje Sukcesyjne"
 };
 
-// ==================== INICJALIZACJA ====================
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
     startInactivityTimer();
@@ -66,11 +65,12 @@ async function initDashboard() {
         window.location.href = "login.html";
         return;
     }
+
     document.getElementById('userEmail').textContent = email;
-
     masterPassword = sessionStorage.getItem('myheredo_master_password');
-    const savedEncryptedVault = localStorage.getItem('myheredo_encrypted_vault');
 
+    const savedEncryptedVault = localStorage.getItem('myheredo_encrypted_vault');
+    
     if (savedEncryptedVault && masterPassword) {
         try {
             vaultData = await decryptData(savedEncryptedVault, masterPassword);
@@ -95,17 +95,15 @@ async function initDashboard() {
     const savedHeirs = localStorage.getItem('myheredo_heirs');
     const savedIcons = localStorage.getItem('myheredo_custom_icons');
     const savedDMS = localStorage.getItem('myheredo_dms_config');
-    const savedRecovery = localStorage.getItem('myheredo_recovery_password');
 
     if (savedHeirs) heirs = JSON.parse(savedHeirs);
     if (savedIcons) customIcons = JSON.parse(savedIcons);
     if (savedDMS) dmsConfig = JSON.parse(savedDMS);
-    if (savedRecovery) recoveryPassword = savedRecovery;
 
     renderSkrytki();
     renderHeirs();
     setupDMS();
-    setTimeout(() => loadCertificates(), 800);
+    setTimeout(() => loadCertificates(), 800); // opóźnienie
 }
 
 // ==================== TIMER ====================
@@ -166,12 +164,17 @@ function renderSkrytki() {
     const grid = document.getElementById('skrytkiGrid');
     if (!grid) return;
     grid.innerHTML = '';
+
     Object.keys(vaultData).forEach((key) => {
         const isFilled = vaultData[key] && vaultData[key].trim() !== '';
         const isCustom = !Object.keys(defaultCategories).includes(key);
+
         const card = document.createElement('div');
-        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
+        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
+                          rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
+
         const icon = getIcon ? getIcon(key) : '📁';
+
         card.innerHTML = `
             <div class="flex items-start gap-4">
                 <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
@@ -182,13 +185,14 @@ function renderSkrytki() {
                     </p>
                 </div>
             </div>
-            ${isCustom ? `<button onclick="event.stopImmediatePropagation(); deleteCustomVault('${key}');" class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>` : ''}
+            ${isCustom ? `<button onclick="event.stopImmediatePropagation(); deleteCustomVault('${key}');" 
+                         class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>` : ''}
         `;
+
         card.onclick = () => openVaultModal(key);
         grid.appendChild(card);
     });
 }
-
 function getIcon(key) {
     if (customIcons[key]) return customIcons[key];
     const icons = { passwordManager: "🔑", banki: "🏦", krypto: "₿", social: "📱", instrukcje: "📜" };
@@ -224,6 +228,7 @@ async function saveVault(key) {
     renderSkrytki();
 }
 
+// ==================== NOWA SKRYTKA ====================
 function addCustomVault() {
     const name = prompt("Podaj nazwę nowej skrytki:");
     if (!name || name.trim() === "") return;
@@ -300,12 +305,21 @@ function setupDMS() {
 
 // ==================== CERTYFIKAT ====================
 async function showCertificate() {
-    if (!db) return alert("Firebase jeszcze się ładuje...");
-    if (!masterPassword) return alert("Wymagane hasło master.");
+    if (!db) {
+        alert("Firebase jeszcze się ładuje...");
+        return;
+    }
+    if (!masterPassword) {
+        alert("Wymagane hasło master.");
+        return;
+    }
 
     const userEmail = localStorage.getItem('myheredo_user_email');
+    if (!userEmail) return alert("Brak użytkownika");
+
     const now = new Date();
 
+    // Szyfrujemy dane skrytek
     const encryptedVaults = {};
     for (let key in vaultData) {
         if (vaultData[key] && vaultData[key].trim() !== '') {
@@ -319,7 +333,7 @@ async function showCertificate() {
         generatedDate: now.toISOString(),
         dmsDays: parseInt(document.getElementById('dmsSlider')?.value || 45),
         heirs: heirs,
-        encryptedVaults: encryptedVaults,
+        encryptedVaults: encryptedVaults,   // <-- zaszyfrowane dane
         vaultsSummary: Object.keys(vaultData).map(key => ({
             category: categoryNames[key] || key,
             status: "Zaszyfrowane"
@@ -331,10 +345,11 @@ async function showCertificate() {
 
     try {
         const docRef = await db.collection("certificates").add(certificateData);
+        alert(`✅ Zaszyfrowany certyfikat zapisany!\nID: ${docRef.id}`);
         renderCertificateOverlay(certificateData, docRef.id);
     } catch (error) {
         console.error(error);
-        alert("Błąd zapisu certyfikatu.");
+        alert("Błąd zapisu.");
     }
 }
 
@@ -346,14 +361,19 @@ function renderCertificateOverlay(certificateData, docId) {
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-6 overflow-auto">
         <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden text-slate-900">
+
+            <!-- Nagłówek -->
             <div class="pt-12 pb-8 text-center border-b border-slate-200">
                 <img src="logo.png" alt="MyHeredo" class="h-20 mx-auto mb-6">
                 <h1 class="text-4xl font-bold flex items-center justify-center gap-3">
                     <span>🪶</span> CERTYFIKAT SUKCESJI
                 </h1>
                 <p class="text-xl text-amber-600 font-medium mt-1">Cyfrowa Sukcesja</p>
+                <p class="text-slate-600">MyHeredo • Bezpieczny Sejf Spadkowy</p>
             </div>
+
             <div class="p-12 space-y-10">
+
                 <div class="grid grid-cols-2 gap-12">
                     <div>
                         <p class="text-xs uppercase tracking-widest text-slate-500">Numer certyfikatu</p>
@@ -364,14 +384,18 @@ function renderCertificateOverlay(certificateData, docId) {
                         <p class="text-xl">${formattedDate}</p>
                     </div>
                 </div>
+
                 <div>
                     <p class="text-xs uppercase tracking-widest text-slate-500">Właściciel sejfu</p>
                     <p class="text-2xl font-semibold">${certificateData.ownerEmail}</p>
                 </div>
+
                 <div>
                     <p class="text-xs uppercase tracking-widest text-slate-500">Dead Man’s Switch</p>
                     <p class="text-2xl font-semibold">${certificateData.dmsDays || 45} dni bezczynności</p>
                 </div>
+
+                <!-- Skrytki -->
                 <div>
                     <p class="text-xs uppercase tracking-widest text-slate-500 mb-6">ZABEZPIECZONE SKRYTKI</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -382,6 +406,7 @@ function renderCertificateOverlay(certificateData, docId) {
                             else if (iconKey.includes('krypto')) iconKey = 'krypto';
                             else if (iconKey.includes('social') || iconKey.includes('cyfrowe')) iconKey = 'social';
                             else if (iconKey.includes('instrukcje')) iconKey = 'instrukcje';
+
                             const icon = getIcon ? getIcon(iconKey) : '🔒';
                             return `
                                 <div class="flex items-center gap-5 bg-slate-50 border border-slate-200 p-6 rounded-2xl">
@@ -395,6 +420,8 @@ function renderCertificateOverlay(certificateData, docId) {
                         }).join('')}
                     </div>
                 </div>
+
+                <!-- Spadkobiercy -->
                 <div>
                     <p class="text-xs uppercase tracking-widest text-slate-500 mb-6">SPADKOBIERCY (${certificateData.heirs ? certificateData.heirs.length : 0})</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -407,21 +434,58 @@ function renderCertificateOverlay(certificateData, docId) {
                         `).join('')}
                     </div>
                 </div>
+
             </div>
+
+            <!-- Przycisk Recovery Password -->
             <div class="border-t p-10 bg-slate-50">
-                <button onclick="decryptCertificate('${docId}')" class="w-full py-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl text-lg">
+                <div class="text-center mb-6">
+                    <p class="text-slate-500 text-sm">Aby uzyskać dostęp do zaszyfrowanych danych, spadkobierca musi wpisać:</p>
+                    <p class="font-semibold text-lg mt-2">Recovery Password</p>
+                </div>
+                <button onclick="decryptCertificate('${docId}')" 
+                        class="w-full py-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl text-lg transition-all">
                     🔓 Odszyfruj Skrytki (Recovery Password)
                 </button>
             </div>
+
+            <!-- Przyciski dolne -->
             <div class="p-8 border-t flex flex-col sm:flex-row gap-4 print:hidden">
                 <button onclick="printCertificate()" class="flex-1 py-6 bg-slate-900 text-white font-semibold rounded-2xl text-lg hover:bg-black">🖨️ Drukuj / Zapisz jako PDF</button>
                 <button onclick="closeCertificate()" class="flex-1 py-6 border border-slate-300 font-semibold rounded-2xl text-lg hover:bg-slate-100">Zamknij</button>
             </div>
         </div>
     </div>`;
+
     document.body.insertAdjacentHTML('beforeend', html);
 }
 
+                <!-- Spadkobiercy -->
+                <div>
+                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-5">SPADKOBIERCY (${certificateData.heirs ? certificateData.heirs.length : 0})</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        ${(certificateData.heirs || []).map(h => `
+                            <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl">
+                                <p class="font-semibold">${h.name}</p>
+                                <p class="text-slate-600 break-all">${h.email}</p>
+                                <p class="text-emerald-600 text-sm mt-3">● Pełny dostęp</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Przyciski - lepsze na mobile -->
+            <div class="border-t p-6 sm:p-10 flex flex-col gap-3 print:hidden">
+                <button onclick="printCertificate()" class="w-full py-5 sm:py-6 bg-slate-900 text-white font-semibold rounded-2xl text-base sm:text-lg hover:bg-black transition">🖨️ Drukuj / Zapisz jako PDF</button>
+                <button onclick="decryptCertificate('${docId}')" class="w-full py-5 sm:py-6 bg-emerald-600 text-white font-semibold rounded-2xl text-base sm:text-lg hover:bg-emerald-700 transition">🔓 Odszyfruj Skrytki</button>
+                <button onclick="closeCertificate()" class="w-full py-5 sm:py-6 border border-slate-300 font-semibold rounded-2xl text-base sm:text-lg hover:bg-slate-100 transition">Zamknij</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+}
 function closeCertificate() {
     const overlay = document.getElementById('certificateOverlay');
     if (overlay) overlay.remove();
@@ -436,21 +500,25 @@ async function loadCertificates() {
     const container = document.getElementById('certificatesList');
     if (!container) return;
     container.innerHTML = '<p class="text-slate-400">Ładowanie...</p>';
+
     if (!db) {
         container.innerHTML = '<p class="text-red-400">Firebase nie jest gotowy.</p>';
         return;
     }
+
     try {
         const userEmail = localStorage.getItem('myheredo_user_email');
         const snapshot = await db.collection("certificates")
             .where("ownerEmail", "==", userEmail)
             .orderBy("version", "desc")
             .get();
+
         container.innerHTML = '';
         if (snapshot.empty) {
             container.innerHTML = `<p class="text-slate-400 text-center py-12">Nie wygenerowałeś jeszcze certyfikatów.</p>`;
             return;
         }
+
         snapshot.forEach(doc => {
             const cert = doc.data();
             if (cert.isDeleted) return;
@@ -488,9 +556,12 @@ async function openCertificate(certId) {
 }
 
 async function deleteCertificate(certId) {
-    if (!confirm("Usunąć certyfikat?")) return;
+    if (!confirm("Usunąć certyfikat? Zostanie oznaczony jako usunięty.")) return;
     try {
-        await db.collection("certificates").doc(certId).update({ isDeleted: true, deletedAt: firebase.firestore.Timestamp.now() });
+        await db.collection("certificates").doc(certId).update({
+            isDeleted: true,
+            deletedAt: firebase.firestore.Timestamp.now()
+        });
         alert("Certyfikat usunięty.");
         loadCertificates();
     } catch (error) {
@@ -508,6 +579,10 @@ function simulateDeath() {
     alert(msg);
 }
 
+function showSuccessMessage(text) {
+    alert(text);
+}
+
 function loadDemoData() {
     if (!confirm("Wczytać przykładowe dane?")) return;
     vaultData = {
@@ -522,38 +597,89 @@ function loadDemoData() {
     renderHeirs();
     setupDMS();
     setTimeout(() => loadCertificates(), 800);
-    alert("✅ Przykładowe dane wczytane!");
+    showSuccessMessage("✅ Przykładowe dane wczytane!");
 }
+async function decryptCertificate(certId) {
+    const masterPass = prompt("Podaj Master Password aby odszyfrować skrytki:");
+    if (!masterPass) return;
 
-// ==================== RECOVERY PASSWORD ====================
+    try {
+        const doc = await db.collection("certificates").doc(certId).get();
+        const cert = doc.data();
+
+        if (!cert.encryptedVaults) {
+            alert("Ten certyfikat nie zawiera zaszyfrowanych danych.");
+            return;
+        }
+
+        let decryptedText = "🔓 Odszyfrowane skrytki:\n\n";
+        for (let key in cert.encryptedVaults) {
+            const decrypted = await decryptData(cert.encryptedVaults[key], masterPass);
+            decryptedText += `${key.toUpperCase()}:\n${decrypted}\n\n`;
+        }
+
+        alert(decryptedText);
+    } catch (error) {
+        console.error(error);
+        alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
+    }
+}
+// ==================== GLOBALNE FUNKCJE ====================
+window.addHeir = addHeir;
+window.removeHeir = removeHeir;
+window.addCustomVault = addCustomVault;
+window.deleteCustomVault = deleteCustomVault;
+window.showCertificate = showCertificate;
+window.simulateDeath = simulateDeath;
+window.loadDemoData = loadDemoData;
+window.handleLogout = logout;
+window.loadCertificates = loadCertificates;
+window.openCertificate = openCertificate;
+window.deleteCertificate = deleteCertificate;
+window.saveVault = saveVault;
+window.closeVaultModal = closeVaultModal;
+window.openVaultModal = openVaultModal;
+// ==================== RECOVERY PASSWORD & ODSZYFROWYWANIE ====================
+
+let recoveryPassword = null;
+
+// Zapisywanie Recovery Password
 function saveRecoveryPassword() {
     const input = document.getElementById('recoveryPassword');
     if (!input) return;
+    
     const pass = input.value.trim();
     if (!pass) return alert("Wprowadź Recovery Password");
     if (pass.length < 6) return alert("Recovery Password powinien mieć co najmniej 6 znaków");
+
     recoveryPassword = pass;
     localStorage.setItem('myheredo_recovery_password', pass);
-    alert("✅ Recovery Password został zapisany pomyślnie!\n\nPrzekaż go spadkobiercom.");
+    alert("✅ Recovery Password został zapisany pomyślnie!\n\nPrzekaż go spadkobiercom w testamencie lub u notariusza.");
 }
 
+// Ładowanie przy uruchomieniu (dodaj do initDashboard)
+function initDashboard() {
+    // ... Twój istniejący kod initDashboard ...
+
+    const savedRecovery = localStorage.getItem('myheredo_recovery_password');
+    if (savedRecovery) recoveryPassword = savedRecovery;
+}
+
+// Odszyfrowywanie na certyfikacie
 async function decryptCertificate(certId) {
     const inputPass = prompt("Wpisz Recovery Password aby odszyfrować dane spadkobierców:");
     if (!inputPass) return;
+
     if (inputPass === recoveryPassword || inputPass === localStorage.getItem('myheredo_recovery_password')) {
-        let message = "✅ Poprawny Recovery Password!\n\nZawartość skrytek:\n\n";
-        for (let key in vaultData) {
-            if (vaultData[key]) {
-                message += `=== ${categoryNames[key] || key} ===\n${vaultData[key]}\n\n`;
-            }
-        }
-        alert(message);
+        alert("✅ Poprawny Recovery Password!\n\nDane skrytek zostały odszyfrowane.");
+        // Tutaj w przyszłości można wyświetlić pełne dane
     } else {
         alert("❌ Niepoprawny Recovery Password.");
     }
 }
 
-// ==================== FINAL GLOBAL REGISTRATION (NA SAMYM DOLE) ====================
+// ==================== GLOBALNE WYWOŁANIA (NA SAMYM DOLE PLIKU) ====================
+
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
 window.addCustomVault = addCustomVault;
@@ -571,5 +697,3 @@ window.printCertificate = printCertificate;
 window.openVaultModal = openVaultModal;
 window.closeVaultModal = closeVaultModal;
 window.saveVault = saveVault;
-
-console.log("✅ MyHeredo - aplikacja powinna teraz działać");
