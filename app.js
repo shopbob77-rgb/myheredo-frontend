@@ -586,7 +586,8 @@ async function decryptCertificate(certId) {
         alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
     }
 }
-// ==================== GLOBALNE REJESTRACJA FUNKCJI (MUSI BYĆ NA SAMYM KOŃCU PLIKU) ====================
+// ==================== GLOBALNA REJESTRACJA FUNKCJI ====================
+// MUSI BYĆ NA SAMYM KOŃCU PLIKU app.js !!!
 window.addHeir = addHeir;
 window.removeHeir = removeHeir;
 window.addCustomVault = addCustomVault;
@@ -596,7 +597,7 @@ window.showCertificate = showCertificate;
 window.decryptCertificate = decryptCertificate;
 window.simulateDeath = simulateDeath;
 window.loadDemoData = loadDemoData;
-window.handleLogout = handleLogout;           // lub logout jeśli masz inną nazwę
+window.handleLogout = handleLogout;
 window.loadCertificates = loadCertificates;
 window.openCertificate = openCertificate;
 window.closeCertificate = closeCertificate;
@@ -605,4 +606,4 @@ window.openVaultModal = openVaultModal;
 window.closeVaultModal = closeVaultModal;
 window.saveVault = saveVault;
 
-console.log("✅ Wszystkie funkcje globalne zarejestrowane pomyślnie");
+console.log("✅ Wszystkie funkcje zostały pomyślnie zarejestrowane globalnie");
