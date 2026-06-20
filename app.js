@@ -478,64 +478,7 @@ function saveAsPDF() {
     document.title = originalTitle;
 }
 
-function closeCertificate() {
-    const overlay = document.getElementById('certificateOverlay');
-    if (overlay) overlay.remove();
-}
 
-function printCertificate() {
-    const overlay = document.getElementById('certificateOverlay');
-    if (!overlay) return alert("Nie znaleziono certyfikatu.");
-
-    const certContent = overlay.querySelector('.cert-container');
-    if (!certContent) return alert("Nie znaleziono zawartości certyfikatu.");
-
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-        return alert("Przeglądarka zablokowała okno drukowania.");
-    }
-
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="pl">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Certyfikat Sukcesji</title>
-            <script src="https://cdn.tailwindcss.com"><\/script>
-            <style>
-                @page { size: A4 portrait; margin: 12mm; }
-                body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }
-                .print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 8mm; box-sizing: border-box; }
-                .print-hidden { display: none !important; }
-                .cert-container { box-shadow: none !important; border-radius: 12px; max-height: none !important; overflow: visible !important; }
-            </style>
-        </head>
-        <body>
-            <div class="print-wrapper">
-                ${certContent.innerHTML}
-            </div>
-        </body>
-        </html>
-    `);
-
-    printWindow.document.close();
-
-    printWindow.onload = function () {
-        printWindow.focus();
-        printWindow.print();
-
-        printWindow.onafterprint = function () {
-            printWindow.close();
-        };
-
-        setTimeout(function () {
-            if (!printWindow.closed) {
-                printWindow.close();
-            }
-        }, 2500);
-    };
-}
 
 // ==================== MOJE CERTYFIKATY ====================
 async function loadCertificates() {
@@ -691,6 +634,71 @@ function saveRecoveryPassword() {
     localStorage.setItem('myheredo_recovery_password', pass);
 
     alert("✅ Recovery Password został zapisany pomyślnie!\n\nPrzekaż go spadkobiercom (np. w testamencie lub u notariusza).");
+}
+// =============================================
+// FUNKCJE CERTYFIKATU (close + print)
+// Muszą być PRZED blokiem rejestracji globalnej
+// =============================================
+
+function closeCertificate() {
+    const overlay = document.getElementById('certificateOverlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+function printCertificate() {
+    const overlay = document.getElementById('certificateOverlay');
+    if (!overlay) return alert("Nie znaleziono certyfikatu.");
+
+    const certContent = overlay.querySelector('.cert-container');
+    if (!certContent) return alert("Nie znaleziono zawartości certyfikatu.");
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        return alert("Przeglądarka zablokowała okno drukowania.");
+    }
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="pl">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Certyfikat Sukcesji</title>
+            <script src="https://cdn.tailwindcss.com"><\/script>
+            <style>
+                @page { size: A4 portrait; margin: 12mm; }
+                body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }
+                .print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 8mm; box-sizing: border-box; }
+                .print-hidden { display: none !important; }
+                .cert-container { box-shadow: none !important; border-radius: 12px; max-height: none !important; overflow: visible !important; }
+            </style>
+        </head>
+        <body>
+            <div class="print-wrapper">
+                ${certContent.innerHTML}
+            </div>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+
+    printWindow.onload = function () {
+        printWindow.focus();
+        printWindow.print();
+
+        printWindow.onafterprint = function () {
+            printWindow.close();
+        };
+
+        setTimeout(function () {
+            if (!printWindow.closed) {
+                printWindow.close();
+            }
+        }, 3000);
+    };
 }
 // =============================================
 // =============================================
