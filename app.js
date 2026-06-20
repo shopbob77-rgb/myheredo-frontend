@@ -539,7 +539,7 @@ function printCertificate() {
         }, 400);
     };
 }
-}
+
 
 // ==================== MOJE CERTYFIKATY ====================
 async function loadCertificates() {
