@@ -667,7 +667,6 @@ function closeCertificate() {
         overlay.remove();
     }
 }
-
 function printCertificate() {
     const overlay = document.getElementById('certificateOverlay');
     if (!overlay) return alert("Nie znaleziono certyfikatu.");
@@ -690,7 +689,7 @@ function printCertificate() {
             <style>
                 @page {
                     size: A4 portrait;
-                    margin: 6mm;           /* mniejsze marginesy */
+                    margin: 5mm;
                 }
 
                 body {
@@ -705,56 +704,55 @@ function printCertificate() {
                     width: 100%;
                     max-width: 210mm;
                     margin: 0 auto;
-                    padding: 4mm;
+                    padding: 3mm;
                     box-sizing: border-box;
                 }
 
                 .cert-container {
                     box-shadow: none !important;
-                    border-radius: 8px;
+                    border-radius: 6px;
                     max-height: none !important;
                     overflow: visible !important;
-                    padding: 12px 20px !important;   /* mocno zmniejszony padding */
+                    padding: 8px 16px !important;
                 }
 
-                /* === AGRESYWNE ZMNIEJSZENIE WSZYSTKIEGO === */
+                /* === BARDZO AGRESYWNE ZMNIEJSZENIE === */
                 .cert-container h1 {
-                    font-size: 20px !important;
-                    margin-bottom: 2px !important;
-                }
-                
-                .cert-container p {
-                    font-size: 11.5px !important;
-                    line-height: 1.25 !important;
+                    font-size: 18px !important;
                     margin-bottom: 2px !important;
                 }
 
-                .cert-container .text-lg { font-size: 13px !important; }
-                .cert-container .text-xl { font-size: 14px !important; }
-                .cert-container .text-3xl { font-size: 18px !important; }
+                .cert-container p {
+                    font-size: 10.5px !important;
+                    line-height: 1.2 !important;
+                    margin-bottom: 2px !important;
+                }
+
+                .cert-container .text-lg { font-size: 12px !important; }
+                .cert-container .text-xl { font-size: 13px !important; }
+                .cert-container .text-3xl { font-size: 16px !important; }
 
                 /* Karty skrytek i spadkobierców */
                 .cert-container .rounded-2xl {
-                    padding: 8px 10px !important;
+                    padding: 6px 8px !important;
                     margin-bottom: 4px !important;
                 }
 
                 /* Nagłówek */
-                .cert-container .pt-8 { padding-top: 12px !important; }
-                .cert-container .pb-6 { padding-bottom: 8px !important; }
+                .cert-container .pt-8 { padding-top: 6px !important; }
+                .cert-container .pb-6 { padding-bottom: 6px !important; }
 
-                /* Sekcja podpisu cyfrowego — mocno ściśnięta */
+                /* Sekcja podpisu cyfrowego */
                 .cert-container .pt-4.border-t {
-                    padding-top: 8px !important;
-                    margin-top: 8px !important;
+                    padding-top: 6px !important;
+                    margin-top: 6px !important;
                 }
 
-                /* Ukrycie przycisków */
                 .print-hidden { display: none !important; }
 
-                /* Zapobieganie łamaniu sekcji */
+                /* Mocne wymuszenie jednej strony */
                 .cert-container > div {
-                    page-break-inside: avoid;
+                    page-break-inside: avoid !important;
                 }
             </style>
         </head>
@@ -770,9 +768,21 @@ function printCertificate() {
 
     printWindow.onload = function () {
         printWindow.focus();
-        setTimeout(() => {
-            printWindow.print();
-        }, 400);
+
+        // Drukowanie
+        printWindow.print();
+
+        // === Poprawione zamykanie okna ===
+        printWindow.onafterprint = function () {
+            printWindow.close();
+        };
+
+        // Fallback – na wypadek gdyby onafterprint nie zadziałało
+        setTimeout(function () {
+            if (!printWindow.closed) {
+                printWindow.close();
+            }
+        }, 2000);
     };
 }
 // ==================== RECOVERY PASSWORD ====================
