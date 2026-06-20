@@ -479,7 +479,7 @@ function renderCertificateOverlay(certificateData, docId) {
 // Dodatkowa funkcja do bezpośredniego zapisu PDF
 function saveAsPDF() {
     const originalTitle = document.title;
-    document.title = `Certyfikat_Sukcesji_${new Date().toISOString().slice(0,10)}`;
+    document.title = 'Certyfikat_Sukcesji_${new Date().toISOString().slice(0,10)}';
     window.print();
     document.title = originalTitle;
 }
