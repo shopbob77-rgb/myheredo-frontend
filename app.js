@@ -683,25 +683,58 @@ async function decryptCertificate(certId) {
         alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
     }
 }
-// ==================== GLOBALNA REJESTRACJA FUNKCJI ====================
-// MUSI BYĆ NA SAMYM KOŃCU PLIKU app.js !!!
-window.addHeir = addHeir;
-window.removeHeir = removeHeir;
-window.addCustomVault = addCustomVault;
-window.deleteCustomVault = deleteCustomVault;
+// ==================== RECOVERY PASSWORD ====================
+function saveRecoveryPassword() {
+    const input = document.getElementById('recoveryPassword');
+    if (!input) {
+        alert("Nie znaleziono pola do wpisania Recovery Password.");
+        return;
+    }
+
+    const pass = input.value.trim();
+
+    if (!pass) {
+        alert("Wprowadź Recovery Password");
+        return;
+    }
+
+    if (pass.length < 6) {
+        alert("Recovery Password powinien mieć co najmniej 6 znaków.");
+        return;
+    }
+
+    // Zapisujemy Recovery Password
+    recoveryPassword = pass;
+    localStorage.setItem('myheredo_recovery_password', pass);
+
+    alert("✅ Recovery Password został zapisany pomyślnie!\n\nPrzekaż go spadkobiercom (np. w testamencie lub u notariusza).");
+}
+// =============================================
+// GLOBALNA REJESTRACJA FUNKCJI
+// MUSI BYĆ NA SAMYM KOŃCU PLIKU app.js
+// =============================================
+window.addHeir            = addHeir;
+window.removeHeir         = removeHeir;
+window.addCustomVault     = addCustomVault;
+window.deleteCustomVault  = deleteCustomVault;
+
 window.saveRecoveryPassword = saveRecoveryPassword;
-window.showCertificate = showCertificate;
+
+window.showCertificate    = showCertificate;
+window.closeCertificate   = closeCertificate;
+window.printCertificate   = printCertificate;
 window.decryptCertificate = decryptCertificate;
-window.simulateDeath = simulateDeath;
-window.loadDemoData = loadDemoData;
-window.handleLogout = handleLogout;
-window.loadCertificates = loadCertificates;
-window.openCertificate = openCertificate;
-window.closeCertificate = closeCertificate;
-window.printCertificate = printCertificate;
-window.printCertificate = printCertificate;
-window.openVaultModal = openVaultModal;
-window.closeVaultModal = closeVaultModal;
-window.saveVault = saveVault;
+
+window.simulateDeath      = simulateDeath;
+window.loadDemoData       = loadDemoData;
+window.handleLogout       = handleLogout;
+
+window.loadCertificates   = loadCertificates;
+window.openCertificate    = openCertificate;
+window.deleteCertificate  = deleteCertificate;
+
+window.openVaultModal     = openVaultModal;
+window.closeVaultModal    = closeVaultModal;
+window.saveVault          = saveVault;
 
 console.log("✅ Wszystkie funkcje zostały pomyślnie zarejestrowane globalnie");
