@@ -478,6 +478,11 @@ function saveAsPDF() {
     document.title = originalTitle;
 }
 
+function closeCertificate() {
+    const overlay = document.getElementById('certificateOverlay');
+    if (overlay) overlay.remove();
+}
+
 function printCertificate() {
     const overlay = document.getElementById('certificateOverlay');
     if (!overlay) return alert("Nie znaleziono certyfikatu.");
@@ -487,7 +492,7 @@ function printCertificate() {
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-        return alert("Przeglądarka zablokowała okno drukowania. Zezwól na wyskakujące okna.");
+        return alert("Przeglądarka zablokowała okno drukowania.");
     }
 
     printWindow.document.write(`
@@ -497,46 +502,13 @@ function printCertificate() {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Certyfikat Sukcesji</title>
-            
             <script src="https://cdn.tailwindcss.com"><\/script>
-            
             <style>
-                @page {
-                    size: A4 portrait;
-                    margin: 12mm;
-                }
-                
-                body {
-                    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                    margin: 0;
-                    padding: 0;
-                    background: white;
-                    color: #0f172a;
-                }
-                
-                .print-wrapper {
-                    width: 100%;
-                    max-width: 210mm;
-                    margin: 0 auto;
-                    padding: 8mm;
-                    box-sizing: border-box;
-                }
-
-                .print-hidden {
-                    display: none !important;
-                }
-
-                .cert-container {
-                    box-shadow: none !important;
-                    border-radius: 12px;
-                    max-height: none !important;
-                    overflow: visible !important;
-                }
-
-                .cert-container h1 { font-size: 22px !important; }
-                .cert-container p { font-size: 13px !important; line-height: 1.4; }
-                .cert-container .text-lg { font-size: 15px !important; }
-                .cert-container .text-xl { font-size: 16px !important; }
+                @page { size: A4 portrait; margin: 12mm; }
+                body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }
+                .print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 8mm; box-sizing: border-box; }
+                .print-hidden { display: none !important; }
+                .cert-container { box-shadow: none !important; border-radius: 12px; max-height: none !important; overflow: visible !important; }
             </style>
         </head>
         <body>
@@ -551,16 +523,12 @@ function printCertificate() {
 
     printWindow.onload = function () {
         printWindow.focus();
-
-        // Uruchom drukowanie
         printWindow.print();
 
-        // Automatyczne zamknięcie okna po wydruku lub anulowaniu
         printWindow.onafterprint = function () {
             printWindow.close();
         };
 
-        // Fallback – na wypadek gdyby onafterprint nie zadziałało
         setTimeout(function () {
             if (!printWindow.closed) {
                 printWindow.close();
