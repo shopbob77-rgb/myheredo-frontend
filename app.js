@@ -375,106 +375,8 @@ function renderCertificateOverlay(certificateData, docId) {
     const digitalSignature = btoa(contentForHash).substring(0, 28);
 
     const html = `
-    <style>
-        #certificateOverlay {
-            overflow: hidden !important;
-        }
-
-        .cert-container {
-            max-height: 93vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        @media (min-width: 1024px) {
-            .cert-container { max-height: 91vh; }
-        }
-
-        @media (max-width: 768px) {
-            .cert-container { max-height: 100vh; border-radius: 18px; }
-        }
-
-        /* ====================== DRUK - JEDNA STRONA + BEZ CZARNYCH STRON ====================== */
-        @media print {
-            /* Ukrywamy wszystko poza certyfikatem */
-            body * { visibility: hidden !important; }
-            #certificateOverlay, #certificateOverlay * { visibility: visible !important; }
-
-            /* Usuwamy ciemne tło overlayu */
-            #certificateOverlay {
-                position: static !important;
-                background: white !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                overflow: visible !important;
-            }
-
-            .cert-container {
-                max-height: none !important;
-                overflow: visible !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                width: 100% !important;
-                margin: 0 auto !important;
-                background: white !important;
-            }
-
-            /* AGRESYWNE ZMNIEJSZENIE - jedna strona A4 */
-            .cert-container {
-                font-size: 10.5px !important;
-                line-height: 1.2 !important;
-            }
-
-            .cert-container h1,
-            .cert-container .text-3xl,
-            .cert-container .text-4xl {
-                font-size: 18px !important;
-                margin-bottom: 2px !important;
-            }
-
-            .cert-container .pt-8,
-            .cert-container .pt-12,
-            .cert-container .pt-6 {
-                padding-top: 8px !important;
-            }
-
-            .cert-container .pb-6,
-            .cert-container .pb-8 {
-                padding-bottom: 6px !important;
-            }
-
-            .cert-container .p-6,
-            .cert-container .p-8,
-            .cert-container .p-5 {
-                padding: 10px !important;
-            }
-
-            .cert-container .space-y-5 > * + *,
-            .cert-container .space-y-6 > * + *,
-            .cert-container .space-y-7 > * + * {
-                margin-top: 8px !important;
-            }
-
-            .bg-slate-50 {
-                padding: 8px 10px !important;
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-
-            .border-t {
-                margin-top: 6px !important;
-                padding-top: 6px !important;
-            }
-
-            @page {
-                size: A4 portrait;
-                margin: 8mm;
-            }
-        }
-    </style>
-
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-3 sm:p-6 overflow-hidden">
-        <div class="cert-container bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl overflow-hidden text-slate-900">
+        <div class="cert-container bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl overflow-hidden text-slate-900" style="max-height: 93vh;">
             
             <!-- Nagłówek -->
             <div class="pt-6 pb-4 text-center border-b border-slate-200">
@@ -572,7 +474,6 @@ function renderCertificateOverlay(certificateData, docId) {
 
     document.body.insertAdjacentHTML('beforeend', html);
 }
-
 // Dodatkowa funkcja do bezpośredniego zapisu PDF
 function saveAsPDF() {
     const originalTitle = document.title;
@@ -586,7 +487,65 @@ function closeCertificate() {
 }
 
 function printCertificate() {
-    window.print();
+    const overlay = document.getElementById('certificateOverlay');
+    if (!overlay) return alert("Nie znaleziono certyfikatu.");
+
+    const certContent = overlay.querySelector('.cert-container');
+    if (!certContent) return alert("Nie znaleziono zawartości certyfikatu.");
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        return alert("Przeglądarka zablokowała okno drukowania. Zezwól na wyskakujące okna.");
+    }
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="pl">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Certyfikat Sukcesji</title>
+            
+            <!-- Tailwind CSS -->
+            <script src="https://cdn.tailwindcss.com"></script>
+            
+            <style>
+                @page {
+                    size: A4 portrait;
+                    margin: 10mm;
+                }
+                body {
+                    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: white;
+                    color: #0f172a;
+                }
+                .print-wrapper {
+                    width: 100%;
+                    max-width: 210mm;
+                    margin: 0 auto;
+                    padding: 12mm;
+                    box-sizing: border-box;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="print-wrapper">
+                ${certContent.innerHTML}
+            </div>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+
+    printWindow.onload = function () {
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+        }, 400);
+    };
 }
 
 // ==================== MOJE CERTYFIKATY ====================
