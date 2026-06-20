@@ -522,12 +522,10 @@ function printCertificate() {
                     box-sizing: border-box;
                 }
 
-                /* === UKRYWAMY PRZYCISKI NA WYDRUKU === */
                 .print-hidden {
                     display: none !important;
                 }
 
-                /* Lepsze dopasowanie do A4 */
                 .cert-container {
                     box-shadow: none !important;
                     border-radius: 12px;
@@ -535,7 +533,6 @@ function printCertificate() {
                     overflow: visible !important;
                 }
 
-                /* Mniejsze czcionki i odstępy na wydruku */
                 .cert-container h1 { font-size: 22px !important; }
                 .cert-container p { font-size: 13px !important; line-height: 1.4; }
                 .cert-container .text-lg { font-size: 15px !important; }
@@ -554,12 +551,23 @@ function printCertificate() {
 
     printWindow.onload = function () {
         printWindow.focus();
-        setTimeout(() => {
-            printWindow.print();
-        }, 500);
+
+        // Uruchom drukowanie
+        printWindow.print();
+
+        // Automatyczne zamknięcie okna po wydruku lub anulowaniu
+        printWindow.onafterprint = function () {
+            printWindow.close();
+        };
+
+        // Fallback – na wypadek gdyby onafterprint nie zadziałało
+        setTimeout(function () {
+            if (!printWindow.closed) {
+                printWindow.close();
+            }
+        }, 2500);
     };
 }
-
 
 // ==================== MOJE CERTYFIKATY ====================
 async function loadCertificates() {
