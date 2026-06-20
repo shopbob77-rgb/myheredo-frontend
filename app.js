@@ -371,7 +371,6 @@ function renderCertificateOverlay(certificateData, docId) {
     const generatedDate = new Date(certificateData.generatedAt?.toDate ? certificateData.generatedAt.toDate() : Date.now());
     const formattedDate = generatedDate.toLocaleDateString('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' });
 
-    // Prosty podpis cyfrowy (demo)
     const contentForHash = `${docId}|${certificateData.ownerEmail}|${certificateData.dmsDays}|${vaults.length}`;
     const digitalSignature = btoa(contentForHash).substring(0, 28);
 
@@ -395,11 +394,13 @@ function renderCertificateOverlay(certificateData, docId) {
             .cert-container { max-height: 100vh; border-radius: 18px; }
         }
 
-        /* ====================== DRUK - JEDNA STRONA ====================== */
+        /* ====================== DRUK - JEDNA STRONA + BEZ CZARNYCH STRON ====================== */
         @media print {
+            /* Ukrywamy wszystko poza certyfikatem */
             body * { visibility: hidden !important; }
             #certificateOverlay, #certificateOverlay * { visibility: visible !important; }
 
+            /* Usuwamy ciemne tło overlayu */
             #certificateOverlay {
                 position: static !important;
                 background: white !important;
@@ -415,50 +416,54 @@ function renderCertificateOverlay(certificateData, docId) {
                 border-radius: 0 !important;
                 width: 100% !important;
                 margin: 0 auto !important;
+                background: white !important;
             }
 
-            /* AGRESYWNE ZMNIEJSZENIE - żeby zmieściło się na 1 stronie */
+            /* AGRESYWNE ZMNIEJSZENIE - jedna strona A4 */
             .cert-container {
-                font-size: 11.5px !important;
-                line-height: 1.25 !important;
+                font-size: 10.5px !important;
+                line-height: 1.2 !important;
             }
 
             .cert-container h1,
             .cert-container .text-3xl,
             .cert-container .text-4xl {
-                font-size: 20px !important;
-                margin-bottom: 4px !important;
+                font-size: 18px !important;
+                margin-bottom: 2px !important;
             }
 
             .cert-container .pt-8,
-            .cert-container .pt-12 {
-                padding-top: 12px !important;
+            .cert-container .pt-12,
+            .cert-container .pt-6 {
+                padding-top: 8px !important;
             }
 
             .cert-container .pb-6,
             .cert-container .pb-8 {
-                padding-bottom: 10px !important;
+                padding-bottom: 6px !important;
             }
 
             .cert-container .p-6,
-            .cert-container .p-12 {
-                padding: 14px !important;
+            .cert-container .p-8,
+            .cert-container .p-5 {
+                padding: 10px !important;
             }
 
-            .cert-container .space-y-8 > * + *,
-            .cert-container .space-y-10 > * + * {
-                margin-top: 10px !important;
+            .cert-container .space-y-5 > * + *,
+            .cert-container .space-y-6 > * + *,
+            .cert-container .space-y-7 > * + * {
+                margin-top: 8px !important;
             }
 
             .bg-slate-50 {
-                padding: 10px 12px !important;
+                padding: 8px 10px !important;
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
 
             .border-t {
-                margin-top: 8px !important;
-                padding-top: 8px !important;
+                margin-top: 6px !important;
+                padding-top: 6px !important;
             }
 
             @page {
@@ -472,35 +477,35 @@ function renderCertificateOverlay(certificateData, docId) {
         <div class="cert-container bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl overflow-hidden text-slate-900">
             
             <!-- Nagłówek -->
-            <div class="pt-6 sm:pt-8 pb-4 sm:pb-6 text-center border-b border-slate-200">
-                <img src="logo.png" alt="MyHeredo" class="h-12 sm:h-16 mx-auto mb-3">
-                <h1 class="text-2xl sm:text-3xl font-bold flex items-center justify-center gap-2">
+            <div class="pt-6 pb-4 text-center border-b border-slate-200">
+                <img src="logo.png" alt="MyHeredo" class="h-12 mx-auto mb-3">
+                <h1 class="text-2xl font-bold flex items-center justify-center gap-2">
                     <span>🪶</span> CERTYFIKAT SUKCESJI
                 </h1>
-                <p class="text-amber-600 text-sm sm:text-base font-medium">Cyfrowa Sukcesja • MyHeredo</p>
+                <p class="text-amber-600 text-sm font-medium">Cyfrowa Sukcesja • MyHeredo</p>
             </div>
 
             <!-- Treść -->
-            <div class="p-5 sm:p-8 space-y-5 sm:space-y-7">
+            <div class="p-5 space-y-5">
                 <div class="grid grid-cols-2 gap-5 text-sm">
                     <div>
                         <p class="text-xs text-slate-500">Numer certyfikatu</p>
-                        <p class="font-mono font-bold text-base sm:text-xl break-all">${docId}</p>
+                        <p class="font-mono font-bold text-base break-all">${docId}</p>
                     </div>
                     <div class="text-right">
                         <p class="text-xs text-slate-500">Data wystawienia</p>
-                        <p class="text-base sm:text-lg">${formattedDate}</p>
+                        <p class="text-base">${formattedDate}</p>
                     </div>
                 </div>
 
                 <div>
                     <p class="text-xs text-slate-500">Właściciel sejfu</p>
-                    <p class="text-lg sm:text-xl font-semibold break-all">${certificateData.ownerEmail}</p>
+                    <p class="text-lg font-semibold break-all">${certificateData.ownerEmail}</p>
                 </div>
 
                 <div>
                     <p class="text-xs text-slate-500">Dead Man’s Switch</p>
-                    <p class="text-lg sm:text-xl font-semibold">${certificateData.dmsDays || 45} dni bezczynności</p>
+                    <p class="text-lg font-semibold">${certificateData.dmsDays || 45} dni bezczynności</p>
                 </div>
 
                 <!-- Skrytki -->
@@ -517,9 +522,9 @@ function renderCertificateOverlay(certificateData, docId) {
                             const icon = getIcon ? getIcon(iconKey) : '🔒';
                             return `
                                 <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 p-3 rounded-2xl">
-                                    <span class="text-2xl sm:text-3xl">${icon}</span>
+                                    <span class="text-2xl">${icon}</span>
                                     <div>
-                                        <p class="font-medium text-sm sm:text-base">${v.category}</p>
+                                        <p class="font-medium text-sm">${v.category}</p>
                                         <p class="text-emerald-600 text-xs">Zaszyfrowane</p>
                                     </div>
                                 </div>`;
@@ -533,7 +538,7 @@ function renderCertificateOverlay(certificateData, docId) {
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         ${(certificateData.heirs || []).map(h => `
                             <div class="bg-slate-50 border border-slate-200 p-3 rounded-2xl">
-                                <p class="font-semibold text-sm sm:text-base">${h.name}</p>
+                                <p class="font-semibold text-sm">${h.name}</p>
                                 <p class="text-slate-600 text-xs">${h.email}</p>
                             </div>`).join('')}
                     </div>
