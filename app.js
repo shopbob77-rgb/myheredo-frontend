@@ -502,7 +502,8 @@ function printCertificate() {
         return alert("Przeglądarka zablokowała okno drukowania.");
     }
 
-    printWindow.document.write(`
+    // Bezpieczniejsza metoda – używamy konkatenacji zamiast template literal
+    let htmlContent = `
         <!DOCTYPE html>
         <html lang="pl">
         <head>
@@ -529,7 +530,6 @@ function printCertificate() {
                     padding: 12mm;
                     box-sizing: border-box;
                 }
-                /* Ukrywa przyciski przy druku */
                 .print-hidden {
                     display: none !important;
                 }
@@ -537,12 +537,17 @@ function printCertificate() {
         </head>
         <body>
             <div class="print-wrapper">
-                ${certContent.innerHTML}
+    `;
+
+    htmlContent += certContent.innerHTML;
+
+    htmlContent += `
             </div>
         </body>
         </html>
-    `);
+    `;
 
+    printWindow.document.write(htmlContent);
     printWindow.document.close();
 
     printWindow.onload = function () {
