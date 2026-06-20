@@ -675,78 +675,88 @@ function printCertificate() {
     const certContent = overlay.querySelector('.cert-container');
     if (!certContent) return alert("Nie znaleziono zawartości certyfikatu.");
 
-    // Sprawdzamy czy to telefon
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    if (isMobile) {
-        // ==================== WERSJA NA TELEFON ====================
-        // Ukrywamy czarne tło overlayu
-        const originalBackground = overlay.style.background;
-        overlay.style.background = 'white';
-        overlay.style.padding = '0';
-
-        // Ukrywamy przyciski na wydruku
-        const buttons = overlay.querySelector('.print-hidden');
-        if (buttons) buttons.style.display = 'none';
-
-        // Drukujemy bezpośrednio
-        window.print();
-
-        // Przywracamy wygląd po wydruku
-        setTimeout(() => {
-            overlay.style.background = originalBackground || 'rgba(0,0,0,0.95)';
-            overlay.style.padding = '12px';
-            if (buttons) buttons.style.display = '';
-        }, 1000);
-
-    } else {
-        // ==================== WERSJA NA KOMPUTER ====================
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) {
-            return alert("Przeglądarka zablokowała okno drukowania.");
-        }
-
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html lang="pl">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Certyfikat Sukcesji</title>
-                <script src="https://cdn.tailwindcss.com"><\/script>
-                <style>
-                    @page { size: A4 portrait; margin: 12mm; }
-                    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }
-                    .print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 8mm; box-sizing: border-box; }
-                    .print-hidden { display: none !important; }
-                    .cert-container { box-shadow: none !important; border-radius: 12px; max-height: none !important; overflow: visible !important; }
-                </style>
-            </head>
-            <body>
-                <div class="print-wrapper">
-                    ${certContent.innerHTML}
-                </div>
-            </body>
-            </html>
-        `);
-
-        printWindow.document.close();
-
-        printWindow.onload = function () {
-            printWindow.focus();
-            printWindow.print();
-
-            printWindow.onafterprint = function () {
-                printWindow.close();
-            };
-
-            setTimeout(function () {
-                if (!printWindow.closed) {
-                    printWindow.close();
-                }
-            }, 2500);
-        };
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        return alert("Przeglądarka zablokowała okno drukowania.");
     }
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="pl">
+        <head>
+            <meta charset="UTF-8">
+            <title>Certyfikat Sukcesji</title>
+            <script src="https://cdn.tailwindcss.com"><\/script>
+            <style>
+                @page {
+                    size: A4 portrait;
+                    margin: 8mm;
+                }
+
+                body {
+                    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: white;
+                    color: #0f172a;
+                }
+
+                .print-wrapper {
+                    width: 100%;
+                    max-width: 210mm;
+                    margin: 0 auto;
+                    padding: 6mm;
+                    box-sizing: border-box;
+                }
+
+                /* === ZMUSZAMY DO JEDNEJ STRONY === */
+                .cert-container {
+                    box-shadow: none !important;
+                    border-radius: 12px;
+                    max-height: none !important;
+                    overflow: visible !important;
+                    padding-top: 12px !important;
+                    padding-bottom: 12px !important;
+                }
+
+                /* Mniejsze czcionki i odstępy na wydruku */
+                .cert-container h1 { font-size: 22px !important; margin-bottom: 4px !important; }
+                .cert-container p { font-size: 12.5px !important; line-height: 1.35 !important; }
+                .cert-container .text-lg { font-size: 14px !important; }
+                .cert-container .text-xl { font-size: 15px !important; }
+                .cert-container .text-3xl { font-size: 20px !important; }
+
+                /* Mniejsze karty skrytek i spadkobierców */
+                .cert-container .rounded-2xl {
+                    padding: 10px 12px !important;
+                    margin-bottom: 6px !important;
+                }
+
+                /* Ukrycie niepotrzebnych elementów */
+                .print-hidden { display: none !important; }
+
+                /* Zapobieganie łamaniu kart */
+                .cert-container > div {
+                    page-break-inside: avoid;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="print-wrapper">
+                ${certContent.innerHTML}
+            </div>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+
+    printWindow.onload = function () {
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+        }, 400);
+    };
 }
 // ==================== RECOVERY PASSWORD ====================
 
