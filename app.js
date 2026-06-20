@@ -370,16 +370,12 @@ function renderCertificateOverlay(certificateData, docId) {
     const vaults = certificateData.vaultsSummary || [];
     const generatedDate = new Date(certificateData.generatedAt?.toDate ? certificateData.generatedAt.toDate() : Date.now());
     const formattedDate = generatedDate.toLocaleDateString('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' });
-
     const contentForHash = `${docId}|${certificateData.ownerEmail}|${certificateData.dmsDays}|${vaults.length}`;
     const digitalSignature = btoa(contentForHash).substring(0, 28);
 
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-3 sm:p-6 overflow-hidden">
-        
-        <!-- Główny kontener certyfikatu -->
-        <div class="cert-container bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl flex flex-col text-slate-900" 
-             style="max-height: 94vh; width: 100%; max-width: 900px;">
+        <div class="cert-container bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl flex flex-col text-slate-900" style="max-height: 94vh; width: 100%; max-width: 900px;">
             
             <!-- Nagłówek -->
             <div class="pt-6 pb-4 px-6 text-center border-b border-slate-200 flex-shrink-0">
@@ -390,9 +386,8 @@ function renderCertificateOverlay(certificateData, docId) {
                 <p class="text-amber-600 text-sm font-medium">Cyfrowa Sukcesja • MyHeredo</p>
             </div>
 
-            <!-- TREŚĆ (przewijalna) -->
+            <!-- TREŚĆ -->
             <div class="flex-1 overflow-auto p-6 space-y-6">
-                
                 <div class="grid grid-cols-2 gap-6 text-sm">
                     <div>
                         <p class="text-xs text-slate-500">Numer certyfikatu</p>
@@ -462,32 +457,25 @@ function renderCertificateOverlay(certificateData, docId) {
                 </div>
             </div>
 
-          <!-- PRZYCISKI (zawsze widoczne na dole) -->
-<div class="border-t p-5 flex flex-col gap-2 flex-shrink-0 bg-white rounded-b-3xl print-hidden">
-    <button onclick="printCertificate()" 
-            class="w-full py-4 bg-slate-900 text-white font-semibold rounded-2xl text-base hover:bg-black transition">
-        🖨️ Drukuj / Zapisz jako PDF
-    </button>
-    <button onclick="closeCertificate()" 
-            class="w-full py-4 border border-slate-300 font-semibold rounded-2xl text-base hover:bg-slate-100 transition">
-        Zamknij
-    </button>
-</div>
+            <!-- PRZYCISKI -->
+            <div class="border-t p-5 flex flex-col gap-2 flex-shrink-0 bg-white rounded-b-3xl print-hidden">
+                <button onclick="printCertificate()" class="w-full py-4 bg-slate-900 text-white font-semibold rounded-2xl text-base hover:bg-black transition">
+                    🖨️ Drukuj / Zapisz jako PDF
+                </button>
+                <button onclick="closeCertificate()" class="w-full py-4 border border-slate-300 font-semibold rounded-2xl text-base hover:bg-slate-100 transition">
+                    Zamknij
+                </button>
+            </div>
+        </div>
+    </div>`;
 
     document.body.insertAdjacentHTML('beforeend', html);
 }
-// Dodatkowa funkcja do bezpośredniego zapisu PDF
 function saveAsPDF() {
     const originalTitle = document.title;
-    document.title = 'Certyfikat_Sukcesji_${new Date().toISOString().slice(0,10)}';
+    document.title = `Certyfikat_Sukcesji_${new Date().toISOString().slice(0, 10)}`;
     window.print();
     document.title = originalTitle;
-}
-function closeCertificate() {
-    const overlay = document.getElementById('certificateOverlay');
-    if (overlay) {
-        overlay.remove();
-    }
 }
 
 function printCertificate() {
