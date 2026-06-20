@@ -661,12 +661,6 @@ function saveRecoveryPassword() {
 // Muszą być PRZED blokiem rejestracji globalnej
 // =============================================
 
-function closeCertificate() {
-    const overlay = document.getElementById('certificateOverlay');
-    if (overlay) {
-        overlay.remove();
-    }
-}
 function printCertificate() {
     const overlay = document.getElementById('certificateOverlay');
     if (!overlay) return alert("Nie znaleziono certyfikatu.");
@@ -689,7 +683,7 @@ function printCertificate() {
             <style>
                 @page {
                     size: A4 portrait;
-                    margin: 4mm;
+                    margin: 5mm;
                 }
 
                 body {
@@ -704,49 +698,49 @@ function printCertificate() {
                     width: 100%;
                     max-width: 210mm;
                     margin: 0 auto;
-                    padding: 2mm;
+                    padding: 3mm;
                     box-sizing: border-box;
                 }
 
                 .cert-container {
                     box-shadow: none !important;
-                    border-radius: 4px;
+                    border-radius: 6px;
                     max-height: none !important;
                     overflow: visible !important;
-                    padding: 6px 14px !important;
+                    padding: 8px 16px !important;
                 }
 
-                /* === EKSTREMALNE ZMNIEJSZENIE === */
+                /* === BARDZO AGRESYWNE, ALE ZRÓWNOWAŻONE ZMNIEJSZENIE === */
                 .cert-container h1 {
-                    font-size: 17px !important;
-                    margin-bottom: 1px !important;
+                    font-size: 18px !important;
+                    margin-bottom: 2px !important;
                     line-height: 1.1 !important;
                 }
 
                 .cert-container p {
-                    font-size: 10px !important;
-                    line-height: 1.15 !important;
-                    margin-bottom: 1px !important;
+                    font-size: 10.5px !important;
+                    line-height: 1.2 !important;
+                    margin-bottom: 2px !important;
                 }
 
-                .cert-container .text-lg { font-size: 11px !important; }
-                .cert-container .text-xl { font-size: 12px !important; }
-                .cert-container .text-3xl { font-size: 15px !important; }
+                .cert-container .text-lg { font-size: 12px !important; }
+                .cert-container .text-xl { font-size: 13px !important; }
+                .cert-container .text-3xl { font-size: 16px !important; }
 
                 /* Karty skrytek i spadkobierców */
                 .cert-container .rounded-2xl {
-                    padding: 5px 7px !important;
-                    margin-bottom: 3px !important;
+                    padding: 6px 8px !important;
+                    margin-bottom: 4px !important;
                 }
 
                 /* Nagłówek */
-                .cert-container .pt-8 { padding-top: 4px !important; }
-                .cert-container .pb-6 { padding-bottom: 4px !important; }
+                .cert-container .pt-8 { padding-top: 6px !important; }
+                .cert-container .pb-6 { padding-bottom: 6px !important; }
 
-                /* Sekcja podpisu cyfrowego */
+                /* Sekcja podpisu cyfrowego — mocno ściśnięta */
                 .cert-container .pt-4.border-t {
-                    padding-top: 4px !important;
-                    margin-top: 4px !important;
+                    padding-top: 6px !important;
+                    margin-top: 6px !important;
                 }
 
                 .print-hidden { display: none !important; }
