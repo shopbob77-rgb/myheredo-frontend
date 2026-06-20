@@ -104,6 +104,7 @@ async function initDashboard() {
     renderHeirs();
     setupDMS();
     setTimeout(() => loadCertificates(), 800); // opóźnienie
+  updateRecoveryPasswordStatus();  
 }
 
 // ==================== TIMER ====================
@@ -727,6 +728,113 @@ function printCertificate() {
         };
     }
 }
+// ==================== RECOVERY PASSWORD ====================
+
+let recoveryPassword = null;
+
+// Pokazywanie / ukrywanie hasła
+function toggleRecoveryPasswordVisibility() {
+    const input = document.getElementById('recoveryPassword');
+    const icon = document.getElementById('recoveryEyeIcon');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+// Sprawdza czy Recovery Password jest już ustawiony
+function updateRecoveryPasswordStatus() {
+    const statusEl = document.getElementById('recoveryStatus');
+    if (!statusEl) return;
+
+    const saved = localStorage.getItem('myheredo_recovery_password');
+
+    if (saved) {
+        recoveryPassword = saved;
+        statusEl.innerHTML = `
+            <div class="flex items-center gap-2 text-emerald-400">
+                <i class="fas fa-check-circle"></i>
+                <span>Recovery Password jest już ustawiony</span>
+            </div>
+        `;
+    } else {
+        statusEl.innerHTML = `
+            <div class="flex items-center gap-2 text-amber-400">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Nie ustawiono Recovery Password</span>
+            </div>
+        `;
+    }
+}
+
+// Zapisywanie Recovery Password (pierwszy raz)
+function saveRecoveryPassword() {
+    const input = document.getElementById('recoveryPassword');
+    if (!input) return;
+
+    const pass = input.value.trim();
+
+    if (!pass) {
+        alert("Wprowadź Recovery Password");
+        return;
+    }
+    if (pass.length < 6) {
+        alert("Recovery Password musi mieć minimum 6 znaków");
+        return;
+    }
+
+    // Jeśli już istnieje – nie pozwalamy nadpisać bez potwierdzenia
+    if (localStorage.getItem('myheredo_recovery_password')) {
+        if (!confirm("Recovery Password jest już ustawiony. Czy na pewno chcesz go nadpisać?")) {
+            return;
+        }
+    }
+
+    recoveryPassword = pass;
+    localStorage.setItem('myheredo_recovery_password', pass);
+    input.value = '';
+
+    updateRecoveryPasswordStatus();
+    alert("✅ Recovery Password został zapisany!\n\nPamiętaj, żeby przekazać go spadkobiercom.");
+}
+
+// Zmiana Recovery Password (z podaniem starego)
+function changeRecoveryPassword() {
+    const current = localStorage.getItem('myheredo_recovery_password');
+
+    if (!current) {
+        alert("Nie masz jeszcze ustawionego Recovery Password. Użyj przycisku 'Zapisz'.");
+        return;
+    }
+
+    const oldPass = prompt("Podaj aktualne Recovery Password:");
+    if (!oldPass) return;
+
+    if (oldPass !== current) {
+        alert("Podane hasło jest nieprawidłowe.");
+        return;
+    }
+
+    const newPass = prompt("Podaj nowe Recovery Password (min. 6 znaków):");
+    if (!newPass || newPass.length < 6) {
+        alert("Nowe hasło musi mieć minimum 6 znaków.");
+        return;
+    }
+
+    if (!confirm("Na pewno chcesz zmienić Recovery Password?")) return;
+
+    recoveryPassword = newPass;
+    localStorage.setItem('myheredo_recovery_password', newPass);
+
+    updateRecoveryPasswordStatus();
+    alert("✅ Recovery Password został zmieniony pomyślnie.");
+}
 // =============================================
 // =============================================
 // GLOBALNA REJESTRACJA FUNKCJI
@@ -756,5 +864,10 @@ window.deleteCertificate  = deleteCertificate;
 window.openVaultModal     = openVaultModal;
 window.closeVaultModal    = closeVaultModal;
 window.saveVault          = saveVault;
+
+window.toggleRecoveryPasswordVisibility = toggleRecoveryPasswordVisibility;
+window.saveRecoveryPassword = saveRecoveryPassword;
+window.changeRecoveryPassword = changeRecoveryPassword;
+
 
 console.log("✅ Wszystkie funkcje zostały pomyślnie zarejestrowane globalnie");
