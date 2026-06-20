@@ -502,37 +502,31 @@ function printCertificate() {
         return alert("Przeglądarka zablokowała okno drukowania.");
     }
 
-    let html = '';
-
-    html += '<!DOCTYPE html>';
-    html += '<html lang="pl">';
-    html += '<head>';
-    html += '<meta charset="UTF-8">';
-    html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
-    html += '<title>Certyfikat Sukcesji</title>';
-    html += '<script src="https://cdn.tailwindcss.com"><\/script>';
-    html += '<style>';
-    html += '@page { size: A4 portrait; margin: 10mm; }';
-    html += 'body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }';
-    html += '.print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 12mm; box-sizing: border-box; }';
-    html += '.print-hidden { display: none !important; }';
-    html += '</style>';
-    html += '</head>';
-    html += '<body>';
-    html += '<div class="print-wrapper">';
-    html += certContent.innerHTML;
-    html += '</div>';
-    html += '</body>';
-    html += '</html>';
-
-    printWindow.document.write(html);
-    printWindow.document.close();
+    // Tworzymy dokument od zera (bezpieczna metoda)
+    const doc = printWindow.document;
+    doc.open();
+    doc.write('<!DOCTYPE html><html><head>');
+    doc.write('<meta charset="UTF-8">');
+    doc.write('<title>Certyfikat Sukcesji</title>');
+    doc.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+    doc.write('<style>');
+    doc.write('@page { size: A4 portrait; margin: 10mm; }');
+    doc.write('body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }');
+    doc.write('.print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 12mm; box-sizing: border-box; }');
+    doc.write('.print-hidden { display: none !important; }');
+    doc.write('</style>');
+    doc.write('</head><body>');
+    doc.write('<div class="print-wrapper">');
+    doc.write(certContent.innerHTML);
+    doc.write('</div>');
+    doc.write('</body></html>');
+    doc.close();
 
     printWindow.onload = function () {
         printWindow.focus();
         setTimeout(() => {
             printWindow.print();
-        }, 400);
+        }, 500);
     };
 }
 
