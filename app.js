@@ -462,19 +462,17 @@ function renderCertificateOverlay(certificateData, docId) {
                 </div>
             </div>
 
-            <!-- PRZYCISKI (zawsze widoczne na dole) -->
-            <div class="border-t p-5 flex flex-col gap-2 flex-shrink-0 bg-white rounded-b-3xl">
-                <button onclick="printCertificate()" 
-                        class="w-full py-4 bg-slate-900 text-white font-semibold rounded-2xl text-base hover:bg-black transition">
-                    🖨️ Drukuj / Zapisz jako PDF
-                </button>
-                <button onclick="closeCertificate()" 
-                        class="w-full py-4 border border-slate-300 font-semibold rounded-2xl text-base hover:bg-slate-100 transition">
-                    Zamknij
-                </button>
-            </div>
-        </div>
-    </div>`;
+          <!-- PRZYCISKI (zawsze widoczne na dole) -->
+<div class="border-t p-5 flex flex-col gap-2 flex-shrink-0 bg-white rounded-b-3xl print-hidden">
+    <button onclick="printCertificate()" 
+            class="w-full py-4 bg-slate-900 text-white font-semibold rounded-2xl text-base hover:bg-black transition">
+        🖨️ Drukuj / Zapisz jako PDF
+    </button>
+    <button onclick="closeCertificate()" 
+            class="w-full py-4 border border-slate-300 font-semibold rounded-2xl text-base hover:bg-slate-100 transition">
+        Zamknij
+    </button>
+</div>
 
     document.body.insertAdjacentHTML('beforeend', html);
 }
@@ -501,8 +499,59 @@ function printCertificate() {
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-        return alert("Przeglądarka zablokowała okno drukowania. Zezwól na wyskakujące okna.");
+        return alert("Przeglądarka zablokowała okno drukowania.");
     }
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="pl">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Certyfikat Sukcesji</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+                @page {
+                    size: A4 portrait;
+                    margin: 10mm;
+                }
+                body {
+                    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: white;
+                    color: #0f172a;
+                }
+                .print-wrapper {
+                    width: 100%;
+                    max-width: 210mm;
+                    margin: 0 auto;
+                    padding: 12mm;
+                    box-sizing: border-box;
+                }
+                /* Ukrywa przyciski przy druku */
+                .print-hidden {
+                    display: none !important;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="print-wrapper">
+                ${certContent.innerHTML}
+            </div>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+
+    printWindow.onload = function () {
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+        }, 400);
+    };
+}
 
     printWindow.document.write(`
         <!DOCTYPE html>
