@@ -502,52 +502,31 @@ function printCertificate() {
         return alert("Przeglądarka zablokowała okno drukowania.");
     }
 
-    // Bezpieczniejsza metoda – używamy konkatenacji zamiast template literal
-    let htmlContent = `
-        <!DOCTYPE html>
-        <html lang="pl">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Certyfikat Sukcesji</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <style>
-                @page {
-                    size: A4 portrait;
-                    margin: 10mm;
-                }
-                body {
-                    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                    margin: 0;
-                    padding: 0;
-                    background: white;
-                    color: #0f172a;
-                }
-                .print-wrapper {
-                    width: 100%;
-                    max-width: 210mm;
-                    margin: 0 auto;
-                    padding: 12mm;
-                    box-sizing: border-box;
-                }
-                .print-hidden {
-                    display: none !important;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="print-wrapper">
-    `;
+    // === WERSJA BEZPIECZNA (konkatenacja zamiast template literal) ===
+    let html = '';
 
-    htmlContent += certContent.innerHTML;
+    html += '<!DOCTYPE html>';
+    html += '<html lang="pl">';
+    html += '<head>';
+    html += '<meta charset="UTF-8">';
+    html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
+    html += '<title>Certyfikat Sukcesji</title>';
+    html += '<script src="https://cdn.tailwindcss.com"><\/script>';
+    html += '<style>';
+    html += '@page { size: A4 portrait; margin: 10mm; }';
+    html += 'body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }';
+    html += '.print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 12mm; box-sizing: border-box; }';
+    html += '.print-hidden { display: none !important; }';
+    html += '</style>';
+    html += '</head>';
+    html += '<body>';
+    html += '<div class="print-wrapper">';
+    html += certContent.innerHTML;
+    html += '</div>';
+    html += '</body>';
+    html += '</html>';
 
-    htmlContent += `
-            </div>
-        </body>
-        </html>
-    `;
-
-    printWindow.document.write(htmlContent);
+    printWindow.document.write(html);
     printWindow.document.close();
 
     printWindow.onload = function () {
