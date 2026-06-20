@@ -487,7 +487,9 @@ function saveAsPDF() {
 }
 function closeCertificate() {
     const overlay = document.getElementById('certificateOverlay');
-    if (overlay) overlay.remove();
+    if (overlay) {
+        overlay.remove();
+    }
 }
 
 function printCertificate() {
@@ -696,6 +698,7 @@ window.handleLogout = handleLogout;
 window.loadCertificates = loadCertificates;
 window.openCertificate = openCertificate;
 window.closeCertificate = closeCertificate;
+window.printCertificate = printCertificate;
 window.printCertificate = printCertificate;
 window.openVaultModal = openVaultModal;
 window.closeVaultModal = closeVaultModal;
