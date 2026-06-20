@@ -369,50 +369,55 @@ async function showCertificate() {
 
 function renderCertificateOverlay(certificateData, docId) {
     const vaults = certificateData.vaultsSummary || [];
+    const heirs = certificateData.heirs || [];
     const generatedDate = new Date(certificateData.generatedAt?.toDate ? certificateData.generatedAt.toDate() : Date.now());
-    const formattedDate = generatedDate.toLocaleDateString('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' });
+    const formattedDate = generatedDate.toLocaleDateString('pl-PL', { 
+        day: '2-digit', month: 'long', year: 'numeric' 
+    });
+
     const contentForHash = `${docId}|${certificateData.ownerEmail}|${certificateData.dmsDays}|${vaults.length}`;
     const digitalSignature = btoa(contentForHash).substring(0, 28);
 
     const html = `
-    <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-3 sm:p-6 overflow-hidden">
-        <div class="cert-container bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl flex flex-col text-slate-900" style="max-height: 94vh; width: 100%; max-width: 900px;">
+    <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-4 sm:p-6 overflow-hidden">
+        <div class="cert-container bg-white w-full max-w-3xl md:max-w-[820px] rounded-3xl shadow-2xl flex flex-col text-slate-900"
+             style="max-height: 94vh; width: 100%; max-width: 820px;">
             
             <!-- Nagłówek -->
-            <div class="pt-6 pb-4 px-6 text-center border-b border-slate-200 flex-shrink-0">
-                <img src="logo.png" alt="MyHeredo" class="h-12 mx-auto mb-3">
-                <h1 class="text-2xl font-bold flex items-center justify-center gap-2">
-                    <span>🪶</span> CERTYFIKAT SUKCESJI
-                </h1>
-                <p class="text-amber-600 text-sm font-medium">Cyfrowa Sukcesja • MyHeredo</p>
+            <div class="pt-8 pb-6 px-8 text-center border-b border-slate-200 flex-shrink-0">
+                <img src="logo.png" alt="MyHeredo" class="h-14 mx-auto mb-4">
+                <h1 class="text-3xl font-bold tracking-tight">CERTYFIKAT SUKCESJI</h1>
+                <p class="text-amber-600 text-base mt-1 font-medium">Cyfrowa Sukcesja • MyHeredo</p>
             </div>
 
-            <!-- TREŚĆ -->
-            <div class="flex-1 overflow-auto p-6 space-y-6">
-                <div class="grid grid-cols-2 gap-6 text-sm">
+            <!-- Treść -->
+            <div class="flex-1 overflow-auto p-8 space-y-8">
+                
+                <!-- Informacje podstawowe -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-sm">
                     <div>
-                        <p class="text-xs text-slate-500">Numer certyfikatu</p>
-                        <p class="font-mono font-bold text-base break-all">${docId}</p>
+                        <p class="text-xs text-slate-500 mb-1">NUMER CERTYFIKATU</p>
+                        <p class="font-mono font-semibold text-base break-all">${docId}</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-xs text-slate-500">Data wystawienia</p>
-                        <p class="text-base">${formattedDate}</p>
+                    <div class="md:text-right">
+                        <p class="text-xs text-slate-500 mb-1">DATA WYDANIA</p>
+                        <p class="font-medium">${formattedDate}</p>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <p class="text-xs text-slate-500 mb-1">WŁAŚCICIEL SEJFU</p>
+                        <p class="font-semibold text-lg break-all">${certificateData.ownerEmail}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-xs text-slate-500 mb-1">DEAD MAN’S SWITCH</p>
+                        <p class="font-semibold">${certificateData.dmsDays || 45} dni bezczynności</p>
                     </div>
                 </div>
 
+                <!-- Zabezpieczone skrytki -->
                 <div>
-                    <p class="text-xs text-slate-500">Właściciel sejfu</p>
-                    <p class="text-lg font-semibold break-all">${certificateData.ownerEmail}</p>
-                </div>
-
-                <div>
-                    <p class="text-xs text-slate-500">Dead Man’s Switch</p>
-                    <p class="text-lg font-semibold">${certificateData.dmsDays || 45} dni bezczynności</p>
-                </div>
-
-                <!-- Skrytki -->
-                <div>
-                    <p class="text-xs text-slate-500 mb-2">ZABEZPIECZONE SKRYTKI</p>
+                    <p class="text-xs text-slate-500 mb-3 tracking-wider">ZABEZPIECZONE SKRYTKI</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         ${vaults.map(v => {
                             let iconKey = v.category.toLowerCase();
@@ -421,13 +426,15 @@ function renderCertificateOverlay(certificateData, docId) {
                             else if (iconKey.includes('krypto')) iconKey = 'krypto';
                             else if (iconKey.includes('social')) iconKey = 'social';
                             else if (iconKey.includes('instrukcje')) iconKey = 'instrukcje';
+                            
                             const icon = getIcon ? getIcon(iconKey) : '🔒';
+                            
                             return `
-                                <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 p-3 rounded-2xl">
-                                    <span class="text-2xl">${icon}</span>
+                                <div class="flex items-center gap-4 bg-slate-50 border border-slate-200 p-4 rounded-2xl">
+                                    <div class="text-3xl flex-shrink-0">${icon}</div>
                                     <div>
-                                        <p class="font-medium text-sm">${v.category}</p>
-                                        <p class="text-emerald-600 text-xs">Zaszyfrowane</p>
+                                        <p class="font-semibold">${v.category}</p>
+                                        <p class="text-emerald-600 text-sm">Zaszyfrowane end-to-end</p>
                                     </div>
                                 </div>`;
                         }).join('')}
@@ -436,37 +443,50 @@ function renderCertificateOverlay(certificateData, docId) {
 
                 <!-- Spadkobiercy -->
                 <div>
-                    <p class="text-xs text-slate-500 mb-2">SPADKOBIERCY (${certificateData.heirs ? certificateData.heirs.length : 0})</p>
+                    <p class="text-xs text-slate-500 mb-3 tracking-wider">SPADKOBIERCY (${heirs.length})</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        ${(certificateData.heirs || []).map(h => `
-                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-2xl">
-                                <p class="font-semibold text-sm">${h.name}</p>
-                                <p class="text-slate-600 text-xs">${h.email}</p>
-                            </div>`).join('')}
+                        ${heirs.length > 0 ? heirs.map(h => `
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl">
+                                <p class="font-semibold">${h.name}</p>
+                                <p class="text-slate-600 text-sm break-all">${h.email}</p>
+                                <p class="text-emerald-600 text-xs mt-2">● Pełny dostęp do skrytek</p>
+                            </div>
+                        `).join('') : `
+                            <div class="col-span-2 text-center py-6 text-slate-400 italic">
+                                Nie dodano spadkobierców
+                            </div>
+                        `}
                     </div>
                 </div>
 
                 <!-- Podpis cyfrowy -->
                 <div class="pt-4 border-t border-slate-200">
-                    <div class="flex items-center gap-2 text-emerald-600">
-                        <i class="fas fa-shield-alt"></i>
+                    <div class="flex items-start gap-3">
+                        <div class="text-emerald-600 mt-1">
+                            <i class="fas fa-shield-alt text-xl"></i>
+                        </div>
                         <div>
-                            <span class="font-semibold text-sm">Podpis cyfrowy MyHeredo</span><br>
-                            <span class="text-xs text-slate-500 font-mono">SHA-256: ${digitalSignature}</span>
+                            <p class="font-semibold text-emerald-700">Podpis cyfrowy MyHeredo</p>
+                            <p class="text-xs text-slate-500 font-mono mt-0.5">SHA-256: ${digitalSignature}</p>
+                            <p class="text-xs text-slate-400 mt-1">Ten certyfikat został wygenerowany cyfrowo i jest chroniony kryptograficznie.</p>
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            <!-- PRZYCISKI -->
-            <div class="border-t p-5 flex flex-col gap-2 flex-shrink-0 bg-white rounded-b-3xl print-hidden">
-                <button onclick="printCertificate()" class="w-full py-4 bg-slate-900 text-white font-semibold rounded-2xl text-base hover:bg-black transition">
+            <!-- Przyciski -->
+            <div class="border-t p-6 flex flex-col gap-3 flex-shrink-0 bg-white rounded-b-3xl print-hidden">
+                <button onclick="printCertificate()" 
+                        class="w-full py-4 bg-slate-900 hover:bg-black text-white font-semibold rounded-2xl text-base transition">
                     🖨️ Drukuj / Zapisz jako PDF
                 </button>
-                <button onclick="closeCertificate()" class="w-full py-4 border border-slate-300 font-semibold rounded-2xl text-base hover:bg-slate-100 transition">
+                <button onclick="closeCertificate()" 
+                        class="w-full py-4 border border-slate-300 font-semibold rounded-2xl text-base hover:bg-slate-100 transition">
                     Zamknij
                 </button>
             </div>
+
         </div>
     </div>`;
 
