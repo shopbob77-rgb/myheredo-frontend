@@ -654,51 +654,78 @@ function printCertificate() {
     const certContent = overlay.querySelector('.cert-container');
     if (!certContent) return alert("Nie znaleziono zawartości certyfikatu.");
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-        return alert("Przeglądarka zablokowała okno drukowania.");
-    }
+    // Sprawdzamy czy to telefon
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="pl">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Certyfikat Sukcesji</title>
-            <script src="https://cdn.tailwindcss.com"><\/script>
-            <style>
-                @page { size: A4 portrait; margin: 12mm; }
-                body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }
-                .print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 8mm; box-sizing: border-box; }
-                .print-hidden { display: none !important; }
-                .cert-container { box-shadow: none !important; border-radius: 12px; max-height: none !important; overflow: visible !important; }
-            </style>
-        </head>
-        <body>
-            <div class="print-wrapper">
-                ${certContent.innerHTML}
-            </div>
-        </body>
-        </html>
-    `);
+    if (isMobile) {
+        // ==================== WERSJA NA TELEFON ====================
+        // Ukrywamy czarne tło overlayu
+        const originalBackground = overlay.style.background;
+        overlay.style.background = 'white';
+        overlay.style.padding = '0';
 
-    printWindow.document.close();
+        // Ukrywamy przyciski na wydruku
+        const buttons = overlay.querySelector('.print-hidden');
+        if (buttons) buttons.style.display = 'none';
 
-    printWindow.onload = function () {
-        printWindow.focus();
-        printWindow.print();
+        // Drukujemy bezpośrednio
+        window.print();
 
-        printWindow.onafterprint = function () {
-            printWindow.close();
-        };
+        // Przywracamy wygląd po wydruku
+        setTimeout(() => {
+            overlay.style.background = originalBackground || 'rgba(0,0,0,0.95)';
+            overlay.style.padding = '12px';
+            if (buttons) buttons.style.display = '';
+        }, 1000);
 
-        setTimeout(function () {
-            if (!printWindow.closed) {
+    } else {
+        // ==================== WERSJA NA KOMPUTER ====================
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            return alert("Przeglądarka zablokowała okno drukowania.");
+        }
+
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="pl">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Certyfikat Sukcesji</title>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <style>
+                    @page { size: A4 portrait; margin: 12mm; }
+                    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }
+                    .print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 8mm; box-sizing: border-box; }
+                    .print-hidden { display: none !important; }
+                    .cert-container { box-shadow: none !important; border-radius: 12px; max-height: none !important; overflow: visible !important; }
+                </style>
+            </head>
+            <body>
+                <div class="print-wrapper">
+                    ${certContent.innerHTML}
+                </div>
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+
+        printWindow.onload = function () {
+            printWindow.focus();
+            printWindow.print();
+
+            printWindow.onafterprint = function () {
                 printWindow.close();
-            }
-        }, 3000);
-    };
+            };
+
+            setTimeout(function () {
+                if (!printWindow.closed) {
+                    printWindow.close();
+                }
+            }, 2500);
+        };
+    }
 }
 // =============================================
 // =============================================
