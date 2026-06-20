@@ -114,11 +114,24 @@ function startInactivityTimer() {
 function resetInactivityTimer() {
     startInactivityTimer();
 }
-function logout(silent = false) {
-    if (!silent && !confirm("Wylogować się?")) return;
-    sessionStorage.clear();
-    window.location.href = "index.html";
+// ==================== WYLOGOWANIE ====================
+function handleLogout() {
+    if (confirm("Wylogować się z MyHeredo?")) {
+        // Czyszczenie wszystkich danych sesji
+        sessionStorage.clear();
+        localStorage.removeItem('myheredo_user_email');
+        localStorage.removeItem('myheredo_encrypted_vault');
+        localStorage.removeItem('myheredo_heirs');
+        localStorage.removeItem('myheredo_dms_config');
+        
+        console.log("Wylogowano - przekierowanie na stronę główną");
+        window.location.href = "index.html";
+    }
 }
+
+// Rejestracja globalna
+window.handleLogout = handleLogout;
+window.logout = handleLogout;   // na wszelki wypadek
 
 // ==================== SZYFROWANIE ====================
 async function deriveKey(password, salt) {
