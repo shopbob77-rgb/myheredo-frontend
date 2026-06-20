@@ -690,7 +690,7 @@ function printCertificate() {
             <style>
                 @page {
                     size: A4 portrait;
-                    margin: 8mm;
+                    margin: 6mm;           /* mniejsze marginesy */
                 }
 
                 body {
@@ -705,37 +705,54 @@ function printCertificate() {
                     width: 100%;
                     max-width: 210mm;
                     margin: 0 auto;
-                    padding: 6mm;
+                    padding: 4mm;
                     box-sizing: border-box;
                 }
 
-                /* === ZMUSZAMY DO JEDNEJ STRONY === */
                 .cert-container {
                     box-shadow: none !important;
-                    border-radius: 12px;
+                    border-radius: 8px;
                     max-height: none !important;
                     overflow: visible !important;
-                    padding-top: 12px !important;
-                    padding-bottom: 12px !important;
+                    padding: 12px 20px !important;   /* mocno zmniejszony padding */
                 }
 
-                /* Mniejsze czcionki i odstępy na wydruku */
-                .cert-container h1 { font-size: 22px !important; margin-bottom: 4px !important; }
-                .cert-container p { font-size: 12.5px !important; line-height: 1.35 !important; }
-                .cert-container .text-lg { font-size: 14px !important; }
-                .cert-container .text-xl { font-size: 15px !important; }
-                .cert-container .text-3xl { font-size: 20px !important; }
+                /* === AGRESYWNE ZMNIEJSZENIE WSZYSTKIEGO === */
+                .cert-container h1 {
+                    font-size: 20px !important;
+                    margin-bottom: 2px !important;
+                }
+                
+                .cert-container p {
+                    font-size: 11.5px !important;
+                    line-height: 1.25 !important;
+                    margin-bottom: 2px !important;
+                }
 
-                /* Mniejsze karty skrytek i spadkobierców */
+                .cert-container .text-lg { font-size: 13px !important; }
+                .cert-container .text-xl { font-size: 14px !important; }
+                .cert-container .text-3xl { font-size: 18px !important; }
+
+                /* Karty skrytek i spadkobierców */
                 .cert-container .rounded-2xl {
-                    padding: 10px 12px !important;
-                    margin-bottom: 6px !important;
+                    padding: 8px 10px !important;
+                    margin-bottom: 4px !important;
                 }
 
-                /* Ukrycie niepotrzebnych elementów */
+                /* Nagłówek */
+                .cert-container .pt-8 { padding-top: 12px !important; }
+                .cert-container .pb-6 { padding-bottom: 8px !important; }
+
+                /* Sekcja podpisu cyfrowego — mocno ściśnięta */
+                .cert-container .pt-4.border-t {
+                    padding-top: 8px !important;
+                    margin-top: 8px !important;
+                }
+
+                /* Ukrycie przycisków */
                 .print-hidden { display: none !important; }
 
-                /* Zapobieganie łamaniu kart */
+                /* Zapobieganie łamaniu sekcji */
                 .cert-container > div {
                     page-break-inside: avoid;
                 }
