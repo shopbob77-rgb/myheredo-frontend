@@ -376,10 +376,13 @@ function renderCertificateOverlay(certificateData, docId) {
 
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-3 sm:p-6 overflow-hidden">
-        <div class="cert-container bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl overflow-hidden text-slate-900" style="max-height: 93vh;">
+        
+        <!-- Główny kontener certyfikatu -->
+        <div class="cert-container bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl flex flex-col text-slate-900" 
+             style="max-height: 94vh; width: 100%; max-width: 900px;">
             
             <!-- Nagłówek -->
-            <div class="pt-6 pb-4 text-center border-b border-slate-200">
+            <div class="pt-6 pb-4 px-6 text-center border-b border-slate-200 flex-shrink-0">
                 <img src="logo.png" alt="MyHeredo" class="h-12 mx-auto mb-3">
                 <h1 class="text-2xl font-bold flex items-center justify-center gap-2">
                     <span>🪶</span> CERTYFIKAT SUKCESJI
@@ -387,9 +390,10 @@ function renderCertificateOverlay(certificateData, docId) {
                 <p class="text-amber-600 text-sm font-medium">Cyfrowa Sukcesja • MyHeredo</p>
             </div>
 
-            <!-- Treść -->
-            <div class="p-5 space-y-5">
-                <div class="grid grid-cols-2 gap-5 text-sm">
+            <!-- TREŚĆ (przewijalna) -->
+            <div class="flex-1 overflow-auto p-6 space-y-6">
+                
+                <div class="grid grid-cols-2 gap-6 text-sm">
                     <div>
                         <p class="text-xs text-slate-500">Numer certyfikatu</p>
                         <p class="font-mono font-bold text-base break-all">${docId}</p>
@@ -458,8 +462,8 @@ function renderCertificateOverlay(certificateData, docId) {
                 </div>
             </div>
 
-            <!-- Przyciski -->
-            <div class="border-t p-5 flex flex-col gap-2 print:hidden">
+            <!-- PRZYCISKI (zawsze widoczne na dole) -->
+            <div class="border-t p-5 flex flex-col gap-2 flex-shrink-0 bg-white rounded-b-3xl">
                 <button onclick="printCertificate()" 
                         class="w-full py-4 bg-slate-900 text-white font-semibold rounded-2xl text-base hover:bg-black transition">
                     🖨️ Drukuj / Zapisz jako PDF
