@@ -970,6 +970,13 @@ function changeRecoveryPassword() {
 
     openChangeRecoveryModal();
 }
+// ==================== ZAMYKANIE CERTYFIKATU ====================
+function closeCertificate() {
+    const overlay = document.getElementById('certificateOverlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
 // =============================================
 // =============================================
 // GLOBALNA REJESTRACJA FUNKCJI
