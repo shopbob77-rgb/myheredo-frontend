@@ -502,10 +502,11 @@ function printCertificate() {
         return alert("Przeglądarka zablokowała okno drukowania.");
     }
 
-    // Wersja bezpieczna (bez template literal)
     let html = '';
 
-    html += '<!DOCTYPE html><html lang="pl"><head>';
+    html += '<!DOCTYPE html>';
+    html += '<html lang="pl">';
+    html += '<head>';
     html += '<meta charset="UTF-8">';
     html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
     html += '<title>Certyfikat Sukcesji</title>';
@@ -515,10 +516,14 @@ function printCertificate() {
     html += 'body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: white; color: #0f172a; }';
     html += '.print-wrapper { width: 100%; max-width: 210mm; margin: 0 auto; padding: 12mm; box-sizing: border-box; }';
     html += '.print-hidden { display: none !important; }';
-    html += '</style></head><body>';
+    html += '</style>';
+    html += '</head>';
+    html += '<body>';
     html += '<div class="print-wrapper">';
     html += certContent.innerHTML;
-    html += '</div></body></html>';
+    html += '</div>';
+    html += '</body>';
+    html += '</html>';
 
     printWindow.document.write(html);
     printWindow.document.close();
