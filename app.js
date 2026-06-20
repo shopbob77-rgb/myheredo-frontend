@@ -710,6 +710,7 @@ function saveRecoveryPassword() {
     alert("✅ Recovery Password został zapisany pomyślnie!\n\nPrzekaż go spadkobiercom (np. w testamencie lub u notariusza).");
 }
 // =============================================
+// =============================================
 // GLOBALNA REJESTRACJA FUNKCJI
 // MUSI BYĆ NA SAMYM KOŃCU PLIKU app.js
 // =============================================
@@ -723,6 +724,7 @@ window.saveRecoveryPassword = saveRecoveryPassword;
 window.showCertificate    = showCertificate;
 window.closeCertificate   = closeCertificate;
 window.printCertificate   = printCertificate;
+window.saveAsPDF          = saveAsPDF;
 window.decryptCertificate = decryptCertificate;
 
 window.simulateDeath      = simulateDeath;
