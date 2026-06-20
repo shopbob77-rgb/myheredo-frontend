@@ -373,7 +373,7 @@ function renderCertificateOverlay(certificateData, docId) {
     
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-4 sm:p-6 overflow-hidden">
-        <div class="bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl overflow-hidden text-slate-900" style="max-height: 95vh;">
+        <div class="bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl overflow-hidden text-slate-900" style="max-height: 96vh;">
             
             <!-- Nagłówek -->
             <div class="pt-8 sm:pt-12 pb-6 sm:pb-8 text-center border-b border-slate-200">
@@ -385,8 +385,8 @@ function renderCertificateOverlay(certificateData, docId) {
                 <p class="text-slate-600 text-sm sm:text-base">MyHeredo • Bezpieczny Sejf Spadkowy</p>
             </div>
             
-            <!-- Treść główna - z kontrolowaną wysokością -->
-            <div class="p-6 sm:p-12 space-y-8 sm:space-y-10 overflow-auto" style="max-height: calc(95vh - 220px);">
+            <!-- Treść główna -->
+            <div class="p-6 sm:p-12 space-y-8 sm:space-y-10 overflow-auto" style="max-height: calc(96vh - 230px);">
                 <!-- Numer i data -->
                 <div class="grid grid-cols-2 gap-6 text-sm sm:text-base">
                     <div>
@@ -447,7 +447,7 @@ function renderCertificateOverlay(certificateData, docId) {
                 </div>
             </div>
             
-            <!-- Przyciski -->
+            <!-- Przyciski - bez zmian -->
             <div class="border-t p-6 sm:p-10 flex flex-col gap-3 print:hidden">
                 <button onclick="printCertificate()" class="w-full py-5 sm:py-6 bg-slate-900 text-white font-semibold rounded-2xl text-base sm:text-lg hover:bg-black transition">🖨️ Drukuj / Zapisz jako PDF</button>
                 <button onclick="decryptCertificate('${docId}')" class="w-full py-5 sm:py-6 bg-emerald-600 text-white font-semibold rounded-2xl text-base sm:text-lg hover:bg-emerald-700 transition">🔓 Odszyfruj Skrytki</button>
@@ -458,7 +458,6 @@ function renderCertificateOverlay(certificateData, docId) {
 
     document.body.insertAdjacentHTML('beforeend', html);
 }
-
 function closeCertificate() {
     const overlay = document.getElementById('certificateOverlay');
     if (overlay) overlay.remove();
