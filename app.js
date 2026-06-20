@@ -498,14 +498,14 @@ function printCertificate() {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Certyfikat Sukcesji</title>
             
-            <!-- Tailwind CSS -->
-            <script src="https://cdn.tailwindcss.com"></script>
+            <script src="https://cdn.tailwindcss.com"><\/script>
             
             <style>
                 @page {
                     size: A4 portrait;
-                    margin: 10mm;
+                    margin: 12mm;
                 }
+                
                 body {
                     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     margin: 0;
@@ -513,13 +513,33 @@ function printCertificate() {
                     background: white;
                     color: #0f172a;
                 }
+                
                 .print-wrapper {
                     width: 100%;
                     max-width: 210mm;
                     margin: 0 auto;
-                    padding: 12mm;
+                    padding: 8mm;
                     box-sizing: border-box;
                 }
+
+                /* === UKRYWAMY PRZYCISKI NA WYDRUKU === */
+                .print-hidden {
+                    display: none !important;
+                }
+
+                /* Lepsze dopasowanie do A4 */
+                .cert-container {
+                    box-shadow: none !important;
+                    border-radius: 12px;
+                    max-height: none !important;
+                    overflow: visible !important;
+                }
+
+                /* Mniejsze czcionki i odstępy na wydruku */
+                .cert-container h1 { font-size: 22px !important; }
+                .cert-container p { font-size: 13px !important; line-height: 1.4; }
+                .cert-container .text-lg { font-size: 15px !important; }
+                .cert-container .text-xl { font-size: 16px !important; }
             </style>
         </head>
         <body>
@@ -536,7 +556,7 @@ function printCertificate() {
         printWindow.focus();
         setTimeout(() => {
             printWindow.print();
-        }, 400);
+        }, 500);
     };
 }
 
