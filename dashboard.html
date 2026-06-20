@@ -159,21 +159,57 @@
             📋 Wczytaj przykładowe dane demonstracyjne
         </button>
     </div>
-<!-- Recovery Password -->
-<div class="bg-slate-900 rounded-3xl p-6 border border-slate-700 mt-6">
-    <h3 class="font-semibold mb-4 flex items-center gap-2">
-        <span>🔑</span> Recovery Password (do sukcesji)
-    </h3>
-    <input id="recoveryPassword" type="password" 
-           class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 mb-3"
-           placeholder="Hasło tylko do sukcesji">
-    <button onclick="saveRecoveryPassword()" 
-            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-2xl">
-        Zapisz Recovery Password
-    </button>
-    <p class="text-xs text-slate-500 mt-3 text-center">
-        To hasło będzie potrzebne spadkobiercom do odszyfrowania danych
-    </p>
+<!-- ==================== RECOVERY PASSWORD ==================== -->
+<div class="bg-slate-900 rounded-3xl p-6 border border-slate-700">
+    <div class="flex items-center gap-3 mb-4">
+        <div class="text-2xl">🔐</div>
+        <div>
+            <h3 class="text-xl font-semibold">Recovery Password</h3>
+            <p class="text-sm text-slate-400">Hasło dla spadkobierców (do odszyfrowania skrytek)</p>
+        </div>
+    </div>
+
+    <!-- Status -->
+    <div id="recoveryStatus" class="mb-4 text-sm"></div>
+
+    <!-- Formularz -->
+    <div class="space-y-4">
+        <div>
+            <label class="block text-sm text-slate-400 mb-1.5">Recovery Password</label>
+            <div class="relative">
+                <input 
+                    id="recoveryPassword" 
+                    type="password" 
+                    class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white"
+                    placeholder="Wpisz silne hasło (min. 6 znaków)">
+                
+                <!-- Ikona oka -->
+                <button 
+                    type="button"
+                    onclick="toggleRecoveryPasswordVisibility()"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                    <i class="fas fa-eye" id="recoveryEyeIcon"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mt-1.5">
+                Przekaż to hasło spadkobiercom (np. w testamencie lub u notariusza)
+            </p>
+        </div>
+
+        <div class="flex gap-3">
+            <button 
+                onclick="saveRecoveryPassword()"
+                class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3.5 rounded-2xl transition">
+                Zapisz Recovery Password
+            </button>
+            
+            <button 
+                onclick="changeRecoveryPassword()"
+                class="flex-1 border border-slate-600 hover:bg-slate-800 font-semibold py-3.5 rounded-2xl transition">
+                Zmień hasło
+            </button>
+        </div>
+    </div>
 </div>
     <!-- Moje Certyfikaty -->
     <div class="mt-16 pt-10 border-t border-slate-700">
