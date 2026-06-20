@@ -370,10 +370,10 @@ function renderCertificateOverlay(certificateData, docId) {
     const vaults = certificateData.vaultsSummary || [];
     const generatedDate = new Date(certificateData.generatedAt?.toDate ? certificateData.generatedAt.toDate() : Date.now());
     const formattedDate = generatedDate.toLocaleDateString('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' });
-
+    
     const html = `
     <div id="certificateOverlay" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[10000] p-4 sm:p-6 overflow-hidden">
-        <div class="bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl overflow-hidden text-slate-900" style="max-height: 94vh;">
+        <div class="bg-white w-full max-w-3xl md:max-w-4xl rounded-3xl shadow-2xl overflow-hidden text-slate-900" style="max-height: 93vh;">
             
             <!-- Nagłówek -->
             <div class="pt-8 sm:pt-12 pb-6 sm:pb-8 text-center border-b border-slate-200">
@@ -386,7 +386,7 @@ function renderCertificateOverlay(certificateData, docId) {
             </div>
             
             <!-- Treść główna -->
-            <div class="p-6 sm:p-10 space-y-7 sm:space-y-9 overflow-auto" style="max-height: calc(94vh - 260px);">
+            <div class="p-6 sm:p-12 space-y-8 sm:space-y-10 overflow-auto" style="max-height: calc(93vh - 250px);">
                 <!-- Numer i data -->
                 <div class="grid grid-cols-2 gap-6 text-sm sm:text-base">
                     <div>
@@ -398,18 +398,16 @@ function renderCertificateOverlay(certificateData, docId) {
                         <p class="text-lg sm:text-xl">${formattedDate}</p>
                     </div>
                 </div>
-                
                 <div>
                     <p class="text-xs uppercase tracking-widest text-slate-500">Właściciel sejfu</p>
                     <p class="text-xl sm:text-2xl font-semibold break-all">${certificateData.ownerEmail}</p>
                 </div>
-                
                 <div>
                     <p class="text-xs uppercase tracking-widest text-slate-500">Dead Man’s Switch</p>
                     <p class="text-xl sm:text-2xl font-semibold">${certificateData.dmsDays || 45} dni bezczynności</p>
                 </div>
                 
-                <!-- Skrytki z piktogramami -->
+                <!-- Skrytki -->
                 <div>
                     <p class="text-xs uppercase tracking-widest text-slate-500 mb-5">ZABEZPIECZONE SKRYTKI</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -449,11 +447,11 @@ function renderCertificateOverlay(certificateData, docId) {
                 </div>
             </div>
             
-            <!-- Przyciski -->
-            <div class="border-t p-6 sm:p-8 flex flex-col gap-3 print:hidden">
-                <button onclick="printCertificate()" class="w-full py-4 bg-slate-900 text-white font-semibold rounded-2xl text-base hover:bg-black transition">🖨️ Drukuj / Zapisz jako PDF</button>
-                <button onclick="decryptCertificate('${docId}')" class="w-full py-4 bg-emerald-600 text-white font-semibold rounded-2xl text-base hover:bg-emerald-700 transition">🔓 Odszyfruj Skrytki</button>
-                <button onclick="closeCertificate()" class="w-full py-4 border border-slate-300 font-semibold rounded-2xl text-base hover:bg-slate-100 transition">Zamknij</button>
+            <!-- Przyciski - bez zmian -->
+            <div class="border-t p-6 sm:p-10 flex flex-col gap-3 print:hidden">
+                <button onclick="printCertificate()" class="w-full py-5 sm:py-6 bg-slate-900 text-white font-semibold rounded-2xl text-base sm:text-lg hover:bg-black transition">🖨️ Drukuj / Zapisz jako PDF</button>
+                <button onclick="decryptCertificate('${docId}')" class="w-full py-5 sm:py-6 bg-emerald-600 text-white font-semibold rounded-2xl text-base sm:text-lg hover:bg-emerald-700 transition">🔓 Odszyfruj Skrytki</button>
+                <button onclick="closeCertificate()" class="w-full py-5 sm:py-6 border border-slate-300 font-semibold rounded-2xl text-base sm:text-lg hover:bg-slate-100 transition">Zamknij</button>
             </div>
         </div>
     </div>`;
