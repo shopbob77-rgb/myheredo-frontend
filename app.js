@@ -835,6 +835,96 @@ function changeRecoveryPassword() {
     updateRecoveryPasswordStatus();
     alert("✅ Recovery Password został zmieniony pomyślnie.");
 }
+// ==================== RECOVERY PASSWORD - MODAL ====================
+
+function toggleModalPasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function openChangeRecoveryModal() {
+    const modal = document.getElementById('changeRecoveryModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        // Czyścimy pola
+        document.getElementById('currentRecoveryPass').value = '';
+        document.getElementById('newRecoveryPass').value = '';
+        document.getElementById('confirmRecoveryPass').value = '';
+    }
+}
+
+function closeChangeRecoveryModal() {
+    const modal = document.getElementById('changeRecoveryModal');
+    if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }
+}
+
+function confirmChangeRecoveryPassword() {
+    const current = document.getElementById('currentRecoveryPass').value.trim();
+    const newPass = document.getElementById('newRecoveryPass').value.trim();
+    const confirmPass = document.getElementById('confirmRecoveryPass').value.trim();
+
+    const savedPass = localStorage.getItem('myheredo_recovery_password');
+
+    if (!current || !newPass || !confirmPass) {
+        alert("Wypełnij wszystkie pola.");
+        return;
+    }
+
+    if (current !== savedPass) {
+        alert("Aktualne Recovery Password jest nieprawidłowe.");
+        return;
+    }
+
+    if (newPass.length < 6) {
+        alert("Nowe hasło musi mieć minimum 6 znaków.");
+        return;
+    }
+
+    if (newPass !== confirmPass) {
+        alert("Nowe hasła nie są identyczne.");
+        return;
+    }
+
+    if (!confirm("Na pewno chcesz zmienić Recovery Password?")) {
+        return;
+    }
+
+    // Zapisujemy nowe hasło
+    localStorage.setItem('myheredo_recovery_password', newPass);
+    recoveryPassword = newPass;
+
+    closeChangeRecoveryModal();
+    updateRecoveryPasswordStatus();
+
+    alert("✅ Recovery Password został pomyślnie zmieniony.");
+}
+
+// Nadpisujemy starą funkcję changeRecoveryPassword()
+function changeRecoveryPassword() {
+    const current = localStorage.getItem('myheredo_recovery_password');
+
+    if (!current) {
+        alert("Nie masz jeszcze ustawionego Recovery Password.");
+        return;
+    }
+
+    openChangeRecoveryModal();
+}
 // =============================================
 // =============================================
 // GLOBALNA REJESTRACJA FUNKCJI
@@ -867,6 +957,11 @@ window.saveVault          = saveVault;
 
 window.toggleRecoveryPasswordVisibility = toggleRecoveryPasswordVisibility;
 window.saveRecoveryPassword = saveRecoveryPassword;
+window.changeRecoveryPassword = changeRecoveryPassword;
+
+window.openChangeRecoveryModal = openChangeRecoveryModal;
+window.closeChangeRecoveryModal = closeChangeRecoveryModal;
+window.confirmChangeRecoveryPassword = confirmChangeRecoveryPassword;
 window.changeRecoveryPassword = changeRecoveryPassword;
 
 
