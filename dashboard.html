@@ -234,6 +234,74 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('❌ Błąd SW:', err));
     });
 }
+    
 </script>
+<!-- ==================== MODAL ZMIANY RECOVERY PASSWORD ==================== -->
+<div id="changeRecoveryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
+    <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-md mx-4 border border-slate-700">
+        
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-semibold">Zmień Recovery Password</h3>
+            <button onclick="closeChangeRecoveryModal()" class="text-3xl text-slate-400 hover:text-white leading-none">×</button>
+        </div>
+
+        <div class="space-y-5">
+            
+            <!-- Aktualne hasło -->
+            <div>
+                <label class="block text-sm text-slate-400 mb-1.5">Aktualne Recovery Password</label>
+                <div class="relative">
+                    <input id="currentRecoveryPass" type="password" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
+                    <button type="button" onclick="toggleModalPasswordVisibility('currentRecoveryPass', 'currentEye')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                        <i class="fas fa-eye" id="currentEye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nowe hasło -->
+            <div>
+                <label class="block text-sm text-slate-400 mb-1.5">Nowe Recovery Password</label>
+                <div class="relative">
+                    <input id="newRecoveryPass" type="password" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
+                    <button type="button" onclick="toggleModalPasswordVisibility('newRecoveryPass', 'newEye')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                        <i class="fas fa-eye" id="newEye"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Minimum 6 znaków</p>
+            </div>
+
+            <!-- Potwierdzenie nowego hasła -->
+            <div>
+                <label class="block text-sm text-slate-400 mb-1.5">Potwierdź nowe Recovery Password</label>
+                <div class="relative">
+                    <input id="confirmRecoveryPass" type="password" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
+                    <button type="button" onclick="toggleModalPasswordVisibility('confirmRecoveryPass', 'confirmEye')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                        <i class="fas fa-eye" id="confirmEye"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Przyciski -->
+        <div class="flex gap-3 mt-8">
+            <button onclick="closeChangeRecoveryModal()" 
+                    class="flex-1 py-3.5 border border-slate-600 rounded-2xl font-semibold hover:bg-slate-800 transition">
+                Anuluj
+            </button>
+            <button onclick="confirmChangeRecoveryPassword()" 
+                    class="flex-1 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-2xl transition">
+                Zmień hasło
+            </button>
+        </div>
+
+    </div>
+</div>    
 </body>
 </html>
