@@ -1,23 +1,24 @@
 // auth.js
 import { 
     createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword,
+    signOut,
     sendEmailVerification 
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 import { auth, db } from "./firebase.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// ===================== REJESTRACJA UŻYTKOWNIKA =====================
+// ===================== REJESTRACJA =====================
 export async function registerUser(email, password) {
     try {
-        // 1. Tworzymy użytkownika w Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // 2. Wysyłamy email weryfikacyjny
+        // Wysyłamy email weryfikacyjny
         await sendEmailVerification(user);
 
-        // 3. Zapisujemy dane użytkownika do Firestore
+        // Zapisujemy użytkownika do Firestore
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             email: user.email,
@@ -31,6 +32,32 @@ export async function registerUser(email, password) {
 
     } catch (error) {
         console.error("Błąd rejestracji:", error);
+        throw error;
+    }
+}
+
+// ===================== LOGOWANIE =====================
+export async function loginUser(email, password) {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        console.log("✅ Zalogowano użytkownika:", user.email);
+        return user;
+
+    } catch (error) {
+        console.error("Błąd logowania:", error);
+        throw error;
+    }
+}
+
+// ===================== WYLOGOWANIE =====================
+export async function logoutUser() {
+    try {
+        await signOut(auth);
+        console.log("✅ Wylogowano użytkownika");
+    } catch (error) {
+        console.error("Błąd wylogowania:", error);
         throw error;
     }
 }
