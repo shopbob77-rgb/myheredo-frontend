@@ -1,13 +1,4 @@
-// auth.js
-import { 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword,
-    signOut,
-    sendEmailVerification 
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-import { auth, db } from "./firebase.js";
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ===================== REJESTRACJA =====================
 // auth.js
