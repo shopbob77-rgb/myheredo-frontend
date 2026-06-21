@@ -251,127 +251,128 @@
 </div>
 
 <script>
-// ==================== WSZYSTKIE FUNKCJE SKRYTEK ====================
+<script>
+// ==================== NOWE 7 SKRYTEK SUKCESYJNYCH (czysta wersja) ====================
 
-let currentVaultId = '';
+function openSuccessionVault(key) {
+    const modal = document.getElementById('successionModal');
+    const titleEl = document.getElementById('successionModalTitle');
+    const tipsEl = document.getElementById('successionModalTips');
+    const notesEl = document.getElementById('successionVaultNotes');
 
-function openVaultModal(vaultId) {
-    currentVaultId = vaultId;
-    const modal = document.getElementById('vaultModal');
-    const titleEl = document.getElementById('modalTitle');
-    const tipsEl = document.getElementById('modalTips');
-    const notesEl = document.getElementById('vaultNotes');
+    if (!modal || !titleEl || !tipsEl || !notesEl) {
+        alert("Błąd: Brak modala successionModal w HTML");
+        return;
+    }
 
     tipsEl.innerHTML = '';
     notesEl.value = '';
 
-    const vaultInfo = getVaultInfo(vaultId);
-    titleEl.textContent = vaultInfo.title;
+    const data = getSuccessionVaultData(key);
+    titleEl.textContent = data.title;
 
-    vaultInfo.tips.forEach(tip => {
+    data.tips.forEach(tip => {
         const div = document.createElement('div');
         div.className = 'flex items-start gap-3 bg-slate-950 p-3 rounded-2xl border border-slate-700';
         div.innerHTML = `<i class="fas fa-lightbulb text-amber-400 mt-0.5"></i> <span>${tip}</span>`;
         tipsEl.appendChild(div);
     });
 
-    const savedNotes = localStorage.getItem('vault_' + vaultId);
-    if (savedNotes) notesEl.value = savedNotes;
+    const saved = localStorage.getItem('succession_vault_' + key);
+    if (saved) notesEl.value = saved;
+
+    window.currentSuccessionKey = key;
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 }
 
-function getVaultInfo(id) {
+function getSuccessionVaultData(key) {
     const data = {
-        'dostep-do-kont': { title: 'Dostęp do kont i urządzeń', tips: ['Gdzie przechowujesz hasła?', 'Gdzie są kody recovery / 2FA?', 'Jakie urządzenia są najważniejsze?'] },
-        'aktywa-cyfrowe': { title: 'Aktywa cyfrowe i finansowe', tips: ['Lista kont bankowych', 'Portfele kryptowalutowe', 'Subskrypcje i inwestycje'] },
-        'profile-spolecznosciowe': { title: 'Profile społecznościowe', tips: ['Co zrobić z profilami na Facebooku/Instagramie?', 'Czy chcesz memorializację kont?'] },
-        'dokumenty-formalnosci': { title: 'Ważne dokumenty i formalności', tips: ['Gdzie jest testament?', 'Polisy na życie i ubezpieczenia'] },
-        'wiadomosci-dla-bliskich': { title: 'Wiadomości dla bliskich', tips: ['Listy pożegnalne', 'Ostatnie życzenia'] },
-        'instrukcje-techniczne': { title: 'Instrukcje techniczne i backupi', tips: ['Procedury odzyskiwania dostępu', 'Gdzie są backupi?'] },
-        'inne-informacje': { title: 'Inne ważne informacje', tips: ['Dowolne informacje, które uznajesz za istotne'] }
+        'dostep-do-kont': { title: 'Dostęp do kont i urządzeń', tips: ['Gdzie przechowujesz hasła?', 'Gdzie są kody recovery / 2FA?'] },
+        'aktywa-cyfrowe': { title: 'Aktywa cyfrowe i finansowe', tips: ['Lista kont bankowych', 'Portfele kryptowalutowe'] },
+        'profile-spolecznosciowe': { title: 'Profile społecznościowe', tips: ['Co zrobić z profilami?'] },
+        'dokumenty-formalnosci': { title: 'Ważne dokumenty i formalności', tips: ['Gdzie jest testament?'] },
+        'wiadomosci-dla-bliskich': { title: 'Wiadomości dla bliskich', tips: ['Listy pożegnalne'] },
+        'instrukcje-techniczne': { title: 'Instrukcje techniczne i backupi', tips: ['Procedury odzyskiwania'] },
+        'inne-informacje': { title: 'Inne ważne informacje', tips: ['Dowolne informacje'] }
     };
-    return data[id] || { title: 'Skrytka', tips: ['Wpisz tutaj swoje informacje'] };
+    return data[key] || { title: 'Skrytka', tips: ['Wpisz informacje'] };
 }
 
-function saveVaultNotes() {
-    const notes = document.getElementById('vaultNotes').value.trim();
-    if (!currentVaultId) return;
+function saveSuccessionVault() {
+    const key = window.currentSuccessionKey;
+    const content = document.getElementById('successionVaultNotes').value.trim();
 
-    localStorage.setItem('vault_' + currentVaultId, notes);
+    if (!key) return;
 
-    // Zielona obwódka + zielony napis
+    localStorage.setItem('succession_vault_' + key, content);
+
+    const preview = document.getElementById('preview-' + key);
+    if (preview) {
+        preview.textContent = content ? content.substring(0, 90) + '...' : 'Kliknij, aby dodać informacje';
+    }
+
     const allCards = document.querySelectorAll('#skrytkiGrid > div');
     allCards.forEach(card => {
-        const onclick = card.getAttribute('onclick') || '';
-        if (onclick.includes(currentVaultId)) {
+        if (card.getAttribute('onclick')?.includes(key)) {
             card.classList.remove('border-slate-700');
             card.classList.add('border-emerald-400');
-
-            const statusDiv = card.querySelector('.mt-3');
-            if (statusDiv) {
-                statusDiv.classList.remove('text-slate-400');
-                statusDiv.classList.add('text-emerald-400');
-            }
         }
     });
 
-    const preview = document.getElementById('preview-' + currentVaultId);
-    if (preview) {
-        preview.textContent = notes ? notes.substring(0, 90) + (notes.length > 90 ? '...' : '') : 'Kliknij, aby dodać informacje';
+    closeSuccessionModal();
+    alert('Zapisano!');
+}
+
+function closeSuccessionModal() {
+    const modal = document.getElementById('successionModal');
+    if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
     }
-
-    closeVaultModal();
-    alert('Zapisano pomyślnie!');
 }
 
-function closeVaultModal() {
-    const modal = document.getElementById('vaultModal');
-    modal.classList.remove('flex');
-    modal.classList.add('hidden');
-}
-
-function loadSavedVaultPreviews() {
-    const vaultIds = ['dostep-do-kont', 'aktywa-cyfrowe', 'profile-spolecznosciowe', 'dokumenty-formalnosci', 'wiadomosci-dla-bliskich', 'instrukcje-techniczne', 'inne-informacje'];
-    vaultIds.forEach(id => {
-        const saved = localStorage.getItem('vault_' + id);
-        const preview = document.getElementById('preview-' + id);
+function loadSuccessionVaultPreviews() {
+    const keys = ['dostep-do-kont','aktywa-cyfrowe','profile-spolecznosciowe','dokumenty-formalnosci','wiadomosci-dla-bliskich','instrukcje-techniczne','inne-informacje'];
+    keys.forEach(key => {
+        const saved = localStorage.getItem('succession_vault_' + key);
+        const preview = document.getElementById('preview-' + key);
         if (saved && preview) {
-            preview.textContent = saved.substring(0, 90) + (saved.length > 90 ? '...' : '');
+            preview.textContent = saved.substring(0, 90) + '...';
         }
     });
 }
 
 function applyGreenBorderAndStatus() {
-    const vaultIds = ['dostep-do-kont', 'aktywa-cyfrowe', 'profile-spolecznosciowe', 'dokumenty-formalnosci', 'wiadomosci-dla-bliskich', 'instrukcje-techniczne', 'inne-informacje'];
+    const keys = ['dostep-do-kont','aktywa-cyfrowe','profile-spolecznosciowe','dokumenty-formalnosci','wiadomosci-dla-bliskich','instrukcje-techniczne','inne-informacje'];
     const allCards = document.querySelectorAll('#skrytkiGrid > div');
 
     allCards.forEach(card => {
         const onclick = card.getAttribute('onclick') || '';
-        vaultIds.forEach(id => {
-            if (onclick.includes(id)) {
-                const hasData = localStorage.getItem('vault_' + id);
+        keys.forEach(key => {
+            if (onclick.includes(key)) {
+                const hasData = localStorage.getItem('succession_vault_' + key);
                 if (hasData) {
                     card.classList.remove('border-slate-700');
                     card.classList.add('border-emerald-400');
-                    const statusDiv = card.querySelector('.mt-3');
-                    if (statusDiv) {
-                        statusDiv.classList.remove('text-slate-400');
-                        statusDiv.classList.add('text-emerald-400');
-                    }
                 }
             }
         });
     });
 }
 
+// Inicjalizacja
 window.onload = function() {
-    loadSavedVaultPreviews();
+    loadSuccessionVaultPreviews();
     applyGreenBorderAndStatus();
 };
+
+// Rejestracja globalna
+window.openSuccessionVault = openSuccessionVault;
+window.saveSuccessionVault = saveSuccessionVault;
+window.closeSuccessionModal = closeSuccessionModal;
 </script>
-<script>
 // ==================== STUB FUNCTIONS (żeby nie było błędów) ====================
 
 function addCustomVault() {
