@@ -1197,30 +1197,15 @@ function loadSuccessionVaultPreviews() {
     });
 }
 
-window.onload = function() {
-    // === Stara logika z app.js ===
+window.onload = function () {
+    console.log(">>> 1. window.onload się uruchomił");
+
     if (typeof initDashboard === 'function') {
+        console.log(">>> 2. initDashboard istnieje - wywołuję");
         initDashboard();
+    } else {
+        console.log(">>> 2. initDashboard NIE ISTNIEJE!");
     }
-
-    if (typeof startInactivityTimer === 'function') {
-        startInactivityTimer();
-    }
-
-    // === Nowa logika skrytek sukcesyjnych ===
-    if (typeof initSuccessionPreviews === 'function') {
-        initSuccessionPreviews();
-    }
-
-    if (typeof loadSuccessionVaultPreviews === 'function') {
-        loadSuccessionVaultPreviews();
-    }
-
-    if (typeof applyGreenBorderAndStatus === 'function') {
-        applyGreenBorderAndStatus();
-    }
-
-    console.log("✅ Dashboard zainicjalizowany");
 };
 
 // =============================================
