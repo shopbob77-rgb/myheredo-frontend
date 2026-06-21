@@ -1,28 +1,50 @@
-const CACHE_NAME = 'myheredo-v4';
+const CACHE_NAME = 'myheredo-v5';
+
+// Pliki, które mają być dostępne offline od razu
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/dashboard.html',
+  '/login.html',
+  '/register.html',
+  '/style.css',
+  '/app.js',
+  '/firebase.js',
+  '/logo.png',
+  '/logo192.png',
+  '/logo512.png',
+  '/manifest.json'
+];
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      )
-    ).then(() => self.clients.claim())
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
   const { request } = event;
 
-  // Ignorujemy wszystkie zapytania inne niż GET
+  // Pomijamy zapytania inne niż GET
   if (request.method !== 'GET') {
     return;
   }
 
-  // Dla nawigacji (strony HTML)
+  // Dla nawigacji (strony HTML) — Network First
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
@@ -36,7 +58,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Dla plików statycznych (CSS, JS, obrazy)
+  // Dla pozostałych plików (CSS, JS, obrazy) — Cache First
   event.respondWith(
     caches.match(request).then(cachedResponse => {
       if (cachedResponse) {
