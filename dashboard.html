@@ -366,13 +366,30 @@ function getVaultInfo(id) {
     return data[id] || { title: 'Skrytka', tips: ['Wpisz tutaj swoje informacje'] };
 }
 
+<script>
 function saveVaultNotes() {
     const notes = document.getElementById('vaultNotes').value.trim();
     if (!currentVaultId) return;
 
+    // Zapisz do localStorage
     localStorage.setItem('vault_' + currentVaultId, notes);
 
-    // Odśwież podgląd na karcie
+    // Znajdź kartę i dodaj zieloną obwódkę
+    const allCards = document.querySelectorAll('#skrytkiGrid > div');
+    
+    allCards.forEach(card => {
+        // Usuń poprzednią zieloną ramkę (jeśli była)
+        card.classList.remove('border-emerald-400');
+        card.classList.add('border-slate-700');
+
+        // Sprawdź, czy to jest karta aktualnej skrytki
+        if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(currentVaultId)) {
+            card.classList.remove('border-slate-700');
+            card.classList.add('border-emerald-400');
+        }
+    });
+
+    // Odśwież tekst podglądu
     const preview = document.getElementById('preview-' + currentVaultId);
     if (preview) {
         preview.textContent = notes ? notes.substring(0, 90) + (notes.length > 90 ? '...' : '') : 'Kliknij, aby dodać informacje';
@@ -381,6 +398,53 @@ function saveVaultNotes() {
     closeVaultModal();
     alert('Zapisano pomyślnie!');
 }
+ <script>
+function applyGreenBorderAndStatus() {
+    const vaultIds = [
+        'dostep-do-kont', 'aktywa-cyfrowe', 'profile-spolecznosciowe',
+        'dokumenty-formalnosci', 'wiadomosci-dla-bliskich', 
+        'instrukcje-techniczne', 'inne-informacje'
+    ];
+
+    const allCards = document.querySelectorAll('#skrytkiGrid > div');
+
+    allCards.forEach(card => {
+        const onclick = card.getAttribute('onclick') || '';
+        
+        vaultIds.forEach(id => {
+            if (onclick.includes(id)) {
+                const hasData = localStorage.getItem('vault_' + id);
+                
+                if (hasData) {
+                    // Zielona obwódka
+                    card.classList.remove('border-slate-700');
+                    card.classList.add('border-emerald-400');
+
+                    // Zielony napis "Zaszyfrowane"
+                    const statusDiv = card.querySelector('.mt-3');
+                    if (statusDiv) {
+                        statusDiv.classList.remove('text-slate-400');
+                        statusDiv.classList.add('text-emerald-400');
+                    }
+                }
+            }
+        });
+    });
+}
+
+// Wywołaj po załadowaniu strony
+window.onload = function() {
+    loadSavedVaultPreviews();
+    applyGreenBorderAndStatus();
+};
+ <script>
+window.onload = function() {
+    loadSavedVaultPreviews();
+    applyGreenBorderAndStatus();
+};
+</script>   
+</script>   
+</script>
 
 function closeVaultModal() {
     const modal = document.getElementById('vaultModal');
