@@ -1196,11 +1196,30 @@ function loadSuccessionVaultPreviews() {
     });
 }
 
-// Nadpisujemy window.onload, żeby ładować też nowe skrytki
-const originalWindowOnLoad = window.onload;
+// =============================================
+// JEDEN WSPÓLNY window.onload (zastępuje wszystkie poprzednie)
+// =============================================
 window.onload = function () {
-    if (originalWindowOnLoad) originalWindowOnLoad();
-    loadSuccessionVaultPreviews();
+    
+    // === Stara logika z Twojego app.js ===
+    if (typeof initDashboard === 'function') {
+        initDashboard();
+    }
+    
+    if (typeof startInactivityTimer === 'function') {
+        startInactivityTimer();
+    }
+
+    // === Nowa logika skrytek sukcesyjnych ===
+    if (typeof loadSuccessionVaultPreviews === 'function') {
+        loadSuccessionVaultPreviews();
+    }
+    
+    if (typeof applyGreenBorderAndStatus === 'function') {
+        applyGreenBorderAndStatus();
+    }
+
+    console.log("✅ Dashboard zainicjalizowany (stara + nowa logika)");
 };
 
 
