@@ -251,17 +251,48 @@
 </div>
 
 <script>
-// ==================== FUNKCJE SKRYTEK SUKCESYJNYCH ====================
+<!-- ==================== MODAL DO SKRYTEK SUKCESYJNYCH ==================== -->
+<div id="successionModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
+    <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-2xl mx-4 border border-slate-700">
+        <div class="flex justify-between items-center mb-6">
+            <h3 id="successionModalTitle" class="text-2xl font-semibold"></h3>
+            <button onclick="closeSuccessionModal()" class="text-3xl text-slate-400 hover:text-white">×</button>
+        </div>
+
+        <div class="mb-6">
+            <h4 class="font-semibold mb-3 text-amber-400">Podpowiedzi co warto wpisać:</h4>
+            <div id="successionModalTips" class="space-y-2 text-sm"></div>
+        </div>
+
+        <div>
+            <label class="block text-sm text-slate-400 mb-2">Twoje notatki:</label>
+            <textarea id="successionVaultNotes" rows="7" class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-white resize-y"></textarea>
+        </div>
+
+        <div class="flex gap-3 mt-6">
+            <button onclick="saveSuccessionVault()" class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3.5 rounded-2xl">Zapisz</button>
+            <button onclick="closeSuccessionModal()" class="flex-1 border border-slate-600 hover:bg-slate-800 font-semibold py-3.5 rounded-2xl">Anuluj</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== NOWE 7 SKRYTEK SUKCESYJNYCH ====================
 function openSuccessionVault(key) {
     const modal = document.getElementById('successionModal');
     const titleEl = document.getElementById('successionModalTitle');
     const tipsEl = document.getElementById('successionModalTips');
     const notesEl = document.getElementById('successionVaultNotes');
 
+    if (!modal || !titleEl || !tipsEl || !notesEl) {
+        alert("Błąd: Brak modala successionModal w HTML");
+        return;
+    }
+
     tipsEl.innerHTML = '';
     notesEl.value = '';
 
-    const data = getSuccessionData(key);
+    const data = getSuccessionVaultData(key);
     titleEl.textContent = data.title;
 
     data.tips.forEach(tip => {
@@ -279,9 +310,9 @@ function openSuccessionVault(key) {
     modal.classList.add('flex');
 }
 
-function getSuccessionData(key) {
+function getSuccessionVaultData(key) {
     const data = {
-        'dostep-do-kont': { title: 'Dostęp do kont i urządzeń', tips: ['Gdzie przechowujesz hasła?', 'Gdzie są kody recovery?'] },
+        'dostep-do-kont': { title: 'Dostęp do kont i urządzeń', tips: ['Gdzie przechowujesz hasła?', 'Gdzie są kody recovery / 2FA?'] },
         'aktywa-cyfrowe': { title: 'Aktywa cyfrowe i finansowe', tips: ['Lista kont bankowych', 'Portfele kryptowalutowe'] },
         'profile-spolecznosciowe': { title: 'Profile społecznościowe', tips: ['Co zrobić z profilami?'] },
         'dokumenty-formalnosci': { title: 'Ważne dokumenty i formalności', tips: ['Gdzie jest testament?'] },
@@ -300,7 +331,9 @@ function saveSuccessionVault() {
     localStorage.setItem('succession_vault_' + key, content);
 
     const preview = document.getElementById('preview-' + key);
-    if (preview) preview.textContent = content ? content.substring(0, 90) + '...' : '';
+    if (preview) {
+        preview.textContent = content ? content.substring(0, 90) + '...' : 'Kliknij, aby dodać informacje';
+    }
 
     const allCards = document.querySelectorAll('#skrytkiGrid > div');
     allCards.forEach(card => {
@@ -316,26 +349,53 @@ function saveSuccessionVault() {
 
 function closeSuccessionModal() {
     const modal = document.getElementById('successionModal');
-    if (modal) modal.classList.remove('flex', 'hidden');
+    if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }
+}
+
+function loadSuccessionVaultPreviews() {
+    const keys = ['dostep-do-kont','aktywa-cyfrowe','profile-spolecznosciowe','dokumenty-formalnosci','wiadomosci-dla-bliskich','instrukcje-techniczne','inne-informacje'];
+    keys.forEach(key => {
+        const saved = localStorage.getItem('succession_vault_' + key);
+        const preview = document.getElementById('preview-' + key);
+        if (saved && preview) {
+            preview.textContent = saved.substring(0, 90) + '...';
+        }
+    });
+}
+
+function applyGreenBorderAndStatus() {
+    const keys = ['dostep-do-kont','aktywa-cyfrowe','profile-spolecznosciowe','dokumenty-formalnosci','wiadomosci-dla-bliskich','instrukcje-techniczne','inne-informacje'];
+    const allCards = document.querySelectorAll('#skrytkiGrid > div');
+
+    allCards.forEach(card => {
+        const onclick = card.getAttribute('onclick') || '';
+        keys.forEach(key => {
+            if (onclick.includes(key)) {
+                const hasData = localStorage.getItem('succession_vault_' + key);
+                if (hasData) {
+                    card.classList.remove('border-slate-700');
+                    card.classList.add('border-emerald-400');
+                }
+            }
+        });
+    });
 }
 
 // Inicjalizacja
 window.onload = function() {
-    if (typeof loadSuccessionVaultPreviews === 'function') loadSuccessionVaultPreviews();
+    loadSuccessionVaultPreviews();
+    applyGreenBorderAndStatus();
 };
 
-// Stub functions (żeby nie było błędów)
-function addCustomVault() { alert('Funkcja w przygotowaniu'); }
-function addHeir() { alert('Funkcja w przygotowaniu'); }
-function showCertificate() { alert('Funkcja w przygotowaniu'); }
-function simulateDeath() { alert('Funkcja w przygotowaniu'); }
-function loadDemoData() { alert('Funkcja w przygotowaniu'); }
-function handleLogout() {
-    if (confirm('Wylogować się?')) window.location.href = 'index.html';
-}
-</script>
-// ==================== STUB FUNCTIONS (żeby nie było błędów) ====================
+// Rejestracja globalna
+window.openSuccessionVault = openSuccessionVault;
+window.saveSuccessionVault = saveSuccessionVault;
+window.closeSuccessionModal = closeSuccessionModal;
 
+// ==================== STUB FUNCTIONS ====================
 function addCustomVault() {
     alert('Funkcja "Dodaj własną skrytkę" będzie dostępna wkrótce.');
 }
@@ -343,14 +403,13 @@ function addCustomVault() {
 function addHeir() {
     const name = document.getElementById('heirName')?.value.trim();
     const email = document.getElementById('heirEmail')?.value.trim();
-    
+
     if (!name || !email) {
         alert('Podaj imię i email spadkobiercy');
         return;
     }
-    
+
     alert('Spadkobierca dodany (wersja demo): ' + name);
-    // Tu później dodamy normalną logikę
 }
 
 function showCertificate() {
@@ -365,7 +424,7 @@ function simulateDeath() {
 
 function handleLogout() {
     if (confirm('Czy na pewno chcesz się wylogować?')) {
-        window.location.href = 'index.html'; // lub '/login'
+        window.location.href = 'index.html';
     }
 }
 
@@ -376,7 +435,7 @@ function loadDemoData() {
 function toggleRecoveryPasswordVisibility() {
     const input = document.getElementById('recoveryPassword');
     const icon = document.getElementById('recoveryEyeIcon');
-    
+
     if (input.type === 'password') {
         input.type = 'text';
         icon.classList.remove('fa-eye');
@@ -410,7 +469,7 @@ function confirmChangeRecoveryPassword() {
 function toggleModalPasswordVisibility(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
-    
+
     if (input.type === 'password') {
         input.type = 'text';
         icon.classList.remove('fa-eye');
