@@ -1061,8 +1061,9 @@ function initSuccessionPreviews() {
     });
 }
 
-window.onload = function() {
-    initSuccessionPreviews();
+// window.onload = function() {
+//     initSuccessionPreviews();
+// };
 };
 // =====================================================
 // NOWA LOGIKA: 7 SKRYTEK SUKCESYJNYCH (dostosowana do istniejącego app.js)
@@ -1196,32 +1197,31 @@ function loadSuccessionVaultPreviews() {
     });
 }
 
-// =============================================
-// JEDEN WSPÓLNY window.onload (zastępuje wszystkie poprzednie)
-// =============================================
-window.onload = function () {
-    
-    // === Stara logika z Twojego app.js ===
+window.onload = function() {
+    // === Stara logika z app.js ===
     if (typeof initDashboard === 'function') {
         initDashboard();
     }
-    
+
     if (typeof startInactivityTimer === 'function') {
         startInactivityTimer();
     }
 
     // === Nowa logika skrytek sukcesyjnych ===
+    if (typeof initSuccessionPreviews === 'function') {
+        initSuccessionPreviews();
+    }
+
     if (typeof loadSuccessionVaultPreviews === 'function') {
         loadSuccessionVaultPreviews();
     }
-    
+
     if (typeof applyGreenBorderAndStatus === 'function') {
         applyGreenBorderAndStatus();
     }
 
-    console.log("✅ Dashboard zainicjalizowany (stara + nowa logika)");
+    console.log("✅ Dashboard zainicjalizowany");
 };
-
 
 // =============================================
 // =============================================
