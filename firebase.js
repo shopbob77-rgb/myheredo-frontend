@@ -5,12 +5,13 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-aut
 
 // ==================== KONFIGURACJA FIREBASE ====================
 const firebaseConfig = {
-    apiKey: "wpisz_tutaj_api_key",
-    authDomain: "myheredo.firebaseapp.com",
-    projectId: "myheredo",
-    storageBucket: "myheredo.appspot.com",
-    messagingSenderId: "wpisz_messaging_sender_id",
-    appId: "wpisz_app_id"
+  apiKey: "AIzaSyDgKN7f9p4aTDFLMjQjg1DnrQleaqw-RM",
+  authDomain: "myheredo.firebaseapp.com",
+  projectId: "myheredo",
+  storageBucket: "myheredo.firebasestorage.app",
+  messagingSenderId: "819096717512",
+  appId: "1:819096717512:web:ef46410042212263e6bdfd",
+  measurementId: "G-T8KMX99DN4"
 };
 // ============================================================
 
