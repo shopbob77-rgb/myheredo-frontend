@@ -88,6 +88,44 @@ export async function registerUser(email, password) {
         throw error;
     }
 }
+// auth.js
+
+import { 
+    collection, query, where, getDocs, orderBy 
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+import { db } from "./firebase.js";
+
+// ===================== POBIERANIE SKRYTEK UŻYTKOWNIKA =====================
+export async function getUserVaults(userId) {
+    try {
+        const vaultsRef = collection(db, "vaults");
+        
+        // Tworzymy zapytanie: skrytki należące do użytkownika, posortowane od najnowszych
+        const q = query(
+            vaultsRef,
+            where("userId", "==", userId),
+            orderBy("createdAt", "desc")
+        );
+
+        const querySnapshot = await getDocs(q);
+        const vaults = [];
+
+        querySnapshot.forEach((doc) => {
+            vaults.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        console.log(`✅ Pobrano ${vaults.length} skrytek dla użytkownika ${userId}`);
+        return vaults;
+
+    } catch (error) {
+        console.error("Błąd pobierania skrytek:", error);
+        throw error;
+    }
+}
 // ===================== LOGOWANIE =====================
 export async function loginUser(email, password) {
     try {
