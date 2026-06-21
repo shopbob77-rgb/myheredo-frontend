@@ -1,72 +1,53 @@
-const CACHE_NAME = 'myheredo-v2'; // ← Zwiększaj wersję przy każdej większej zmianie
+const CACHE_NAME = 'myheredo-v4';
 
-// Pliki, które chcemy mieć offline (statyczne zasoby)
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/dashboard.html',
-  '/login.html',
-  '/register.html',
-  '/logo.png',
-  '/style.css',
-  '/app.js'
-];
-
-// Instalacja
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting()) // Natychmiast aktywuj nowy SW
-  );
+  self.skipWaiting();
 });
 
-// Aktywacja + czyszczenie starych cache'y
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
-      );
-    }).then(() => self.clients.claim()) // Przejmij kontrolę nad otwartymi kartami
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
-// Strategia fetch
 self.addEventListener('fetch', event => {
   const { request } = event;
 
-  // Dla nawigacji (strony HTML) używamy Network First
+  // Ignorujemy wszystkie zapytania inne niż GET
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  // Dla nawigacji (strony HTML)
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then(response => {
-          // Zapisujemy świeżą wersję do cache
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, responseClone));
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
           return response;
         })
-        .catch(() => caches.match(request)) // Jeśli offline — bierzemy z cache
+        .catch(() => caches.match(request))
     );
     return;
   }
 
-  // Dla reszty plików (CSS, JS, obrazy) — Cache First
+  // Dla plików statycznych (CSS, JS, obrazy)
   event.respondWith(
-    caches.match(request)
-      .then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(request).then(response => {
-          // Zapisujemy nowe pliki do cache
-          return caches.open(CACHE_NAME).then(cache => {
-            cache.put(request, response.clone());
-            return response;
-          });
-        });
-      })
+    caches.match(request).then(cachedResponse => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(request).then(response => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+        return response;
+      });
+    })
   );
 });
