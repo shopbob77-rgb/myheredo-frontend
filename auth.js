@@ -10,15 +10,29 @@ import { auth, db } from "./firebase.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ===================== REJESTRACJA =====================
+// auth.js
+import { 
+    createUserWithEmailAndPassword, 
+    sendEmailVerification 
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+import { auth, db } from "./firebase.js";
+import { 
+    doc, setDoc, serverTimestamp, 
+    collection, addDoc 
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+// ===================== REJESTRACJA UŻYTKOWNIKA =====================
 export async function registerUser(email, password) {
     try {
+        // 1. Tworzymy użytkownika w Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Wysyłamy email weryfikacyjny
+        // 2. Wysyłamy email weryfikacyjny
         await sendEmailVerification(user);
 
-        // Zapisujemy użytkownika do Firestore
+        // 3. Zapisujemy użytkownika do Firestore
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             email: user.email,
@@ -27,7 +41,46 @@ export async function registerUser(email, password) {
             emailVerified: false
         });
 
-        console.log("✅ Użytkownik zarejestrowany:", user.email);
+        // 4. Tworzymy przykładowe puste skrytki dla nowego użytkownika
+        const defaultVaults = [
+            {
+                title: "Konta bankowe i finansowe",
+                type: "bank",
+                encryptedContent: ""   // na razie puste (zaszyfrowane później przez użytkownika)
+            },
+            {
+                title: "Kryptowaluty i Portfele",
+                type: "crypto",
+                encryptedContent: ""
+            },
+            {
+                title: "Konta Cyfrowe i Social Media",
+                type: "social",
+                encryptedContent: ""
+            },
+            {
+                title: "Instrukcje Sukcesyjne",
+                type: "instructions",
+                encryptedContent: ""
+            }
+        ];
+
+        // Dodajemy skrytki do kolekcji vaults
+        const vaultsCollection = collection(db, "vaults");
+        
+        for (const vault of defaultVaults) {
+            await addDoc(vaultsCollection, {
+                userId: user.uid,
+                title: vault.title,
+                type: vault.type,
+                encryptedContent: vault.encryptedContent,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                isActive: true
+            });
+        }
+
+        console.log("✅ Użytkownik zarejestrowany z przykładowymi skrytkami:", user.email);
         return user;
 
     } catch (error) {
@@ -35,7 +88,6 @@ export async function registerUser(email, password) {
         throw error;
     }
 }
-
 // ===================== LOGOWANIE =====================
 export async function loginUser(email, password) {
     try {
