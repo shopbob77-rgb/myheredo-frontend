@@ -225,7 +225,7 @@
     </div>
 </div>
 
-<!-- MODAL Z PODPOWIEDZIAMI I ZAPISEM -->
+<!-- ==================== MODAL Z PODPOWIEDZIAMI I ZAPISEM ==================== -->
 <div id="vaultModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
     <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-2xl mx-4 border border-slate-700 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
@@ -233,16 +233,14 @@
             <button onclick="closeVaultModal()" class="text-3xl text-slate-400 hover:text-white leading-none">×</button>
         </div>
 
-        <!-- Podpowiedzi -->
         <div class="mb-6">
             <h4 class="font-semibold mb-3 text-amber-400">Podpowiedzi co warto wpisać:</h4>
             <div id="modalTips" class="space-y-2 text-sm"></div>
         </div>
 
-        <!-- Pole do zapisu -->
         <div>
             <label class="block text-sm text-slate-400 mb-2">Twoje notatki:</label>
-            <textarea id="vaultNotes" rows="7" class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-white resize-y" placeholder="Wpisz tutaj informacje, które chcesz przekazać spadkobiercom..."></textarea>
+            <textarea id="vaultNotes" rows="7" class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-white resize-y" placeholder="Wpisz tutaj informacje..."></textarea>
         </div>
 
         <div class="flex gap-3 mt-6">
@@ -252,54 +250,9 @@
     </div>
 </div>
 
-<!-- MODAL ZMIANY RECOVERY PASSWORD -->
-<div id="changeRecoveryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
-    <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-md mx-4 border border-slate-700">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-semibold">Zmień Recovery Password</h3>
-            <button onclick="closeChangeRecoveryModal()" class="text-3xl text-slate-400 hover:text-white leading-none">×</button>
-        </div>
-        <div class="space-y-5">
-            <div>
-                <label class="block text-sm text-slate-400 mb-1.5">Aktualne Recovery Password</label>
-                <div class="relative">
-                    <input id="currentRecoveryPass" type="password" class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
-                    <button type="button" onclick="toggleModalPasswordVisibility('currentRecoveryPass', 'currentEye')" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-                        <i class="fas fa-eye" id="currentEye"></i>
-                    </button>
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm text-slate-400 mb-1.5">Nowe Recovery Password</label>
-                <div class="relative">
-                    <input id="newRecoveryPass" type="password" class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
-                    <button type="button" onclick="toggleModalPasswordVisibility('newRecoveryPass', 'newEye')" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-                        <i class="fas fa-eye" id="newEye"></i>
-                    </button>
-                </div>
-                <p class="text-xs text-slate-500 mt-1">Minimum 6 znaków</p>
-            </div>
-            <div>
-                <label class="block text-sm text-slate-400 mb-1.5">Potwierdź nowe Recovery Password</label>
-                <div class="relative">
-                    <input id="confirmRecoveryPass" type="password" class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
-                    <button type="button" onclick="toggleModalPasswordVisibility('confirmRecoveryPass', 'confirmEye')" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-                        <i class="fas fa-eye" id="confirmEye"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="flex gap-3 mt-8">
-            <button onclick="closeChangeRecoveryModal()" class="flex-1 py-3.5 border border-slate-600 rounded-2xl font-semibold hover:bg-slate-800 transition">Anuluj</button>
-            <button onclick="confirmChangeRecoveryPassword()" class="flex-1 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-2xl transition">Zmień hasło</button>
-        </div>
-    </div>
-</div>
-
-<script src="app.js"></script>
-
 <script>
-// ==================== SYSTEM SKRYTEK Z ZAPISEM ====================
+// ==================== WSZYSTKIE FUNKCJE SKRYTEK ====================
+
 let currentVaultId = '';
 
 function openVaultModal(vaultId) {
@@ -322,11 +275,8 @@ function openVaultModal(vaultId) {
         tipsEl.appendChild(div);
     });
 
-    // Wczytaj zapisane notatki
     const savedNotes = localStorage.getItem('vault_' + vaultId);
-    if (savedNotes) {
-        notesEl.value = savedNotes;
-    }
+    if (savedNotes) notesEl.value = savedNotes;
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -334,62 +284,39 @@ function openVaultModal(vaultId) {
 
 function getVaultInfo(id) {
     const data = {
-        'dostep-do-kont': {
-            title: 'Dostęp do kont i urządzeń',
-            tips: ['Gdzie przechowujesz hasła?', 'Gdzie są kody recovery / 2FA?', 'Jakie urządzenia są najważniejsze?']
-        },
-        'aktywa-cyfrowe': {
-            title: 'Aktywa cyfrowe i finansowe',
-            tips: ['Lista kont bankowych', 'Portfele kryptowalutowe', 'Subskrypcje i inwestycje']
-        },
-        'profile-spolecznosciowe': {
-            title: 'Profile społecznościowe',
-            tips: ['Co zrobić z profilami na Facebooku/Instagramie?', 'Czy chcesz memorializację kont?']
-        },
-        'dokumenty-formalnosci': {
-            title: 'Ważne dokumenty i formalności',
-            tips: ['Gdzie jest testament?', 'Polisy na życie i ubezpieczenia']
-        },
-        'wiadomosci-dla-bliskich': {
-            title: 'Wiadomości dla bliskich',
-            tips: ['Listy pożegnalne', 'Ostatnie życzenia']
-        },
-        'instrukcje-techniczne': {
-            title: 'Instrukcje techniczne i backupi',
-            tips: ['Procedury odzyskiwania dostępu', 'Gdzie są backupi?']
-        },
-        'inne-informacje': {
-            title: 'Inne ważne informacje',
-            tips: ['Dowolne informacje, które uznajesz za istotne']
-        }
+        'dostep-do-kont': { title: 'Dostęp do kont i urządzeń', tips: ['Gdzie przechowujesz hasła?', 'Gdzie są kody recovery / 2FA?', 'Jakie urządzenia są najważniejsze?'] },
+        'aktywa-cyfrowe': { title: 'Aktywa cyfrowe i finansowe', tips: ['Lista kont bankowych', 'Portfele kryptowalutowe', 'Subskrypcje i inwestycje'] },
+        'profile-spolecznosciowe': { title: 'Profile społecznościowe', tips: ['Co zrobić z profilami na Facebooku/Instagramie?', 'Czy chcesz memorializację kont?'] },
+        'dokumenty-formalnosci': { title: 'Ważne dokumenty i formalności', tips: ['Gdzie jest testament?', 'Polisy na życie i ubezpieczenia'] },
+        'wiadomosci-dla-bliskich': { title: 'Wiadomości dla bliskich', tips: ['Listy pożegnalne', 'Ostatnie życzenia'] },
+        'instrukcje-techniczne': { title: 'Instrukcje techniczne i backupi', tips: ['Procedury odzyskiwania dostępu', 'Gdzie są backupi?'] },
+        'inne-informacje': { title: 'Inne ważne informacje', tips: ['Dowolne informacje, które uznajesz za istotne'] }
     };
     return data[id] || { title: 'Skrytka', tips: ['Wpisz tutaj swoje informacje'] };
 }
 
-<script>
 function saveVaultNotes() {
     const notes = document.getElementById('vaultNotes').value.trim();
     if (!currentVaultId) return;
 
-    // Zapisz do localStorage
     localStorage.setItem('vault_' + currentVaultId, notes);
 
-    // Znajdź kartę i dodaj zieloną obwódkę
+    // Zielona obwódka + zielony napis
     const allCards = document.querySelectorAll('#skrytkiGrid > div');
-    
     allCards.forEach(card => {
-        // Usuń poprzednią zieloną ramkę (jeśli była)
-        card.classList.remove('border-emerald-400');
-        card.classList.add('border-slate-700');
-
-        // Sprawdź, czy to jest karta aktualnej skrytki
-        if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(currentVaultId)) {
+        const onclick = card.getAttribute('onclick') || '';
+        if (onclick.includes(currentVaultId)) {
             card.classList.remove('border-slate-700');
             card.classList.add('border-emerald-400');
+
+            const statusDiv = card.querySelector('.mt-3');
+            if (statusDiv) {
+                statusDiv.classList.remove('text-slate-400');
+                statusDiv.classList.add('text-emerald-400');
+            }
         }
     });
 
-    // Odśwież tekst podglądu
     const preview = document.getElementById('preview-' + currentVaultId);
     if (preview) {
         preview.textContent = notes ? notes.substring(0, 90) + (notes.length > 90 ? '...' : '') : 'Kliknij, aby dodać informacje';
@@ -398,29 +325,36 @@ function saveVaultNotes() {
     closeVaultModal();
     alert('Zapisano pomyślnie!');
 }
- <script>
-function applyGreenBorderAndStatus() {
-    const vaultIds = [
-        'dostep-do-kont', 'aktywa-cyfrowe', 'profile-spolecznosciowe',
-        'dokumenty-formalnosci', 'wiadomosci-dla-bliskich', 
-        'instrukcje-techniczne', 'inne-informacje'
-    ];
 
+function closeVaultModal() {
+    const modal = document.getElementById('vaultModal');
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+}
+
+function loadSavedVaultPreviews() {
+    const vaultIds = ['dostep-do-kont', 'aktywa-cyfrowe', 'profile-spolecznosciowe', 'dokumenty-formalnosci', 'wiadomosci-dla-bliskich', 'instrukcje-techniczne', 'inne-informacje'];
+    vaultIds.forEach(id => {
+        const saved = localStorage.getItem('vault_' + id);
+        const preview = document.getElementById('preview-' + id);
+        if (saved && preview) {
+            preview.textContent = saved.substring(0, 90) + (saved.length > 90 ? '...' : '');
+        }
+    });
+}
+
+function applyGreenBorderAndStatus() {
+    const vaultIds = ['dostep-do-kont', 'aktywa-cyfrowe', 'profile-spolecznosciowe', 'dokumenty-formalnosci', 'wiadomosci-dla-bliskich', 'instrukcje-techniczne', 'inne-informacje'];
     const allCards = document.querySelectorAll('#skrytkiGrid > div');
 
     allCards.forEach(card => {
         const onclick = card.getAttribute('onclick') || '';
-        
         vaultIds.forEach(id => {
             if (onclick.includes(id)) {
                 const hasData = localStorage.getItem('vault_' + id);
-                
                 if (hasData) {
-                    // Zielona obwódka
                     card.classList.remove('border-slate-700');
                     card.classList.add('border-emerald-400');
-
-                    // Zielony napis "Zaszyfrowane"
                     const statusDiv = card.querySelector('.mt-3');
                     if (statusDiv) {
                         statusDiv.classList.remove('text-slate-400');
@@ -432,41 +366,9 @@ function applyGreenBorderAndStatus() {
     });
 }
 
-// Wywołaj po załadowaniu strony
 window.onload = function() {
     loadSavedVaultPreviews();
     applyGreenBorderAndStatus();
-};
- <script>
-window.onload = function() {
-    loadSavedVaultPreviews();
-    applyGreenBorderAndStatus();
-};
-</script>   
-</script>   
-</script>
-
-function closeVaultModal() {
-    const modal = document.getElementById('vaultModal');
-    modal.classList.remove('flex');
-    modal.classList.add('hidden');
-}
-
-// Wczytaj zapisane notatki na kartach
-function loadSavedVaultPreviews() {
-    const vaultIds = ['dostep-do-kont', 'aktywa-cyfrowe', 'profile-spolecznosciowe', 'dokumenty-formalnosci', 'wiadomosci-dla-bliskich', 'instrukcje-techniczne', 'inne-informacje'];
-    
-    vaultIds.forEach(id => {
-        const saved = localStorage.getItem('vault_' + id);
-        const preview = document.getElementById('preview-' + id);
-        if (saved && preview) {
-            preview.textContent = saved.substring(0, 90) + (saved.length > 90 ? '...' : '');
-        }
-    });
-}
-
-window.onload = function() {
-    loadSavedVaultPreviews();
 };
 </script>
 
