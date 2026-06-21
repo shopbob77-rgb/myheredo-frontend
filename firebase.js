@@ -5,7 +5,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-aut
 
 // ==================== KONFIGURACJA FIREBASE ====================
 const firebaseConfig = {
-  apiKey: "AIzaSyDgKN7f9p4aTDFLMjQjg1DnrQleaqw-RM",
+  apiKey: "AIzaSyDgKN7f9p4aTDFlMjQjg01DnrQleaqw-RM",
   authDomain: "myheredo.firebaseapp.com",
   projectId: "myheredo",
   storageBucket: "myheredo.firebasestorage.app",
