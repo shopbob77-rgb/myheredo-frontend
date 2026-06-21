@@ -1,16 +1,23 @@
-
-
-// ===================== REJESTRACJA =====================
 // auth.js
-import { 
-    createUserWithEmailAndPassword, 
-    sendEmailVerification 
+import {
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    signInWithEmailAndPassword,
+    signOut
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 import { auth, db } from "./firebase.js";
-import { 
-    doc, setDoc, serverTimestamp, 
-    collection, addDoc 
+
+import {
+    doc,
+    setDoc,
+    serverTimestamp,
+    collection,
+    addDoc,
+    query,
+    where,
+    getDocs,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ===================== REJESTRACJA UŻYTKOWNIKA =====================
@@ -37,7 +44,7 @@ export async function registerUser(email, password) {
             {
                 title: "Konta bankowe i finansowe",
                 type: "bank",
-                encryptedContent: ""   // na razie puste (zaszyfrowane później przez użytkownika)
+                encryptedContent: ""
             },
             {
                 title: "Kryptowaluty i Portfele",
@@ -56,11 +63,8 @@ export async function registerUser(email, password) {
             }
         ];
 
-        // Dodajemy skrytki do kolekcji vaults
-        const vaultsCollection = collection(db, "vaults");
-        
         for (const vault of defaultVaults) {
-            await addDoc(vaultsCollection, {
+            await addDoc(collection(db, "vaults"), {
                 userId: user.uid,
                 title: vault.title,
                 type: vault.type,
@@ -79,22 +83,12 @@ export async function registerUser(email, password) {
         throw error;
     }
 }
-// auth.js
-
-import { 
-    collection, query, where, getDocs, orderBy 
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-import { db } from "./firebase.js";
 
 // ===================== POBIERANIE SKRYTEK UŻYTKOWNIKA =====================
 export async function getUserVaults(userId) {
     try {
-        const vaultsRef = collection(db, "vaults");
-        
-        // Tworzymy zapytanie: skrytki należące do użytkownika, posortowane od najnowszych
         const q = query(
-            vaultsRef,
+            collection(db, "vaults"),
             where("userId", "==", userId),
             orderBy("createdAt", "desc")
         );
@@ -117,6 +111,7 @@ export async function getUserVaults(userId) {
         throw error;
     }
 }
+
 // ===================== LOGOWANIE =====================
 export async function loginUser(email, password) {
     try {
