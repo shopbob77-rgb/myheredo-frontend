@@ -225,27 +225,27 @@
     </div>
 </div>
 
-<!-- ==================== MODAL Z PODPOWIEDZIAMI I ZAPISEM ==================== -->
-<div id="vaultModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
-    <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-2xl mx-4 border border-slate-700 max-h-[90vh] overflow-y-auto">
+<!-- MODAL DO NOWYCH SKRYTEK SUKCESYJNYCH -->
+<div id="successionModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
+    <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-2xl mx-4 border border-slate-700">
         <div class="flex justify-between items-center mb-6">
-            <h3 id="modalTitle" class="text-2xl font-semibold"></h3>
-            <button onclick="closeVaultModal()" class="text-3xl text-slate-400 hover:text-white leading-none">×</button>
+            <h3 id="successionModalTitle" class="text-2xl font-semibold"></h3>
+            <button onclick="closeSuccessionModal()" class="text-3xl text-slate-400 hover:text-white">×</button>
         </div>
 
         <div class="mb-6">
             <h4 class="font-semibold mb-3 text-amber-400">Podpowiedzi co warto wpisać:</h4>
-            <div id="modalTips" class="space-y-2 text-sm"></div>
+            <div id="successionModalTips" class="space-y-2 text-sm"></div>
         </div>
 
         <div>
             <label class="block text-sm text-slate-400 mb-2">Twoje notatki:</label>
-            <textarea id="vaultNotes" rows="7" class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-white resize-y" placeholder="Wpisz tutaj informacje..."></textarea>
+            <textarea id="successionVaultNotes" rows="7" class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-white resize-y"></textarea>
         </div>
 
         <div class="flex gap-3 mt-6">
-            <button onclick="saveVaultNotes()" class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3.5 rounded-2xl transition">Zapisz</button>
-            <button onclick="closeVaultModal()" class="flex-1 border border-slate-600 hover:bg-slate-800 font-semibold py-3.5 rounded-2xl transition">Anuluj</button>
+            <button onclick="saveSuccessionVault()" class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3.5 rounded-2xl">Zapisz</button>
+            <button onclick="closeSuccessionModal()" class="flex-1 border border-slate-600 hover:bg-slate-800 font-semibold py-3.5 rounded-2xl">Anuluj</button>
         </div>
     </div>
 </div>
