@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script type="module" src="firebase.js"></script>
+<script type="module" src="auth.js"></script>    
     <style>
         body { 
             background-color: #0a0a0a; 
@@ -132,6 +134,25 @@
                 alert("Niepoprawny kod. W demo użyj: 123456");
             }
         }
-    </script>
+    <script type="module">
+    import { registerUser } from "./auth.js";
+
+    const form = document.getElementById("registerForm"); // ← zmień na ID swojego formularza
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;     // ← zmień ID jeśli inne
+        const password = document.getElementById("password").value; // ← zmień ID jeśli inne
+
+        try {
+            await registerUser(email, password);
+            alert("Rejestracja udana! Sprawdź swoją skrzynkę email.");
+            // window.location.href = "login.html"; // opcjonalnie przekierowanie
+        } catch (error) {
+            alert("Błąd rejestracji: " + error.message);
+        }
+    });
+</script>
 </body>
 </html>
