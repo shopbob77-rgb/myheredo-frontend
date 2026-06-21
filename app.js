@@ -978,6 +978,93 @@ function closeCertificate() {
     }
 }
 // =============================================
+// OBSŁUGA 7 NOWYCH SKRYTEK SUKCESYJNYCH
+// =============================================
+
+const successionKeys = ['dostep-do-kont','aktywa-cyfrowe','profile-spolecznosciowe','dokumenty-formalnosci','wiadomosci-dla-bliskich','instrukcje-techniczne','inne-informacje'];
+
+function openSuccessionVault(key) {
+    const modal = document.getElementById('successionModal');
+    const title = document.getElementById('successionModalTitle');
+    const tipsContainer = document.getElementById('successionModalTips');
+    const textarea = document.getElementById('successionVaultNotes');
+
+    tipsContainer.innerHTML = '';
+    textarea.value = '';
+
+    const data = getSuccessionVaultData(key);
+    title.textContent = data.title;
+
+    data.tips.forEach(tip => {
+        const div = document.createElement('div');
+        div.className = 'flex items-start gap-3 bg-slate-950 p-3 rounded-2xl border border-slate-700';
+        div.innerHTML = `<i class="fas fa-lightbulb text-amber-400 mt-0.5"></i> <span>${tip}</span>`;
+        tipsContainer.appendChild(div);
+    });
+
+    const saved = localStorage.getItem('succession_vault_' + key);
+    if (saved) textarea.value = saved;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function getSuccessionVaultData(key) {
+    const map = {
+        'dostep-do-kont': { title: 'Dostęp do kont i urządzeń', tips: ['Gdzie przechowujesz hasła?', 'Gdzie są kody recovery / 2FA?'] },
+        'aktywa-cyfrowe': { title: 'Aktywa cyfrowe i finansowe', tips: ['Lista kont bankowych', 'Portfele kryptowalutowe'] },
+        'profile-spolecznosciowe': { title: 'Profile społecznościowe', tips: ['Co zrobić z profilami?'] },
+        'dokumenty-formalnosci': { title: 'Ważne dokumenty i formalności', tips: ['Gdzie jest testament?'] },
+        'wiadomosci-dla-bliskich': { title: 'Wiadomości dla bliskich', tips: ['Listy pożegnalne'] },
+        'instrukcje-techniczne': { title: 'Instrukcje techniczne i backupi', tips: ['Procedury odzyskiwania'] },
+        'inne-informacje': { title: 'Inne ważne informacje', tips: ['Dowolne informacje'] }
+    };
+    return map[key] || { title: 'Skrytka', tips: ['Wpisz informacje'] };
+}
+
+function saveSuccessionVault() {
+    const key = window.currentSuccessionKey;
+    const content = document.getElementById('successionVaultNotes').value.trim();
+    
+    localStorage.setItem('succession_vault_' + key, content);
+    
+    // Odśwież podgląd i zieloną ramkę
+    const preview = document.getElementById('preview-' + key);
+    if (preview) preview.textContent = content ? content.substring(0, 90) + '...' : 'Kliknij, aby dodać informacje';
+
+    const allCards = document.querySelectorAll('#skrytkiGrid > div');
+    allCards.forEach(card => {
+        if (card.getAttribute('onclick')?.includes(key)) {
+            card.classList.remove('border-slate-700');
+            card.classList.add('border-emerald-400');
+        }
+    });
+
+    closeSuccessionModal();
+    alert('Zapisano!');
+}
+
+function closeSuccessionModal() {
+    const modal = document.getElementById('successionModal');
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+}
+
+// Inicjalizacja podglądów po załadowaniu
+function initSuccessionPreviews() {
+    successionKeys.forEach(key => {
+        const saved = localStorage.getItem('succession_vault_' + key);
+        const preview = document.getElementById('preview-' + key);
+        if (saved && preview) {
+            preview.textContent = saved.substring(0, 90) + '...';
+        }
+    });
+}
+
+window.onload = function() {
+    initSuccessionPreviews();
+};
+// =============================================
 // =============================================
 // GLOBALNA REJESTRACJA FUNKCJI
 // MUSI BYĆ NA SAMYM KOŃCU PLIKU app.js
