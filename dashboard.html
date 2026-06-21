@@ -15,19 +15,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-
     <style>
-        body { 
-            background-color: #0a0a0a; 
-            color: #e2e8f0; 
+        body {
+            background-color: #0a0a0a;
+            color: #e2e8f0;
         }
-        .dashboard-container { 
-            min-height: 100vh; 
-            max-width: 1480px; 
-            margin: 0 auto; 
-            padding: 24px; 
+        .dashboard-container {
+            min-height: 100vh;
+            max-width: 1480px;
+            margin: 0 auto;
+            padding: 24px;
         }
-
         /* Poprawki nagłówka i skrytek */
         #userEmail {
             overflow: hidden;
@@ -35,12 +33,10 @@
             white-space: nowrap;
             max-width: 160px;
         }
-
         #skrytkiGrid {
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 16px;
         }
-
         @media (max-width: 640px) {
             .dashboard-container {
                 padding: 16px;
@@ -58,16 +54,12 @@
             }
         }
     </style>
-
  <!-- INLINE MANIFEST - USUNIĘTY (zły sposób) -->
 <!-- Zamiast tego używamy statycznego pliku manifest.json -->
-
 <link rel="manifest" href="/manifest.json">
-
 </head>
 <body>
 <div class="dashboard-container">
-
     <!-- Nagłówek -->
     <div class="flex justify-between items-center pb-6 border-b border-slate-800 px-2 sm:px-0">
         <div class="flex items-center gap-3">
@@ -77,137 +69,29 @@
                 <p class="text-xs sm:text-sm text-slate-400 -mt-1">Cyfrowy Sejf Sukcesyjny</p>
             </div>
         </div>
-        
+       
         <div class="flex items-center gap-3 sm:gap-6">
             <div id="userEmail" class="text-xs sm:text-sm text-slate-400 text-right"></div>
-            <button onclick="handleLogout()" 
+            <button onclick="handleLogout()"
                     class="px-4 sm:px-6 py-2 text-sm border border-slate-700 hover:border-red-500 hover:text-red-400 rounded-2xl whitespace-nowrap">
                 Wyloguj się
             </button>
         </div>
     </div>
-
     <!-- Reszta Twojego kodu (bez zmian) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
         <!-- Lewa kolumna - Skrytki -->
         <div class="lg:col-span-7">
-    <h2 class="text-2xl font-bold mb-5">Twoje Skrytki Sukcesyjne</h2>
-
-<div id="skrytkiGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-    
-    <!-- 1. Dostęp do kont i urządzeń -->
-    <div onclick="openVaultModal('dostep-do-kont')" 
-         class="skrytka-card bg-slate-900 border border-slate-700 hover:border-amber-400 transition-all rounded-3xl p-6 cursor-pointer">
-        <div class="flex items-start gap-4">
-            <div class="text-3xl text-amber-400 mt-1"><i class="fas fa-key"></i></div>
-            <div class="flex-1">
-                <h3 class="font-semibold text-lg">Dostęp do kont i urządzeń</h3>
-                <p class="text-sm text-slate-400 mt-1">Gdzie i jak rodzina ma się dostać do Twoich kont</p>
-                <div class="mt-3 text-xs text-emerald-400 flex items-center gap-1">
-                    <i class="fas fa-check-circle"></i> <span>Zaszyfrowane</span>
-                </div>
+            <h2 class="text-2xl font-bold mb-5">Twoje Skrytki Sukcesyjne</h2>
+            <div id="skrytkiGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- generowane przez JS -->
             </div>
-        </div>
-    </div>
-
-    <!-- 2. Aktywa cyfrowe i finansowe -->
-    <div onclick="openVaultModal('aktywa-cyfrowe')" 
-         class="skrytka-card bg-slate-900 border border-slate-700 hover:border-amber-400 transition-all rounded-3xl p-6 cursor-pointer">
-        <div class="flex items-start gap-4">
-            <div class="text-3xl text-amber-400 mt-1"><i class="fab fa-bitcoin"></i></div>
-            <div class="flex-1">
-                <h3 class="font-semibold text-lg">Aktywa cyfrowe i finansowe</h3>
-                <p class="text-sm text-slate-400 mt-1">Lista kont bankowych, kryptowalut i inwestycji</p>
-                <div class="mt-3 text-xs text-emerald-400 flex items-center gap-1">
-                    <i class="fas fa-check-circle"></i> <span>Zaszyfrowane</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. Profile społecznościowe -->
-    <div onclick="openVaultModal('profile-spolecznosciowe')" 
-         class="skrytka-card bg-slate-900 border border-slate-700 hover:border-amber-400 transition-all rounded-3xl p-6 cursor-pointer">
-        <div class="flex items-start gap-4">
-            <div class="text-3xl text-amber-400 mt-1"><i class="fas fa-share-alt"></i></div>
-            <div class="flex-1">
-                <h3 class="font-semibold text-lg">Profile społecznościowe</h3>
-                <p class="text-sm text-slate-400 mt-1">Co zrobić z Twoimi profilami w social mediach</p>
-                <div class="mt-3 text-xs text-emerald-400 flex items-center gap-1">
-                    <i class="fas fa-check-circle"></i> <span>Zaszyfrowane</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. Ważne dokumenty i formalności -->
-    <div onclick="openVaultModal('dokumenty-formalnosci')" 
-         class="skrytka-card bg-slate-900 border border-slate-700 hover:border-amber-400 transition-all rounded-3xl p-6 cursor-pointer">
-        <div class="flex items-start gap-4">
-            <div class="text-3xl text-amber-400 mt-1"><i class="fas fa-file-alt"></i></div>
-            <div class="flex-1">
-                <h3 class="font-semibold text-lg">Ważne dokumenty i formalności</h3>
-                <p class="text-sm text-slate-400 mt-1">Gdzie znajdują się testament, polisy i umowy</p>
-                <div class="mt-3 text-xs text-emerald-400 flex items-center gap-1">
-                    <i class="fas fa-check-circle"></i> <span>Zaszyfrowane</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. Wiadomości dla bliskich -->
-    <div onclick="openVaultModal('wiadomosci-dla-bliskich')" 
-         class="skrytka-card bg-slate-900 border border-slate-700 hover:border-amber-400 transition-all rounded-3xl p-6 cursor-pointer">
-        <div class="flex items-start gap-4">
-            <div class="text-3xl text-amber-400 mt-1"><i class="fas fa-envelope"></i></div>
-            <div class="flex-1">
-                <h3 class="font-semibold text-lg">Wiadomości dla bliskich</h3>
-                <p class="text-sm text-slate-400 mt-1">Listy pożegnalne i ostatnie życzenia</p>
-                <div class="mt-3 text-xs text-emerald-400 flex items-center gap-1">
-                    <i class="fas fa-check-circle"></i> <span>Zaszyfrowane</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 6. Instrukcje techniczne i backupi -->
-    <div onclick="openVaultModal('instrukcje-techniczne')" 
-         class="skrytka-card bg-slate-900 border border-slate-700 hover:border-amber-400 transition-all rounded-3xl p-6 cursor-pointer">
-        <div class="flex items-start gap-4">
-            <div class="text-3xl text-amber-400 mt-1"><i class="fas fa-cog"></i></div>
-            <div class="flex-1">
-                <h3 class="font-semibold text-lg">Instrukcje techniczne i backupi</h3>
-                <p class="text-sm text-slate-400 mt-1">Procedury odzyskiwania dostępu i backupów</p>
-                <div class="mt-3 text-xs text-emerald-400 flex items-center gap-1">
-                    <i class="fas fa-check-circle"></i> <span>Zaszyfrowane</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 7. Inne ważne informacje -->
-    <div onclick="openVaultModal('inne-informacje')" 
-         class="skrytka-card bg-slate-900 border border-slate-700 hover:border-amber-400 transition-all rounded-3xl p-6 cursor-pointer">
-        <div class="flex items-start gap-4">
-            <div class="text-3xl text-amber-400 mt-1"><i class="fas fa-folder-open"></i></div>
-            <div class="flex-1">
-                <h3 class="font-semibold text-lg">Inne ważne informacje</h3>
-                <p class="text-sm text-slate-400 mt-1">Dodatkowe informacje niepasujące do innych kategorii</p>
-                <div class="mt-3 text-xs text-emerald-400 flex items-center gap-1">
-                    <i class="fas fa-check-circle"></i> <span>Zaszyfrowane</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
             <div class="mt-8">
                 <button onclick="addCustomVault()" class="w-full py-4 border border-dashed border-slate-600 hover:border-amber-400 rounded-3xl text-slate-400 hover:text-amber-400">
                     + Dodaj własną skrytkę
                 </button>
             </div>
         </div>
-
         <!-- Prawa kolumna - Spadkobiercy -->
         <div class="lg:col-span-5">
             <h2 class="text-2xl font-bold mb-5">Zaufani Spadkobiercy</h2>
@@ -224,7 +108,6 @@
             </div>
         </div>
     </div>
-
     <!-- Dead Man’s Switch + Przyciski -->
     <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-slate-900 rounded-3xl p-6 border border-slate-700">
@@ -243,7 +126,6 @@
             ⚰️ Symulacja Po Śmierci
         </button>
     </div>
-
     <!-- Demo -->
     <div class="mt-6">
         <button onclick="loadDemoData()" class="w-full py-4 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-3xl text-slate-300 hover:text-white transition-all">
@@ -259,23 +141,21 @@
             <p class="text-sm text-slate-400">Hasło dla spadkobierców (do odszyfrowania skrytek)</p>
         </div>
     </div>
-
     <!-- Status -->
     <div id="recoveryStatus" class="mb-4 text-sm"></div>
-
     <!-- Formularz -->
     <div class="space-y-4">
         <div>
             <label class="block text-sm text-slate-400 mb-1.5">Recovery Password</label>
             <div class="relative">
-                <input 
-                    id="recoveryPassword" 
-                    type="password" 
+                <input
+                    id="recoveryPassword"
+                    type="password"
                     class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white"
                     placeholder="Wpisz silne hasło (min. 6 znaków)">
-                
+               
                 <!-- Ikona oka -->
-                <button 
+                <button
                     type="button"
                     onclick="toggleRecoveryPasswordVisibility()"
                     class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
@@ -286,15 +166,14 @@
                 Przekaż to hasło spadkobiercom (np. w testamencie lub u notariusza)
             </p>
         </div>
-
         <div class="flex gap-3">
-            <button 
+            <button
                 onclick="saveRecoveryPassword()"
                 class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3.5 rounded-2xl transition">
                 Zapisz Recovery Password
             </button>
-            
-            <button 
+           
+            <button
                 onclick="changeRecoveryPassword()"
                 class="flex-1 border border-slate-600 hover:bg-slate-800 font-semibold py-3.5 rounded-2xl transition">
                 Zmień hasło
@@ -313,9 +192,7 @@
         <div id="certificatesList" class="space-y-4"></div>
     </div>
 </div>
-
 <script src="app.js"></script>
-
 <!-- PWA Service Worker -->
 <script>
 if ('serviceWorker' in navigator) {
@@ -325,157 +202,23 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('❌ Błąd SW:', err));
     });
 }
-    
+   
 </script>
-    <script>
-function openVaultModal(vaultType) {
-    const modal = document.getElementById('vaultModal');
-    const title = document.getElementById('modalTitle');
-    const content = document.getElementById('modalContent');
-    
-    content.innerHTML = '';
-    
-    let vaultTitle = '';
-    let tips = [];
-    
-    switch(vaultType) {
-        case 'dostep-do-kont':
-            vaultTitle = 'Dostęp do kont i urządzeń';
-            tips = [
-                'Gdzie przechowujesz hasła? (menedżer haseł, kartka, sejf)',
-                'Gdzie znajdują się kody recovery / 2FA backup?',
-                'Jakie urządzenia są najważniejsze i gdzie się znajdują?',
-                'Czy masz hasła zapisane w fizycznym sejfie?',
-                'Jakie konta email są kluczowe do odzyskania dostępu?'
-            ];
-            break;
-            
-        case 'aktywa-cyfrowe':
-            vaultTitle = 'Aktywa cyfrowe i finansowe';
-            tips = [
-                'Lista wszystkich kont bankowych (bez haseł)',
-                'Portfele kryptowalutowe i giełdy',
-                'Konta inwestycyjne i maklerskie',
-                'Subskrypcje i usługi płatnicze',
-                'Domeny internetowe i hostingi'
-            ];
-            break;
-            
-        case 'profile-spolecznosciowe':
-            vaultTitle = 'Profile społecznościowe';
-            tips = [
-                'Co zrobić z profilami na Facebooku / Instagramie?',
-                'Czy chcesz memorializację kont?',
-                'Co zrobić z kontem LinkedIn?',
-                'Instrukcje dotyczące WhatsApp / Telegram',
-                'Inne ważne profile (fora, grupy, YouTube)'
-            ];
-            break;
-            
-        case 'dokumenty-formalnosci':
-            vaultTitle = 'Ważne dokumenty i formalności';
-            tips = [
-                'Gdzie znajduje się testament (oryginał i kopia)',
-                'Pełnomocnictwa notarialne',
-                'Polisy na życie i ubezpieczenia',
-                'Umowy najmu, kredyty, leasingi',
-                'Klucze do sejfu fizycznego / skrytki bankowej'
-            ];
-            break;
-            
-        case 'wiadomosci-dla-bliskich':
-            vaultTitle = 'Wiadomości dla bliskich';
-            tips = [
-                'Wiadomość do partnera / dzieci',
-                'Ostatnie życzenia dotyczące pogrzebu',
-                'Podziękowania lub przeprosiny',
-                'Ważne informacje rodzinne',
-                'Osobiste listy pożegnalne'
-            ];
-            break;
-            
-        case 'instrukcje-techniczne':
-            vaultTitle = 'Instrukcje techniczne i backupi';
-            tips = [
-                'Procedury odzyskiwania dostępu do kont',
-                'Gdzie znajdują się backupi zdjęć i dokumentów',
-                'Instrukcje do ważnych programów',
-                'Hasła do Wi-Fi, routerów, alarmów (opcjonalnie)',
-                'Kontakt do supportu ważnych usług'
-            ];
-            break;
-            
-        case 'inne-informacje':
-            vaultTitle = 'Inne ważne informacje';
-            tips = [
-                'Dowolne informacje, których nie ma w innych skrytkach',
-                'Ważne kontakty (prawnik, notariusz, doradca)',
-                'Informacje o zwierzętach domowych',
-                'Instrukcje dotyczące pojazdu / nieruchomości',
-                'Inne rzeczy, które uznajesz za istotne'
-            ];
-            break;
-    }
-    
-    title.textContent = vaultTitle;
-    
-    tips.forEach(tip => {
-        const div = document.createElement('div');
-        div.className = 'flex items-start gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-700';
-        div.innerHTML = `
-            <i class="fas fa-lightbulb text-amber-400 mt-1"></i>
-            <span class="text-sm">${tip}</span>
-        `;
-        content.appendChild(div);
-    });
-    
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-}
-
-function closeVaultModal() {
-    const modal = document.getElementById('vaultModal');
-    modal.classList.remove('flex');
-    modal.classList.add('hidden');
-}
-</script>
-    <!-- MODAL Z PODPOWIEDZIAMI -->
-<div id="vaultModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
-    <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-2xl mx-4 border border-slate-700 max-h-[85vh] overflow-y-auto">
-        
-        <div class="flex justify-between items-center mb-6">
-            <h3 id="modalTitle" class="text-2xl font-semibold"></h3>
-            <button onclick="closeVaultModal()" class="text-3xl text-slate-400 hover:text-white leading-none">×</button>
-        </div>
-
-        <div id="modalContent" class="space-y-3 text-slate-300">
-            <!-- Podpowiedzi generowane przez JS -->
-        </div>
-
-        <div class="mt-8 flex justify-end">
-            <button onclick="closeVaultModal()" 
-                    class="px-8 py-3 bg-slate-700 hover:bg-slate-600 rounded-2xl font-semibold transition">
-                Zamknij
-            </button>
-        </div>
-    </div>
-</div>
 <!-- ==================== MODAL ZMIANY RECOVERY PASSWORD ==================== -->
 <div id="changeRecoveryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
     <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-md mx-4 border border-slate-700">
-        
+       
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-2xl font-semibold">Zmień Recovery Password</h3>
             <button onclick="closeChangeRecoveryModal()" class="text-3xl text-slate-400 hover:text-white leading-none">×</button>
         </div>
-
         <div class="space-y-5">
-            
+           
             <!-- Aktualne hasło -->
             <div>
                 <label class="block text-sm text-slate-400 mb-1.5">Aktualne Recovery Password</label>
                 <div class="relative">
-                    <input id="currentRecoveryPass" type="password" 
+                    <input id="currentRecoveryPass" type="password"
                            class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
                     <button type="button" onclick="toggleModalPasswordVisibility('currentRecoveryPass', 'currentEye')"
                             class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
@@ -483,12 +226,11 @@ function closeVaultModal() {
                     </button>
                 </div>
             </div>
-
             <!-- Nowe hasło -->
             <div>
                 <label class="block text-sm text-slate-400 mb-1.5">Nowe Recovery Password</label>
                 <div class="relative">
-                    <input id="newRecoveryPass" type="password" 
+                    <input id="newRecoveryPass" type="password"
                            class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
                     <button type="button" onclick="toggleModalPasswordVisibility('newRecoveryPass', 'newEye')"
                             class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
@@ -497,12 +239,11 @@ function closeVaultModal() {
                 </div>
                 <p class="text-xs text-slate-500 mt-1">Minimum 6 znaków</p>
             </div>
-
             <!-- Potwierdzenie nowego hasła -->
             <div>
                 <label class="block text-sm text-slate-400 mb-1.5">Potwierdź nowe Recovery Password</label>
                 <div class="relative">
-                    <input id="confirmRecoveryPass" type="password" 
+                    <input id="confirmRecoveryPass" type="password"
                            class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
                     <button type="button" onclick="toggleModalPasswordVisibility('confirmRecoveryPass', 'confirmEye')"
                             class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
@@ -510,22 +251,19 @@ function closeVaultModal() {
                     </button>
                 </div>
             </div>
-
         </div>
-
         <!-- Przyciski -->
         <div class="flex gap-3 mt-8">
-            <button onclick="closeChangeRecoveryModal()" 
+            <button onclick="closeChangeRecoveryModal()"
                     class="flex-1 py-3.5 border border-slate-600 rounded-2xl font-semibold hover:bg-slate-800 transition">
                 Anuluj
             </button>
-            <button onclick="confirmChangeRecoveryPassword()" 
+            <button onclick="confirmChangeRecoveryPassword()"
                     class="flex-1 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-2xl transition">
                 Zmień hasło
             </button>
         </div>
-
     </div>
-</div>    
+</div>
 </body>
 </html>
