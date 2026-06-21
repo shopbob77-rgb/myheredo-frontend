@@ -371,6 +371,98 @@ window.onload = function() {
     applyGreenBorderAndStatus();
 };
 </script>
+<script>
+// ==================== STUB FUNCTIONS (żeby nie było błędów) ====================
 
+function addCustomVault() {
+    alert('Funkcja "Dodaj własną skrytkę" będzie dostępna wkrótce.');
+}
+
+function addHeir() {
+    const name = document.getElementById('heirName')?.value.trim();
+    const email = document.getElementById('heirEmail')?.value.trim();
+    
+    if (!name || !email) {
+        alert('Podaj imię i email spadkobiercy');
+        return;
+    }
+    
+    alert('Spadkobierca dodany (wersja demo): ' + name);
+    // Tu później dodamy normalną logikę
+}
+
+function showCertificate() {
+    alert('Generowanie certyfikatu sukcesji (funkcja w przygotowaniu)');
+}
+
+function simulateDeath() {
+    if (confirm('Czy na pewno chcesz uruchomić symulację po śmierci?')) {
+        alert('Symulacja uruchomiona (wersja demo)');
+    }
+}
+
+function handleLogout() {
+    if (confirm('Czy na pewno chcesz się wylogować?')) {
+        window.location.href = 'index.html'; // lub '/login'
+    }
+}
+
+function loadDemoData() {
+    alert('Wczytywanie danych demonstracyjnych (funkcja w przygotowaniu)');
+}
+
+function toggleRecoveryPasswordVisibility() {
+    const input = document.getElementById('recoveryPassword');
+    const icon = document.getElementById('recoveryEyeIcon');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function saveRecoveryPassword() {
+    alert('Recovery Password zapisane (wersja demo)');
+}
+
+function changeRecoveryPassword() {
+    document.getElementById('changeRecoveryModal').classList.remove('hidden');
+    document.getElementById('changeRecoveryModal').classList.add('flex');
+}
+
+function closeChangeRecoveryModal() {
+    document.getElementById('changeRecoveryModal').classList.remove('flex');
+    document.getElementById('changeRecoveryModal').classList.add('hidden');
+}
+
+function confirmChangeRecoveryPassword() {
+    alert('Hasło zmienione (wersja demo)');
+    closeChangeRecoveryModal();
+}
+
+function toggleModalPasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function loadCertificates() {
+    alert('Ładowanie certyfikatów (funkcja w przygotowaniu)');
+}
+</script>
 </body>
 </html>
