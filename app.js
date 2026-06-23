@@ -221,7 +221,7 @@ function renderSkrytki() {
 
         card.onclick = () => openVaultModal(vault);
         grid.appendChild(card);
-    });
+    );
 }
 
 // Otwieranie modalu edycji
