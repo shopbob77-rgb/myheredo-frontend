@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyHeredo • Dashboard</title>
-  <link rel="icon" href="/ico-512.png" sizes="512x512" type="image/png">
-<link rel="icon" href="/ico-192.png" sizes="192x192" type="image/png">
+    <link rel="icon" href="/ico-512.png" sizes="512x512" type="image/png">
+    <link rel="icon" href="/ico-192.png" sizes="192x192" type="image/png">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#fbbf24">
     <meta name="mobile-web-app-capable" content="yes">
@@ -174,41 +174,91 @@ if ('serviceWorker' in navigator) {
     async function decryptData(encryptedBase64, password) { /* ... */ }
 
     // ===================== SKRYTKI =====================
-async function loadUserVaults() {
-    try {
-        const email = localStorage.getItem('myheredo_user_email');
-        if (!email) {
-            console.log("Brak emaila w localStorage");
+    async function loadUserVaults() {
+        try {
+            const email = localStorage.getItem('myheredo_user_email');
+            if (!email) {
+                console.log("Brak emaila w localStorage");
+                return;
+            }
+            console.log("Ładowanie skrytek dla:", email);
+           
+            const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
+           
+            const querySnapshot = await getDocs(collection(db, "vaults"));
+            const vaults = [];
+           
+            querySnapshot.forEach((doc) => {
+                vaults.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            console.log("Pobrano skrytek:", vaults.length);
+           
+            if (window.renderSkrytki) {
+                window.renderSkrytki(vaults);
+            } else {
+                console.error("renderSkrytki nie jest dostępne");
+            }
+        } catch (error) {
+            console.error("Błąd ładowania skrytek:", error);
+        }
+    }
+
+    // ===================== RENDEROWANIE SKRYTEK (DODANE) =====================
+    function renderSkrytki(vaults = []) {
+        const grid = document.getElementById('skrytkiGrid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+
+        if (!vaults || vaults.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-8 text-slate-400">
+                    Nie masz jeszcze żadnych skrytek.
+                </div>
+            `;
             return;
         }
 
-        console.log("Ładowanie skrytek dla:", email);
-        
-        const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
-        
-        const querySnapshot = await getDocs(collection(db, "vaults"));
-        const vaults = [];
-        
-        querySnapshot.forEach((doc) => {
-            vaults.push({
-                id: doc.id,
-                ...doc.data()
-            });
+        currentVaults = vaults;
+
+        vaults.forEach(vault => {
+            const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
+            const card = document.createElement('div');
+            card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
+                              rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
+            
+            const icon = getIcon(vault.type || 'custom');
+            
+            card.innerHTML = `
+                <div class="flex items-start gap-4">
+                    <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
+                        <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
+                            ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            card.onclick = () => openDecryptModal(vault);
+            grid.appendChild(card);
         });
-
-        console.log("Pobrano skrytek:", vaults.length);
-        
-        // Używamy window.renderSkrytki
-        if (window.renderSkrytki) {
-            window.renderSkrytki(vaults);
-        } else {
-            console.error("renderSkrytki nie jest dostępne");
-        }
-
-    } catch (error) {
-        console.error("Błąd ładowania skrytek:", error);
     }
-}
+
+    function getIcon(type) {
+        const icons = {
+            bank: "🏦",
+            crypto: "₿",
+            social: "📱",
+            instructions: "📜",
+            custom: "📁"
+        };
+        return icons[type] || "📁";
+    }
 
     // ===================== MODAL ODSZYFROWANIA =====================
     function openDecryptModal(vault) { /* ... */ }
@@ -217,7 +267,7 @@ async function loadUserVaults() {
     async function saveVault(vaultId) { /* ... */ }
     async function addCustomVault() { /* ... */ }
 
-    // ===================== SPADKOBIERCY (przeniesione z app.js) =====================
+    // ===================== SPADKOBIERCY =====================
     let heirs = [];
     function renderHeirs() { /* ... */ }
     function addHeir() { /* ... */ }
@@ -237,36 +287,34 @@ async function loadUserVaults() {
     }
 
     // ===================== INICJALIZACJA =====================
- import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-// Sprawdź localStorage jako fallback
-const savedEmail = localStorage.getItem('myheredo_user_email');
+    const savedEmail = localStorage.getItem('myheredo_user_email');
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("✅ Zalogowany według Firebase:", user.email);
-        loadUserVaults();
-    } else {
-        console.log("⚠️ Firebase nie widzi zalogowanego użytkownika");
-        
-        if (savedEmail) {
-            console.log("ℹ️ Mamy email w localStorage — ładujemy skrytki mimo braku Firebase Auth");
-            // Tymczasowo ładujemy skrytki (Firebase Security Rules mogą blokować)
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("✅ Zalogowany według Firebase:", user.email);
             loadUserVaults();
         } else {
-            console.log("❌ Brak emaila — przekierowanie do logowania");
-            window.location.href = "login.html";
+            console.log("⚠️ Firebase nie widzi zalogowanego użytkownika");
+            if (savedEmail) {
+                console.log("ℹ️ Mamy email w localStorage — ładujemy skrytki mimo braku Firebase Auth");
+                loadUserVaults();
+            } else {
+                console.log("❌ Brak emaila — przekierowanie do logowania");
+                window.location.href = "login.html";
+            }
         }
-    }
-});
+    });
+
     // ===================== REJESTRACJA GLOBALNA =====================
     window.handleLogout = handleLogout;
     window.addHeir = addHeir;
     window.removeHeir = removeHeir;
     window.addCustomVault = addCustomVault;
     window.saveVault = saveVault;
-   window.renderSkrytki = renderSkrytki;
-window.loadUserVaults = loadUserVaults;
+    window.renderSkrytki = renderSkrytki;
+    window.loadUserVaults = loadUserVaults;
 </script>
 
 </body>
