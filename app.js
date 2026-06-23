@@ -173,59 +173,80 @@ async function saveAllData() {
     localStorage.setItem('myheredo_encrypted_vault', encrypted);
 }
 
-// ==================== SKRYTKI ====================
-function renderSkrytki() {
+// ==================== SKRYTKI - PEŁNA INTEGRACJA Z FIRESTORE ====================
+
+let currentVaults = [];
+
+// Główna funkcja renderująca skrytki
+function renderSkrytki(vaults = currentVaults) {
     const grid = document.getElementById('skrytkiGrid');
     if (!grid) return;
-    grid.innerHTML = '';
 
-    Object.keys(vaultData).forEach((key) => {
-        const isFilled = vaultData[key] && vaultData[key].trim() !== '';
-        const isCustom = !Object.keys(defaultCategories).includes(key);
+    grid.innerHTML = '';
+    currentVaults = vaults;
+
+    if (vaults.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-8 text-slate-400">
+                Nie masz jeszcze żadnych skrytek.
+            </div>
+        `;
+        return;
+    }
+
+    vaults.forEach((vault) => {
+        const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
+        const isCustom = vault.type === 'custom';
 
         const card = document.createElement('div');
         card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
                           rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
 
-        const icon = getIcon ? getIcon(key) : '📁';
+        const icon = getIcon(vault.type || 'custom');
 
         card.innerHTML = `
             <div class="flex items-start gap-4">
                 <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${categoryNames[key] || key}</h3>
+                    <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
                     <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
                         ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
                     </p>
                 </div>
             </div>
-            ${isCustom ? `<button onclick="event.stopImmediatePropagation(); deleteCustomVault('${key}');" 
-                         class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>` : ''}
+            ${isCustom ? `
+                <button onclick="event.stopImmediatePropagation(); deleteCustomVault('${vault.id}');"
+                        class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>
+            ` : ''}
         `;
 
-        card.onclick = () => openVaultModal(key);
+        card.onclick = () => openVaultModal(vault);
         grid.appendChild(card);
     });
 }
-function getIcon(key) {
-    if (customIcons[key]) return customIcons[key];
-    const icons = { passwordManager: "🔑", banki: "🏦", krypto: "₿", social: "📱", instrukcje: "📜" };
-    return icons[key] || "📁";
-}
 
-function openVaultModal(key) {
-    const content = vaultData[key] || '';
+// Otwieranie modalu edycji
+function openVaultModal(vault) {
+    const content = vault.encryptedContent || '';
+    
     const modalHTML = `
-    <div id="vaultModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div class="bg-slate-900 rounded-3xl p-8 max-w-lg w-full mx-4">
-            <h2 class="text-2xl font-semibold mb-6">${categoryNames[key] || key}</h2>
-            <textarea id="vaultContent" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-2xl p-5 text-slate-200">${content}</textarea>
-            <div class="flex gap-4 mt-6">
-                <button onclick="saveVault('${key}')" class="flex-1 bg-amber-400 text-slate-950 font-semibold py-4 rounded-2xl hover:bg-amber-300">Zapisz</button>
-                <button onclick="closeVaultModal()" class="flex-1 border border-slate-700 font-semibold py-4 rounded-2xl">Anuluj</button>
+        <div id="vaultModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div class="bg-slate-900 rounded-3xl p-8 max-w-lg w-full mx-4">
+                <h2 class="text-2xl font-semibold mb-6">${vault.title}</h2>
+                <textarea id="vaultContent" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-2xl p-5 text-slate-200">${content}</textarea>
+                <div class="flex gap-4 mt-6">
+                    <button onclick="saveVault('${vault.id}')" 
+                            class="flex-1 bg-amber-400 text-slate-950 font-semibold py-4 rounded-2xl hover:bg-amber-300">
+                        Zapisz
+                    </button>
+                    <button onclick="closeVaultModal()" 
+                            class="flex-1 border border-slate-700 font-semibold py-4 rounded-2xl">
+                        Anuluj
+                    </button>
+                </div>
             </div>
-        </div>
-    </div>`;
+        </div>`;
+
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -234,37 +255,95 @@ function closeVaultModal() {
     if (modal) modal.remove();
 }
 
-async function saveVault(key) {
+// Zapisywanie skrytki do Firestore
+async function saveVault(vaultId) {
     const content = document.getElementById('vaultContent').value.trim();
-    vaultData[key] = content;
-    await saveAllData();
-    closeVaultModal();
-    renderSkrytki();
+    const user = auth.currentUser;
+    if (!user) return alert("Musisz być zalogowany.");
+
+    try {
+        const vaultRef = doc(db, "vaults", vaultId);
+        await updateDoc(vaultRef, {
+            encryptedContent: content,
+            updatedAt: serverTimestamp()
+        });
+
+        // Aktualizujemy lokalną listę
+        const index = currentVaults.findIndex(v => v.id === vaultId);
+        if (index !== -1) {
+            currentVaults[index].encryptedContent = content;
+        }
+
+        closeVaultModal();
+        renderSkrytki(currentVaults);
+
+    } catch (error) {
+        console.error("Błąd zapisu skrytki:", error);
+        alert("Nie udało się zapisać skrytki.");
+    }
 }
 
-// ==================== NOWA SKRYTKA ====================
-function addCustomVault() {
+// Dodawanie własnej skrytki (zapis do Firestore)
+async function addCustomVault() {
     const name = prompt("Podaj nazwę nowej skrytki:");
     if (!name || name.trim() === "") return;
-    const key = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    if (vaultData[key]) return alert("Taka skrytka już istnieje.");
-    customIcons[key] = "📁";
-    vaultData[key] = "";
-    categoryNames[key] = name;
-    saveAllData();
-    localStorage.setItem('myheredo_custom_icons', JSON.stringify(customIcons));
-    renderSkrytki();
+
+    const user = auth.currentUser;
+    if (!user) return alert("Musisz być zalogowany.");
+
+    try {
+        const newVault = {
+            userId: user.uid,
+            title: name.trim(),
+            type: "custom",
+            encryptedContent: "",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            isActive: true
+        };
+
+        await addDoc(collection(db, "vaults"), newVault);
+        
+        // Odświeżamy listę
+        const vaults = await getUserVaults(user.uid);
+        renderSkrytki(vaults);
+
+    } catch (error) {
+        console.error("Błąd dodawania skrytki:", error);
+        alert("Nie udało się dodać skrytki.");
+    }
 }
 
-function deleteCustomVault(key) {
-    if (confirm(`Usunąć skrytkę "${categoryNames[key]}"?`)) {
-        delete vaultData[key];
-        delete categoryNames[key];
-        if (customIcons[key]) delete customIcons[key];
-        saveAllData();
-        localStorage.setItem('myheredo_custom_icons', JSON.stringify(customIcons));
-        renderSkrytki();
+// Usuwanie własnej skrytki
+async function deleteCustomVault(vaultId) {
+    if (!confirm("Czy na pewno chcesz usunąć tę skrytkę?")) return;
+
+    try {
+        await deleteDoc(doc(db, "vaults", vaultId));
+        
+        // Odświeżamy listę
+        const user = auth.currentUser;
+        if (user) {
+            const vaults = await getUserVaults(user.uid);
+            renderSkrytki(vaults);
+        }
+    } catch (error) {
+        console.error("Błąd usuwania skrytki:", error);
+        alert("Nie udało się usunąć skrytki.");
     }
+}
+
+// Prosta funkcja zwracająca ikonę
+function getIcon(type) {
+    const icons = {
+        bank: "🏦",
+        crypto: "₿",
+        social: "📱",
+        instructions: "📜",
+        custom: "📁",
+        passwordManager: "🔑"
+    };
+    return icons[type] || "📁";
 }
 
 // ==================== SPADKOBIERCY ====================
