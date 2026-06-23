@@ -4,7 +4,7 @@
 // =============================================
 
 // ==================== FIREBASE COMPAT ====================
-let compatDb = null;   // zmieniamy nazwę, żeby nie kolidowało
+let compatDb = null;
 
 function initializeFirebase() {
     const config = {
@@ -16,7 +16,7 @@ function initializeFirebase() {
         appId: "wpisz_app_id"
     };
     firebase.initializeApp(config);
-   compatDb = firebase.firestore();
+ db = firebase.firestore();
     console.log("✅ Firebase zainicjowany");
 }
 
