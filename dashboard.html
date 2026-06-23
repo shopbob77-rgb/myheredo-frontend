@@ -68,7 +68,7 @@
                 <p class="text-xs sm:text-sm text-slate-400 -mt-1">Cyfrowy Sejf Sukcesyjny</p>
             </div>
         </div>
-       
+      
         <div class="flex items-center gap-3 sm:gap-6">
             <div id="userEmail" class="text-xs sm:text-sm text-slate-400 text-right"></div>
             <button onclick="handleLogout()"
@@ -80,18 +80,17 @@
 
     <!-- Główna zawartość -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-        
+       
         <!-- Lewa kolumna - Skrytki -->
         <div class="lg:col-span-7">
             <h2 class="text-2xl font-bold mb-5">Twoje Skrytki Sukcesyjne</h2>
-            
-            <!-- ZMIENIONA SEKCJA SKRYTEK -->
+           
             <div id="skrytkiGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Skrytki są teraz generowane dynamicznie z kolekcji vaults -->
+                <!-- Skrytki generowane dynamicznie -->
             </div>
-            
+           
             <div class="mt-8">
-                <button onclick="addCustomVault()" 
+                <button onclick="addCustomVault()"
                         class="w-full py-4 border border-dashed border-slate-600 hover:border-amber-400 rounded-3xl text-slate-400 hover:text-amber-400">
                     + Dodaj własną skrytkę
                 </button>
@@ -101,8 +100,7 @@
         <!-- Prawa kolumna - Spadkobiercy -->
         <div class="lg:col-span-5">
             <h2 class="text-2xl font-bold mb-5">Zaufani Spadkobiercy</h2>
-            <div id="heirsList" class="bg-slate-900 rounded-3xl p-6 border border-slate-700 min-h-[300px]">
-            </div>
+            <div id="heirsList" class="bg-slate-900 rounded-3xl p-6 border border-slate-700 min-h-[300px]"></div>
             <div class="mt-6 bg-slate-900 rounded-3xl p-6 border border-slate-700">
                 <div class="grid grid-cols-2 gap-3">
                     <input id="heirName" type="text" class="bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3" placeholder="Imię / relacja">
@@ -248,12 +246,11 @@
     </div>
 </div>
 
-<!-- ==================== MODAL ODSZYFROWANIA SKRYTKI ==================== -->
+<!-- MODAL ODSZYFROWANIA SKRYTKI -->
 <div id="decryptModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
     <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-md mx-4 border border-slate-700">
         <h3 class="text-2xl font-semibold mb-4">Odszyfruj skrytkę</h3>
         <p id="vaultTitle" class="text-lg font-medium text-amber-400 mb-6"></p>
-
         <div class="space-y-4">
             <div>
                 <label class="block text-sm text-slate-400 mb-1.5">Hasło Główne</label>
@@ -262,7 +259,6 @@
                        placeholder="Wpisz hasło główne">
             </div>
         </div>
-
         <div class="flex gap-3 mt-8">
             <button onclick="closeDecryptModal()"
                     class="flex-1 py-3.5 border border-slate-600 rounded-2xl font-semibold hover:bg-slate-800 transition">
@@ -273,10 +269,9 @@
                 Odszyfruj
             </button>
         </div>
-
         <div id="decryptedContent" class="hidden mt-6">
             <h4 class="font-semibold mb-2">Zawartość skrytki:</h4>
-            <pre id="decryptedText" 
+            <pre id="decryptedText"
                  class="bg-slate-950 p-4 rounded-2xl text-sm whitespace-pre-wrap border border-slate-700"></pre>
         </div>
     </div>
@@ -296,114 +291,248 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <script type="module">
-import { getUserVaults } from './auth.js';
-import { auth } from './firebase.js';
+    // ===================== IMPORTY =====================
+    import { auth, db } from './firebase.js';
+    import { getUserVaults } from './auth.js';
+    import { 
+        doc, 
+        updateDoc, 
+        addDoc, 
+        deleteDoc, 
+        collection, 
+        serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// Zmienna do przechowywania aktualnie wybranej skrytki
-let currentVault = null;
+    // ===================== ZMIENNE GLOBALNE =====================
+    let currentVaults = [];
+    let currentVault = null;
 
-// Ładowanie skrytek użytkownika
-async function loadUserVaults() {
-    try {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const vaults = await getUserVaults(user.uid);
-        renderVaultsList(vaults);
-    } catch (error) {
-        console.error("Błąd ładowania skrytek:", error);
+    // ===================== SZYFROWANIE I ODSZYFROWANIE =====================
+    async function encryptData(text, password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        
+        const keyMaterial = await crypto.subtle.importKey(
+            "raw",
+            encoder.encode(password),
+            { name: "PBKDF2" },
+            false,
+            ["deriveBits", "deriveKey"]
+        );
+        
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const key = await crypto.subtle.deriveKey(
+            {
+                name: "PBKDF2",
+                salt: salt,
+                iterations: 100000,
+                hash: "SHA-256"
+            },
+            keyMaterial,
+            { name: "AES-GCM", length: 256 },
+            false,
+            ["encrypt"]
+        );
+        
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encrypted = await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv: iv },
+            key,
+            data
+        );
+        
+        const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+        result.set(salt, 0);
+        result.set(iv, salt.length);
+        result.set(new Uint8Array(encrypted), salt.length + iv.length);
+        
+        return btoa(String.fromCharCode(...result));
     }
-}
 
-// Renderowanie listy skrytek
-function renderVaultsList(vaults) {
-    const container = document.getElementById('skrytkiGrid');
-    container.innerHTML = '';
-
-    if (vaults.length === 0) {
-        container.innerHTML = `
-            <div class="col-span-full text-center py-8 text-slate-400">
-                Nie masz jeszcze żadnych skrytek.
-            </div>
-        `;
-        return;
+    async function decryptData(encryptedBase64, password) {
+        if (!encryptedBase64) return "";
+        
+        try {
+            const data = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+            const salt = data.slice(0, 16);
+            const iv = data.slice(16, 28);
+            const encrypted = data.slice(28);
+            
+            const encoder = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                "raw",
+                encoder.encode(password),
+                { name: "PBKDF2" },
+                false,
+                ["deriveBits", "deriveKey"]
+            );
+            
+            const key = await crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: salt,
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                keyMaterial,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["decrypt"]
+            );
+            
+            const decrypted = await crypto.subtle.decrypt(
+                { name: "AES-GCM", iv: iv },
+                key,
+                encrypted
+            );
+            
+            return new TextDecoder().decode(decrypted);
+        } catch (error) {
+            throw new Error("Nieprawidłowe hasło lub uszkodzone dane");
+        }
     }
 
-    vaults.forEach(vault => {
-        const card = document.createElement('div');
-        card.className = `skrytka-card bg-slate-900 border border-slate-700 rounded-3xl p-6 cursor-pointer hover:border-amber-400 transition-all`;
-        card.innerHTML = `
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-semibold text-lg">${vault.title}</h3>
-                    <p class="text-sm text-slate-400 mt-1">Typ: ${vault.type}</p>
+    // ===================== ŁADOWANIE I RENDEROWANIE SKRYTEK =====================
+    async function loadUserVaults() {
+        try {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const vaults = await getUserVaults(user.uid);
+            currentVaults = vaults;
+            renderSkrytki(vaults);
+        } catch (error) {
+            console.error("Błąd ładowania skrytek:", error);
+        }
+    }
+
+    function renderSkrytki(vaults) {
+        const grid = document.getElementById('skrytkiGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        currentVaults = vaults;
+
+        if (vaults.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-8 text-slate-400">
+                    Nie masz jeszcze żadnych skrytek.
                 </div>
-                <i class="fas fa-lock text-amber-400"></i>
-            </div>
-            <div class="mt-4 text-xs text-slate-500">
-                Utworzono: ${vault.createdAt ? new Date(vault.createdAt.toDate()).toLocaleDateString('pl-PL') : 'brak daty'}
-            </div>
-        `;
-        
-        card.onclick = () => openDecryptModal(vault);
-        container.appendChild(card);
+            `;
+            return;
+        }
+
+        vaults.forEach(vault => {
+            const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
+            const card = document.createElement('div');
+            card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
+                              rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
+            
+            const icon = getIcon(vault.type || 'custom');
+            
+            card.innerHTML = `
+                <div class="flex items-start gap-4">
+                    <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
+                        <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
+                            ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            card.onclick = () => openDecryptModal(vault);
+            grid.appendChild(card);
+        });
+    }
+
+    function getIcon(type) {
+        const icons = {
+            bank: "🏦",
+            crypto: "₿",
+            social: "📱",
+            instructions: "📜",
+            custom: "📁"
+        };
+        return icons[type] || "📁";
+    }
+
+    // ===================== MODAL ODSZYFROWANIA =====================
+    function openDecryptModal(vault) {
+        currentVault = vault;
+        document.getElementById('vaultTitle').textContent = vault.title;
+        document.getElementById('masterPassword').value = '';
+        document.getElementById('decryptedContent').classList.add('hidden');
+        document.getElementById('decryptModal').classList.remove('hidden');
+        document.getElementById('decryptModal').classList.add('flex');
+    }
+
+    function closeDecryptModal() {
+        document.getElementById('decryptModal').classList.remove('flex');
+        document.getElementById('decryptModal').classList.add('hidden');
+        currentVault = null;
+    }
+
+    async function decryptAndShowVault() {
+        const password = document.getElementById('masterPassword').value.trim();
+        if (!password || !currentVault) {
+            alert("Podaj hasło główne.");
+            return;
+        }
+
+        try {
+            const decrypted = await decryptData(currentVault.encryptedContent, password);
+            document.getElementById('decryptedText').textContent = decrypted;
+            document.getElementById('decryptedContent').classList.remove('hidden');
+        } catch (error) {
+            alert(error.message || "Błąd odszyfrowania");
+        }
+    }
+
+    // ===================== ZAPIS SKRYTKI =====================
+    async function saveVault(vaultId) {
+        const content = document.getElementById('vaultContent').value.trim();
+        const password = prompt("Podaj hasło główne do zaszyfrowania:");
+        if (!password) return;
+
+        try {
+            const encrypted = await encryptData(content, password);
+            
+            const vaultRef = doc(db, "vaults", vaultId);
+            await updateDoc(vaultRef, {
+                encryptedContent: encrypted,
+                updatedAt: serverTimestamp()
+            });
+
+            // Odśwież listę
+            const user = auth.currentUser;
+            if (user) {
+                const vaults = await getUserVaults(user.uid);
+                renderSkrytki(vaults);
+            }
+            
+            closeVaultModal();
+            
+        } catch (error) {
+            console.error("Błąd zapisu skrytki:", error);
+            alert("Nie udało się zapisać skrytki.");
+        }
+    }
+
+    // ===================== INICJALIZACJA =====================
+    document.addEventListener('DOMContentLoaded', () => {
+        if (auth.currentUser) {
+            loadUserVaults();
+        }
     });
-}
 
-// Otwieranie modalu odszyfrowania
-function openDecryptModal(vault) {
-    currentVault = vault;
-    document.getElementById('vaultTitle').textContent = vault.title;
-    document.getElementById('masterPassword').value = '';
-    document.getElementById('decryptedContent').classList.add('hidden');
-    document.getElementById('decryptModal').classList.remove('hidden');
-    document.getElementById('decryptModal').classList.add('flex');
-}
-
-// Zamykanie modalu
-function closeDecryptModal() {
-    document.getElementById('decryptModal').classList.remove('flex');
-    document.getElementById('decryptModal').classList.add('hidden');
-    currentVault = null;
-}
-
-// Odszyfrowanie skrytki
-async function decryptAndShowVault() {
-    const password = document.getElementById('masterPassword').value.trim();
-    
-    if (!password || !currentVault) {
-        alert("Podaj hasło główne.");
-        return;
-    }
-
-    try {
-        // TODO: Tutaj wstawisz swoją funkcję odszyfrowania
-        // Na razie pokazujemy przykładową zawartość
-        const decryptedContent = currentVault.encryptedContent || 
-            "Zawartość skrytki (zaszyfrowana).\nW tym miejscu będzie wyświetlona odszyfrowana zawartość po podaniu poprawnego hasła.";
-
-        document.getElementById('decryptedText').textContent = decryptedContent;
-        document.getElementById('decryptedContent').classList.remove('hidden');
-        
-    } catch (error) {
-        console.error("Błąd odszyfrowania:", error);
-        alert("Nieprawidłowe hasło lub błąd odszyfrowania.");
-    }
-}
-
-// Ładowanie skrytek po załadowaniu strony
-document.addEventListener('DOMContentLoaded', () => {
-    // Sprawdź czy użytkownik jest zalogowany
-    if (typeof auth !== 'undefined' && auth.currentUser) {
-        loadUserVaults();
-    }
-});
-
-// Eksportujemy funkcje, żeby były dostępne globalnie
-window.loadUserVaults = loadUserVaults;
-window.openDecryptModal = openDecryptModal;
-window.closeDecryptModal = closeDecryptModal;
-window.decryptAndShowVault = decryptAndShowVault;
+    // Eksport funkcji globalnie
+    window.loadUserVaults = loadUserVaults;
+    window.renderSkrytki = renderSkrytki;
+    window.openDecryptModal = openDecryptModal;
+    window.closeDecryptModal = closeDecryptModal;
+    window.decryptAndShowVault = decryptAndShowVault;
+    window.saveVault = saveVault;
 </script>
 
 </body>
