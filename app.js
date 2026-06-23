@@ -174,21 +174,31 @@ async function saveAllData() {
 }
 
 // ==================== SKRYTKI - PEŁNA INTEGRACJA Z FIRESTORE ====================
-
 let currentVaults = [];
 
-// Główna funkcja renderująca skrytki
-// Zakomentuj to:
-function initDashboard() {
-    // renderSkrytki();   ← zakomentuj lub usuń
-    // ... reszta kodu
-}
-    vaults.forEach((vault) => {
+// Główna funkcja renderująca skrytki (stara wersja - zostawiamy na razie)
+function renderSkrytki() {
+    const grid = document.getElementById('skrytkiGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    // Jeśli nie ma danych z Firestore, pokazujemy komunikat
+    if (!currentVaults || currentVaults.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-8 text-slate-400">
+                Nie masz jeszcze żadnych skrytek.
+            </div>
+        `;
+        return;
+    }
+
+    currentVaults.forEach((vault) => {
         const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
         const isCustom = vault.type === 'custom';
 
         const card = document.createElement('div');
-        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
+        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'}
                           rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
 
         const icon = getIcon(vault.type || 'custom');
