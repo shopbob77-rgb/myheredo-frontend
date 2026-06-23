@@ -284,35 +284,14 @@ async function saveVault(vaultId) {
 }
 
 // Dodawanie własnej skrytki (zapis do Firestore)
-async function addCustomVault() {
-    const name = prompt("Podaj nazwę nowej skrytki:");
-    if (!name || name.trim() === "") return;
-
-    const user = auth.currentUser;
-    if (!user) return alert("Musisz być zalogowany.");
-
-    try {
-        const newVault = {
-            userId: user.uid,
-            title: name.trim(),
-            type: "custom",
-            encryptedContent: "",
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-            isActive: true
-        };
-
-        await addDoc(collection(db, "vaults"), newVault);
-        
-        // Odświeżamy listę
-        const vaults = await getUserVaults(user.uid);
-        renderSkrytki(vaults);
-
-    } catch (error) {
-        console.error("Błąd dodawania skrytki:", error);
-        alert("Nie udało się dodać skrytki.");
+function addCustomVault() {
+    // Tymczasowe rozwiązanie - przekierowujemy do nowej funkcji z modułu
+    if (typeof window.addCustomVault === 'function') {
+        window.addCustomVault();
+    } else {
+        alert("Funkcja dodawania skrytki jest w trakcie aktualizacji.");
     }
-}
+}}
 
 // Usuwanie własnej skrytki
 async function deleteCustomVault(vaultId) {
