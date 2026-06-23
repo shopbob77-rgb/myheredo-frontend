@@ -406,20 +406,23 @@ if ('serviceWorker' in navigator) {
         }
     }
 
-    function renderSkrytki(vaults) {
-        const grid = document.getElementById('skrytkiGrid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        currentVaults = vaults;
-
-        if (vaults.length === 0) {
-            grid.innerHTML = `
-                <div class="col-span-full text-center py-8 text-slate-400">
-                    Nie masz jeszcze żadnych skrytek.
-                </div>
-            `;
-            return;
-        }
+ function renderSkrytki(vaults = []) {
+    const grid = document.getElementById('skrytkiGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    if (!vaults || vaults.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-8 text-slate-400">
+                Nie masz jeszcze żadnych skrytek.
+            </div>
+        `;
+        return;
+    }
+    
+    // reszta kodu...
+}
 
         vaults.forEach(vault => {
             const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
