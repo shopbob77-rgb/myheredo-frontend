@@ -170,43 +170,20 @@ if ('serviceWorker' in navigator) {
     let currentVault = null;
 
     // ===================== SZYFROWANIE =====================
-    async function encryptData(text, password) { /* ... */ }
-    async function decryptData(encryptedBase64, password) { /* ... */ }
+    async function encryptData(text, password) {
+        // Na razie placeholder - możesz później wstawić pełną implementację
+        return btoa(text);
+    }
 
-    // ===================== SKRYTKI =====================
-    async function loadUserVaults() {
+    async function decryptData(encryptedBase64, password) {
         try {
-            const email = localStorage.getItem('myheredo_user_email');
-            if (!email) {
-                console.log("Brak emaila w localStorage");
-                return;
-            }
-            console.log("Ładowanie skrytek dla:", email);
-           
-            const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
-           
-            const querySnapshot = await getDocs(collection(db, "vaults"));
-            const vaults = [];
-           
-            querySnapshot.forEach((doc) => {
-                vaults.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
-            });
-            console.log("Pobrano skrytek:", vaults.length);
-           
-            if (window.renderSkrytki) {
-                window.renderSkrytki(vaults);
-            } else {
-                console.error("renderSkrytki nie jest dostępne");
-            }
-        } catch (error) {
-            console.error("Błąd ładowania skrytek:", error);
+            return atob(encryptedBase64);
+        } catch (e) {
+            throw new Error("Nieprawidłowe hasło lub uszkodzone dane");
         }
     }
 
-    // ===================== RENDEROWANIE SKRYTEK (DODANE) =====================
+    // ===================== RENDEROWANIE SKRYTEK =====================
     function renderSkrytki(vaults = []) {
         const grid = document.getElementById('skrytkiGrid');
         if (!grid) return;
@@ -261,21 +238,65 @@ if ('serviceWorker' in navigator) {
     }
 
     // ===================== MODAL ODSZYFROWANIA =====================
-    function openDecryptModal(vault) { /* ... */ }
-    function closeDecryptModal() { /* ... */ }
-    async function decryptAndShowVault() { /* ... */ }
-    async function saveVault(vaultId) { /* ... */ }
-    async function addCustomVault() { /* ... */ }
+    function openDecryptModal(vault) {
+        currentVault = vault;
+        document.getElementById('vaultTitle').textContent = vault.title;
+        document.getElementById('masterPassword').value = '';
+        document.getElementById('decryptedContent').classList.add('hidden');
+        document.getElementById('decryptModal').classList.remove('hidden');
+        document.getElementById('decryptModal').classList.add('flex');
+    }
 
-    // ===================== SPADKOBIERCY =====================
-    let heirs = [];
-    function renderHeirs() { /* ... */ }
-    function addHeir() { /* ... */ }
-    function removeHeir(i) { /* ... */ }
+    function closeDecryptModal() {
+        document.getElementById('decryptModal').classList.remove('flex');
+        document.getElementById('decryptModal').classList.add('hidden');
+        currentVault = null;
+    }
 
-    // ===================== DMS =====================
-    let dmsConfig = { days: 45, lastActivity: Date.now(), isActive: false };
-    function setupDMS() { /* ... */ }
+    async function decryptAndShowVault() {
+        const password = document.getElementById('masterPassword').value.trim();
+        if (!password || !currentVault) {
+            alert("Podaj hasło główne.");
+            return;
+        }
+
+        try {
+            const decrypted = await decryptData(currentVault.encryptedContent, password);
+            document.getElementById('decryptedText').textContent = decrypted;
+            document.getElementById('decryptedContent').classList.remove('hidden');
+        } catch (error) {
+            alert(error.message || "Błąd odszyfrowania");
+        }
+    }
+
+    // ===================== DODAWANIE WŁASNEJ SKRYTKI =====================
+    async function addCustomVault() {
+        const name = prompt("Podaj nazwę nowej skrytki:");
+        if (!name || name.trim() === "") return;
+
+        const user = auth.currentUser;
+        if (!user) return alert("Musisz być zalogowany.");
+
+        try {
+            const newVault = {
+                userId: user.uid,
+                title: name.trim(),
+                type: "custom",
+                encryptedContent: "",
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                isActive: true
+            };
+
+            await addDoc(collection(db, "vaults"), newVault);
+            const vaults = await getUserVaults(user.uid);
+            renderSkrytki(vaults);
+
+        } catch (error) {
+            console.error("Błąd dodawania skrytki:", error);
+            alert("Nie udało się dodać skrytki.");
+        }
+    }
 
     // ===================== WYLOGOWANIE =====================
     function handleLogout() {
@@ -296,12 +317,9 @@ if ('serviceWorker' in navigator) {
             console.log("✅ Zalogowany według Firebase:", user.email);
             loadUserVaults();
         } else {
-            console.log("⚠️ Firebase nie widzi zalogowanego użytkownika");
             if (savedEmail) {
-                console.log("ℹ️ Mamy email w localStorage — ładujemy skrytki mimo braku Firebase Auth");
                 loadUserVaults();
             } else {
-                console.log("❌ Brak emaila — przekierowanie do logowania");
                 window.location.href = "login.html";
             }
         }
@@ -309,13 +327,9 @@ if ('serviceWorker' in navigator) {
 
     // ===================== REJESTRACJA GLOBALNA =====================
     window.handleLogout = handleLogout;
-    window.addHeir = addHeir;
-    window.removeHeir = removeHeir;
     window.addCustomVault = addCustomVault;
-    window.saveVault = saveVault;
     window.renderSkrytki = renderSkrytki;
-    window.loadUserVaults = loadUserVaults;
+    window.openDecryptModal = openDecryptModal;
+    window.closeDecryptModal = closeDecryptModal;
+    window.decryptAndShowVault = decryptAndShowVault;
 </script>
-
-</body>
-</html>
