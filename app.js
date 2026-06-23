@@ -178,22 +178,11 @@ async function saveAllData() {
 let currentVaults = [];
 
 // Główna funkcja renderująca skrytki
-function renderSkrytki(vaults = currentVaults) {
-    const grid = document.getElementById('skrytkiGrid');
-    if (!grid) return;
-
-    grid.innerHTML = '';
-    currentVaults = vaults;
-
-    if (vaults.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-8 text-slate-400">
-                Nie masz jeszcze żadnych skrytek.
-            </div>
-        `;
-        return;
-    }
-
+// Zakomentuj to:
+function initDashboard() {
+    // renderSkrytki();   ← zakomentuj lub usuń
+    // ... reszta kodu
+}
     vaults.forEach((vault) => {
         const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
         const isCustom = vault.type === 'custom';
