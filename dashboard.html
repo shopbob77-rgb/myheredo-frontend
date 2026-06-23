@@ -4,29 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyHeredo • Dashboard</title>
-    <link rel="icon" href="/ico-512.png" sizes="512x512" type="image/png">
-    <link rel="icon" href="/ico-192.png" sizes="192x192" type="image/png">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/logo512.png" sizes="512x512" type="image/png">
+    <link rel="icon" href="/logo192.png" sizes="192x192" type="image/png">
+
+    <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#fbbf24">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Własne style -->
     <style>
-        body { background-color: #0a0a0a; color: #e2e8f0; }
-        .dashboard-container { min-height: 100vh; max-width: 1480px; margin: 0 auto; padding: 24px; }
-        #userEmail { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
-        #skrytkiGrid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        body {
+            background-color: #0a0a0a;
+            color: #e2e8f0;
+        }
+        .dashboard-container {
+            min-height: 100vh;
+            max-width: 1480px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        /* Poprawki nagłówka i skrytek */
+        #userEmail {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 160px;
+        }
+        #skrytkiGrid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
         @media (max-width: 640px) {
-            .dashboard-container { padding: 16px; }
-            #userEmail { max-width: 110px; font-size: 0.75rem; }
-            #skrytkiGrid { grid-template-columns: 1fr; gap: 12px; }
+            .dashboard-container {
+                padding: 16px;
+            }
+            #userEmail {
+                max-width: 110px;
+                font-size: 0.75rem;
+            }
+            #skrytkiGrid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .skrytka-card {
+                padding: 18px !important;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Tutaj zaczyna się reszta Twojego kodu (dashboard-container itd.) -->
+
+ 
+
+</head>
+<body>
 <div class="dashboard-container">
+
     <!-- Nagłówek -->
     <div class="flex justify-between items-center pb-6 border-b border-slate-800 px-2 sm:px-0">
         <div class="flex items-center gap-3">
@@ -36,20 +81,24 @@
                 <p class="text-xs sm:text-sm text-slate-400 -mt-1">Cyfrowy Sejf Sukcesyjny</p>
             </div>
         </div>
+        
         <div class="flex items-center gap-3 sm:gap-6">
             <div id="userEmail" class="text-xs sm:text-sm text-slate-400 text-right"></div>
-            <button onclick="handleLogout()" class="px-4 sm:px-6 py-2 text-sm border border-slate-700 hover:border-red-500 hover:text-red-400 rounded-2xl whitespace-nowrap">
+            <button onclick="handleLogout()" 
+                    class="px-4 sm:px-6 py-2 text-sm border border-slate-700 hover:border-red-500 hover:text-red-400 rounded-2xl whitespace-nowrap">
                 Wyloguj się
             </button>
         </div>
     </div>
 
-    <!-- Główna zawartość -->
+    <!-- Reszta Twojego kodu (bez zmian) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-        <!-- Skrytki -->
+        <!-- Lewa kolumna - Skrytki -->
         <div class="lg:col-span-7">
             <h2 class="text-2xl font-bold mb-5">Twoje Skrytki Sukcesyjne</h2>
-            <div id="skrytkiGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            <div id="skrytkiGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- generowane przez JS -->
+            </div>
             <div class="mt-8">
                 <button onclick="addCustomVault()" class="w-full py-4 border border-dashed border-slate-600 hover:border-amber-400 rounded-3xl text-slate-400 hover:text-amber-400">
                     + Dodaj własną skrytkę
@@ -57,10 +106,11 @@
             </div>
         </div>
 
-        <!-- Spadkobiercy -->
+        <!-- Prawa kolumna - Spadkobiercy -->
         <div class="lg:col-span-5">
             <h2 class="text-2xl font-bold mb-5">Zaufani Spadkobiercy</h2>
-            <div id="heirsList" class="bg-slate-900 rounded-3xl p-6 border border-slate-700 min-h-[300px]"></div>
+            <div id="heirsList" class="bg-slate-900 rounded-3xl p-6 border border-slate-700 min-h-[300px]">
+            </div>
             <div class="mt-6 bg-slate-900 rounded-3xl p-6 border border-slate-700">
                 <div class="grid grid-cols-2 gap-3">
                     <input id="heirName" type="text" class="bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3" placeholder="Imię / relacja">
@@ -98,35 +148,59 @@
             📋 Wczytaj przykładowe dane demonstracyjne
         </button>
     </div>
-
-    <!-- Recovery Password -->
-    <div class="bg-slate-900 rounded-3xl p-6 border border-slate-700 mt-10">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="text-2xl">🔐</div>
-            <div>
-                <h3 class="text-xl font-semibold">Recovery Password</h3>
-                <p class="text-sm text-slate-400">Hasło dla spadkobierców</p>
-            </div>
-        </div>
-        <div id="recoveryStatus" class="mb-4 text-sm"></div>
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm text-slate-400 mb-1.5">Recovery Password</label>
-                <div class="relative">
-                    <input id="recoveryPassword" type="password" class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
-                    <button type="button" onclick="toggleRecoveryPasswordVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-                        <i class="fas fa-eye" id="recoveryEyeIcon"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="saveRecoveryPassword()" class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3.5 rounded-2xl transition">Zapisz Recovery Password</button>
-                <button onclick="changeRecoveryPassword()" class="flex-1 border border-slate-600 hover:bg-slate-800 font-semibold py-3.5 rounded-2xl transition">Zmień hasło</button>
-            </div>
+<!-- ==================== RECOVERY PASSWORD ==================== -->
+<div class="bg-slate-900 rounded-3xl p-6 border border-slate-700">
+    <div class="flex items-center gap-3 mb-4">
+        <div class="text-2xl">🔐</div>
+        <div>
+            <h3 class="text-xl font-semibold">Recovery Password</h3>
+            <p class="text-sm text-slate-400">Hasło dla spadkobierców (do odszyfrowania skrytek)</p>
         </div>
     </div>
 
-    <!-- Certyfikaty -->
+    <!-- Status -->
+    <div id="recoveryStatus" class="mb-4 text-sm"></div>
+
+    <!-- Formularz -->
+    <div class="space-y-4">
+        <div>
+            <label class="block text-sm text-slate-400 mb-1.5">Recovery Password</label>
+            <div class="relative">
+                <input 
+                    id="recoveryPassword" 
+                    type="password" 
+                    class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white"
+                    placeholder="Wpisz silne hasło (min. 6 znaków)">
+                
+                <!-- Ikona oka -->
+                <button 
+                    type="button"
+                    onclick="toggleRecoveryPasswordVisibility()"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                    <i class="fas fa-eye" id="recoveryEyeIcon"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mt-1.5">
+                Przekaż to hasło spadkobiercom (np. w testamencie lub u notariusza)
+            </p>
+        </div>
+
+        <div class="flex gap-3">
+            <button 
+                onclick="saveRecoveryPassword()"
+                class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold py-3.5 rounded-2xl transition">
+                Zapisz Recovery Password
+            </button>
+            
+            <button 
+                onclick="changeRecoveryPassword()"
+                class="flex-1 border border-slate-600 hover:bg-slate-800 font-semibold py-3.5 rounded-2xl transition">
+                Zmień hasło
+            </button>
+        </div>
+    </div>
+</div>
+    <!-- Moje Certyfikaty -->
     <div class="mt-16 pt-10 border-t border-slate-700">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold flex items-center gap-3">📜 Moje Certyfikaty</h2>
@@ -138,17 +212,7 @@
     </div>
 </div>
 
-<!-- Modale -->
-<div id="changeRecoveryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
-    <!-- ... zawartość modalu zmiany Recovery Password ... -->
-</div>
-
-<div id="decryptModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
-    <!-- ... zawartość modalu odszyfrowania ... -->
-</div>
-
-<!-- WYŁĄCZAMY app.js na razie -->
-<!-- <script src="app.js"></script> -->
+<script src="app.js"></script>
 
 <!-- PWA Service Worker -->
 <script>
@@ -159,181 +223,74 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('❌ Błąd SW:', err));
     });
 }
+    
 </script>
+<!-- ==================== MODAL ZMIANY RECOVERY PASSWORD ==================== -->
+<div id="changeRecoveryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
+    <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-md mx-4 border border-slate-700">
+        
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-semibold">Zmień Recovery Password</h3>
+            <button onclick="closeChangeRecoveryModal()" class="text-3xl text-slate-400 hover:text-white leading-none">×</button>
+        </div>
 
-<script type="module">
-    import { auth, db } from './firebase.js';
-    import { getUserVaults } from './auth.js';
-    import { doc, updateDoc, addDoc, deleteDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-    let currentVaults = [];
-    let currentVault = null;
-
-    // ===================== SZYFROWANIE =====================
-    async function encryptData(text, password) {
-        // Na razie placeholder - możesz później wstawić pełną implementację
-        return btoa(text);
-    }
-
-    async function decryptData(encryptedBase64, password) {
-        try {
-            return atob(encryptedBase64);
-        } catch (e) {
-            throw new Error("Nieprawidłowe hasło lub uszkodzone dane");
-        }
-    }
-
-    // ===================== RENDEROWANIE SKRYTEK =====================
-    function renderSkrytki(vaults = []) {
-        const grid = document.getElementById('skrytkiGrid');
-        if (!grid) return;
-
-        grid.innerHTML = '';
-
-        if (!vaults || vaults.length === 0) {
-            grid.innerHTML = `
-                <div class="col-span-full text-center py-8 text-slate-400">
-                    Nie masz jeszcze żadnych skrytek.
+        <div class="space-y-5">
+            
+            <!-- Aktualne hasło -->
+            <div>
+                <label class="block text-sm text-slate-400 mb-1.5">Aktualne Recovery Password</label>
+                <div class="relative">
+                    <input id="currentRecoveryPass" type="password" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
+                    <button type="button" onclick="toggleModalPasswordVisibility('currentRecoveryPass', 'currentEye')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                        <i class="fas fa-eye" id="currentEye"></i>
+                    </button>
                 </div>
-            `;
-            return;
-        }
+            </div>
 
-        currentVaults = vaults;
-
-        vaults.forEach(vault => {
-            const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
-            const card = document.createElement('div');
-            card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
-                              rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
-            
-            const icon = getIcon(vault.type || 'custom');
-            
-            card.innerHTML = `
-                <div class="flex items-start gap-4">
-                    <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
-                        <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
-                            ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
-                        </p>
-                    </div>
+            <!-- Nowe hasło -->
+            <div>
+                <label class="block text-sm text-slate-400 mb-1.5">Nowe Recovery Password</label>
+                <div class="relative">
+                    <input id="newRecoveryPass" type="password" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
+                    <button type="button" onclick="toggleModalPasswordVisibility('newRecoveryPass', 'newEye')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                        <i class="fas fa-eye" id="newEye"></i>
+                    </button>
                 </div>
-            `;
-            
-            card.onclick = () => openDecryptModal(vault);
-            grid.appendChild(card);
-        });
-    }
+                <p class="text-xs text-slate-500 mt-1">Minimum 6 znaków</p>
+            </div>
 
-    function getIcon(type) {
-        const icons = {
-            bank: "🏦",
-            crypto: "₿",
-            social: "📱",
-            instructions: "📜",
-            custom: "📁"
-        };
-        return icons[type] || "📁";
-    }
+            <!-- Potwierdzenie nowego hasła -->
+            <div>
+                <label class="block text-sm text-slate-400 mb-1.5">Potwierdź nowe Recovery Password</label>
+                <div class="relative">
+                    <input id="confirmRecoveryPass" type="password" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 pr-12 text-white">
+                    <button type="button" onclick="toggleModalPasswordVisibility('confirmRecoveryPass', 'confirmEye')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                        <i class="fas fa-eye" id="confirmEye"></i>
+                    </button>
+                </div>
+            </div>
 
-    // ===================== MODAL ODSZYFROWANIA =====================
-    function openDecryptModal(vault) {
-        currentVault = vault;
-        document.getElementById('vaultTitle').textContent = vault.title;
-        document.getElementById('masterPassword').value = '';
-        document.getElementById('decryptedContent').classList.add('hidden');
-        document.getElementById('decryptModal').classList.remove('hidden');
-        document.getElementById('decryptModal').classList.add('flex');
-    }
+        </div>
 
-    function closeDecryptModal() {
-        document.getElementById('decryptModal').classList.remove('flex');
-        document.getElementById('decryptModal').classList.add('hidden');
-        currentVault = null;
-    }
+        <!-- Przyciski -->
+        <div class="flex gap-3 mt-8">
+            <button onclick="closeChangeRecoveryModal()" 
+                    class="flex-1 py-3.5 border border-slate-600 rounded-2xl font-semibold hover:bg-slate-800 transition">
+                Anuluj
+            </button>
+            <button onclick="confirmChangeRecoveryPassword()" 
+                    class="flex-1 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-2xl transition">
+                Zmień hasło
+            </button>
+        </div>
 
-    async function decryptAndShowVault() {
-        const password = document.getElementById('masterPassword').value.trim();
-        if (!password || !currentVault) {
-            alert("Podaj hasło główne.");
-            return;
-        }
-
-        try {
-            const decrypted = await decryptData(currentVault.encryptedContent, password);
-            document.getElementById('decryptedText').textContent = decrypted;
-            document.getElementById('decryptedContent').classList.remove('hidden');
-        } catch (error) {
-            alert(error.message || "Błąd odszyfrowania");
-        }
-    }
-
-    // ===================== DODAWANIE WŁASNEJ SKRYTKI =====================
-    async function addCustomVault() {
-        const name = prompt("Podaj nazwę nowej skrytki:");
-        if (!name || name.trim() === "") return;
-
-        const user = auth.currentUser;
-        if (!user) return alert("Musisz być zalogowany.");
-
-        try {
-            const newVault = {
-                userId: user.uid,
-                title: name.trim(),
-                type: "custom",
-                encryptedContent: "",
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp(),
-                isActive: true
-            };
-
-            await addDoc(collection(db, "vaults"), newVault);
-            const vaults = await getUserVaults(user.uid);
-            renderSkrytki(vaults);
-
-        } catch (error) {
-            console.error("Błąd dodawania skrytki:", error);
-            alert("Nie udało się dodać skrytki.");
-        }
-    }
-
-    // ===================== WYLOGOWANIE =====================
-    function handleLogout() {
-        if (confirm("Wylogować się z MyHeredo?")) {
-            sessionStorage.clear();
-            localStorage.removeItem('myheredo_user_email');
-            window.location.href = "index.html";
-        }
-    }
-
-  // ===================== INICJALIZACJA =====================
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-
-const savedEmail = localStorage.getItem('myheredo_user_email');
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("✅ Zalogowany według Firebase:", user.email);
-        if (typeof loadUserVaults === 'function') {
-            loadUserVaults();
-        }
-    } else {
-        if (savedEmail) {
-            if (typeof loadUserVaults === 'function') {
-                loadUserVaults();
-            }
-        } else {
-            window.location.href = "login.html";
-        }
-    }
-});
-
-// ===================== REJESTRACJA GLOBALNA =====================
-window.loadUserVaults = loadUserVaults;
-window.renderSkrytki = renderSkrytki;
-window.handleLogout = handleLogout;
-window.addCustomVault = addCustomVault;
-window.openDecryptModal = openDecryptModal;
-window.closeDecryptModal = closeDecryptModal;
-window.decryptAndShowVault = decryptAndShowVault;
+    </div>
+</div>    
+</body>
+</html>
