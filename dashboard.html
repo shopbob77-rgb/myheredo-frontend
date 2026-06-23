@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyHeredo • Dashboard</title>
-    <link rel="icon" href="/logo512.png" sizes="512x512" type="image/png">
-    <link rel="icon" href="/logo192.png" sizes="192x192" type="image/png">
+  <link rel="icon" href="/ico-512.png" sizes="512x512" type="image/png">
+<link rel="icon" href="/ico-192.png" sizes="192x192" type="image/png">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#fbbf24">
     <meta name="mobile-web-app-capable" content="yes">
@@ -205,12 +205,18 @@ if ('serviceWorker' in navigator) {
     }
 
     // ===================== INICJALIZACJA =====================
-    document.addEventListener('DOMContentLoaded', () => {
-        if (auth.currentUser) {
-            loadUserVaults();
-            // Tutaj możesz dodać renderHeirs() i setupDMS() jak przeniesiesz te funkcje
-        }
-    });
+   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+// Na samym końcu modułu dodaj:
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("Zalogowany użytkownik:", user.email);
+        loadUserVaults();
+    } else {
+        console.log("Użytkownik nie jest zalogowany");
+        window.location.href = "login.html";
+    }
+});
 
     // ===================== REJESTRACJA GLOBALNA =====================
     window.handleLogout = handleLogout;
