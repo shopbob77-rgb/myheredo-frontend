@@ -1,10 +1,10 @@
 // =============================================
 // MYHEREDO - Hybrydowa Warstwa Sukcesyjna
-// Stabilna wersja (po audycie)
+// Stabilna wersja
 // =============================================
 
 // ==================== FIREBASE COMPAT ====================
-let compatDb = null;
+let db = null;
 
 function initializeFirebase() {
     const config = {
@@ -16,7 +16,7 @@ function initializeFirebase() {
         appId: "wpisz_app_id"
     };
     firebase.initializeApp(config);
- db = firebase.firestore();
+    db = firebase.firestore();
     console.log("✅ Firebase zainicjowany");
 }
 
@@ -32,7 +32,6 @@ const loadFirebaseScripts = () => {
     };
 };
 loadFirebaseScripts();
-
 // =======================================================
 
 let masterPassword = null;
@@ -66,10 +65,12 @@ async function initDashboard() {
         window.location.href = "login.html";
         return;
     }
+
     document.getElementById('userEmail').textContent = email;
     masterPassword = sessionStorage.getItem('myheredo_master_password');
+
     const savedEncryptedVault = localStorage.getItem('myheredo_encrypted_vault');
-   
+    
     if (savedEncryptedVault && masterPassword) {
         try {
             vaultData = await decryptData(savedEncryptedVault, masterPassword);
@@ -79,6 +80,7 @@ async function initDashboard() {
     } else {
         vaultData = {};
     }
+
     if (Object.keys(vaultData).length === 0) {
         vaultData = {
             passwordManager: "",
@@ -89,17 +91,20 @@ async function initDashboard() {
         };
         categoryNames = { ...defaultCategories };
     }
+
     const savedHeirs = localStorage.getItem('myheredo_heirs');
     const savedIcons = localStorage.getItem('myheredo_custom_icons');
     const savedDMS = localStorage.getItem('myheredo_dms_config');
+
     if (savedHeirs) heirs = JSON.parse(savedHeirs);
     if (savedIcons) customIcons = JSON.parse(savedIcons);
     if (savedDMS) dmsConfig = JSON.parse(savedDMS);
+
     renderSkrytki();
     renderHeirs();
     setupDMS();
-    setTimeout(() => loadCertificates(), 800);
-    updateRecoveryPasswordStatus();
+    setTimeout(() => loadCertificates(), 800); // opóźnienie
+  updateRecoveryPasswordStatus();  
 }
 
 // ==================== TIMER ====================
@@ -110,20 +115,24 @@ function startInactivityTimer() {
 function resetInactivityTimer() {
     startInactivityTimer();
 }
-
 // ==================== WYLOGOWANIE ====================
 function handleLogout() {
     if (confirm("Wylogować się z MyHeredo?")) {
+        // Czyszczenie wszystkich danych sesji
         sessionStorage.clear();
         localStorage.removeItem('myheredo_user_email');
         localStorage.removeItem('myheredo_encrypted_vault');
         localStorage.removeItem('myheredo_heirs');
         localStorage.removeItem('myheredo_dms_config');
+        
+        console.log("Wylogowano - przekierowanie na stronę główną");
         window.location.href = "index.html";
     }
 }
+
+// Rejestracja globalna
 window.handleLogout = handleLogout;
-window.logout = handleLogout;
+window.logout = handleLogout;   // na wszelki wypadek
 
 // ==================== SZYFROWANIE ====================
 async function deriveKey(password, salt) {
@@ -164,65 +173,59 @@ async function saveAllData() {
     localStorage.setItem('myheredo_encrypted_vault', encrypted);
 }
 
-// ==================== SKRYTKI (NOWA WERSJA - Z FIRESTORE) ====================
-let currentVaults = [];
-
-function renderSkrytki(vaults = currentVaults) {
+// ==================== SKRYTKI ====================
+function renderSkrytki() {
     const grid = document.getElementById('skrytkiGrid');
     if (!grid) return;
     grid.innerHTML = '';
-    currentVaults = vaults;
 
-    if (!vaults || vaults.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-8 text-slate-400">
-                Nie masz jeszcze żadnych skrytek.
-            </div>
-        `;
-        return;
-    }
+    Object.keys(vaultData).forEach((key) => {
+        const isFilled = vaultData[key] && vaultData[key].trim() !== '';
+        const isCustom = !Object.keys(defaultCategories).includes(key);
 
-    vaults.forEach((vault) => {
-        const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
-        const isCustom = vault.type === 'custom';
         const card = document.createElement('div');
-        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'}
+        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
                           rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
-        const icon = getIcon(vault.type || 'custom');
+
+        const icon = getIcon ? getIcon(key) : '📁';
+
         card.innerHTML = `
             <div class="flex items-start gap-4">
                 <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
+                    <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${categoryNames[key] || key}</h3>
                     <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
                         ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
                     </p>
                 </div>
             </div>
-            ${isCustom ? `
-                <button onclick="event.stopImmediatePropagation(); deleteCustomVault('${vault.id}');"
-                        class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>
-            ` : ''}
+            ${isCustom ? `<button onclick="event.stopImmediatePropagation(); deleteCustomVault('${key}');" 
+                         class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>` : ''}
         `;
-        card.onclick = () => openVaultModal(vault);
+
+        card.onclick = () => openVaultModal(key);
         grid.appendChild(card);
     });
 }
+function getIcon(key) {
+    if (customIcons[key]) return customIcons[key];
+    const icons = { passwordManager: "🔑", banki: "🏦", krypto: "₿", social: "📱", instrukcje: "📜" };
+    return icons[key] || "📁";
+}
 
-// Otwieranie modalu edycji
-function openVaultModal(vault) {
-    const content = vault.encryptedContent || '';
+function openVaultModal(key) {
+    const content = vaultData[key] || '';
     const modalHTML = `
-        <div id="vaultModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div class="bg-slate-900 rounded-3xl p-8 max-w-lg w-full mx-4">
-                <h2 class="text-2xl font-semibold mb-6">${vault.title}</h2>
-                <textarea id="vaultContent" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-2xl p-5 text-slate-200">${content}</textarea>
-                <div class="flex gap-4 mt-6">
-                    <button onclick="saveVault('${vault.id}')" class="flex-1 bg-amber-400 text-slate-950 font-semibold py-4 rounded-2xl hover:bg-amber-300">Zapisz</button>
-                    <button onclick="closeVaultModal()" class="flex-1 border border-slate-700 font-semibold py-4 rounded-2xl">Anuluj</button>
-                </div>
+    <div id="vaultModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div class="bg-slate-900 rounded-3xl p-8 max-w-lg w-full mx-4">
+            <h2 class="text-2xl font-semibold mb-6">${categoryNames[key] || key}</h2>
+            <textarea id="vaultContent" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-2xl p-5 text-slate-200">${content}</textarea>
+            <div class="flex gap-4 mt-6">
+                <button onclick="saveVault('${key}')" class="flex-1 bg-amber-400 text-slate-950 font-semibold py-4 rounded-2xl hover:bg-amber-300">Zapisz</button>
+                <button onclick="closeVaultModal()" class="flex-1 border border-slate-700 font-semibold py-4 rounded-2xl">Anuluj</button>
             </div>
-        </div>`;
+        </div>
+    </div>`;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -231,41 +234,37 @@ function closeVaultModal() {
     if (modal) modal.remove();
 }
 
-// ==================== DODATKOWE FUNKCJE (z modułu) ====================
+async function saveVault(key) {
+    const content = document.getElementById('vaultContent').value.trim();
+    vaultData[key] = content;
+    await saveAllData();
+    closeVaultModal();
+    renderSkrytki();
+}
+
+// ==================== NOWA SKRYTKA ====================
 function addCustomVault() {
-    // Przekierowanie do nowej funkcji z modułu (bez rekurencji)
-    if (window.addCustomVaultFromModule) {
-        window.addCustomVaultFromModule();
-    } else {
-        alert("Funkcja dodawania skrytki jest w trakcie aktualizacji.");
-    }
+    const name = prompt("Podaj nazwę nowej skrytki:");
+    if (!name || name.trim() === "") return;
+    const key = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    if (vaultData[key]) return alert("Taka skrytka już istnieje.");
+    customIcons[key] = "📁";
+    vaultData[key] = "";
+    categoryNames[key] = name;
+    saveAllData();
+    localStorage.setItem('myheredo_custom_icons', JSON.stringify(customIcons));
+    renderSkrytki();
 }
 
-async function deleteCustomVault(vaultId) {
-    if (!confirm("Czy na pewno chcesz usunąć tę skrytkę?")) return;
-    try {
-        await deleteDoc(doc(db, "vaults", vaultId));
-        const user = auth.currentUser;
-        if (user) {
-            const vaults = await getUserVaults(user.uid);
-            renderSkrytki(vaults);
-        }
-    } catch (error) {
-        console.error("Błąd usuwania skrytki:", error);
-        alert("Nie udało się usunąć skrytki.");
+function deleteCustomVault(key) {
+    if (confirm(`Usunąć skrytkę "${categoryNames[key]}"?`)) {
+        delete vaultData[key];
+        delete categoryNames[key];
+        if (customIcons[key]) delete customIcons[key];
+        saveAllData();
+        localStorage.setItem('myheredo_custom_icons', JSON.stringify(customIcons));
+        renderSkrytki();
     }
-}
-
-function getIcon(type) {
-    const icons = {
-        bank: "🏦",
-        crypto: "₿",
-        social: "📱",
-        instructions: "📜",
-        custom: "📁",
-        passwordManager: "🔑"
-    };
-    return icons[type] || "📁";
 }
 
 // ==================== SPADKOBIERCY ====================
@@ -317,11 +316,6 @@ function setupDMS() {
         });
     }
 }
-
-// ==================== POZOSTAŁE FUNKCJE (bez zmian) ====================
-// ... (cała reszta Twojego kodu pozostaje bez zmian)
-
-console.log("✅ app.js załadowany (po audycie)");
 
 // ==================== CERTYFIKAT ====================
 async function showCertificate() {
@@ -1022,8 +1016,5 @@ window.closeChangeRecoveryModal = closeChangeRecoveryModal;
 window.confirmChangeRecoveryPassword = confirmChangeRecoveryPassword;
 window.changeRecoveryPassword = changeRecoveryPassword;
 
-// ==================== REJESTRACJA FUNKCJI Z MODUŁU ====================
-window.saveVault = saveVault;
-window.addCustomVaultFromModule = addCustomVault; // nowa nazwa, żeby uniknąć rekurencji
 
 console.log("✅ Wszystkie funkcje zostały pomyślnie zarejestrowane globalnie");
