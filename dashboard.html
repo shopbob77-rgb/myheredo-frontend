@@ -307,29 +307,33 @@ if ('serviceWorker' in navigator) {
         }
     }
 
-    // ===================== INICJALIZACJA =====================
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  // ===================== INICJALIZACJA =====================
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-    const savedEmail = localStorage.getItem('myheredo_user_email');
+const savedEmail = localStorage.getItem('myheredo_user_email');
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("✅ Zalogowany według Firebase:", user.email);
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("✅ Zalogowany według Firebase:", user.email);
+        if (typeof loadUserVaults === 'function') {
             loadUserVaults();
-        } else {
-            if (savedEmail) {
-                loadUserVaults();
-            } else {
-                window.location.href = "login.html";
-            }
         }
-    });
+    } else {
+        if (savedEmail) {
+            if (typeof loadUserVaults === 'function') {
+                loadUserVaults();
+            }
+        } else {
+            window.location.href = "login.html";
+        }
+    }
+});
 
-    // ===================== REJESTRACJA GLOBALNA =====================
-    window.handleLogout = handleLogout;
-    window.addCustomVault = addCustomVault;
-    window.renderSkrytki = renderSkrytki;
-    window.openDecryptModal = openDecryptModal;
-    window.closeDecryptModal = closeDecryptModal;
-    window.decryptAndShowVault = decryptAndShowVault;
-</script>
+// ===================== REJESTRACJA GLOBALNA =====================
+window.loadUserVaults = loadUserVaults;
+window.renderSkrytki = renderSkrytki;
+window.handleLogout = handleLogout;
+window.addCustomVault = addCustomVault;
+window.openDecryptModal = openDecryptModal;
+window.closeDecryptModal = closeDecryptModal;
+window.decryptAndShowVault = decryptAndShowVault;
