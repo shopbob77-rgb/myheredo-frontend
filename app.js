@@ -1,6 +1,6 @@
 // =============================================
 // MYHEREDO - Hybrydowa Warstwa Sukcesyjna
-// Stabilna wersja
+// Stabilna wersja (po audycie)
 // =============================================
 
 // ==================== FIREBASE COMPAT ====================
@@ -32,6 +32,7 @@ const loadFirebaseScripts = () => {
     };
 };
 loadFirebaseScripts();
+
 // =======================================================
 
 let masterPassword = null;
@@ -65,12 +66,10 @@ async function initDashboard() {
         window.location.href = "login.html";
         return;
     }
-
     document.getElementById('userEmail').textContent = email;
     masterPassword = sessionStorage.getItem('myheredo_master_password');
-
     const savedEncryptedVault = localStorage.getItem('myheredo_encrypted_vault');
-    
+   
     if (savedEncryptedVault && masterPassword) {
         try {
             vaultData = await decryptData(savedEncryptedVault, masterPassword);
@@ -80,7 +79,6 @@ async function initDashboard() {
     } else {
         vaultData = {};
     }
-
     if (Object.keys(vaultData).length === 0) {
         vaultData = {
             passwordManager: "",
@@ -91,20 +89,17 @@ async function initDashboard() {
         };
         categoryNames = { ...defaultCategories };
     }
-
     const savedHeirs = localStorage.getItem('myheredo_heirs');
     const savedIcons = localStorage.getItem('myheredo_custom_icons');
     const savedDMS = localStorage.getItem('myheredo_dms_config');
-
     if (savedHeirs) heirs = JSON.parse(savedHeirs);
     if (savedIcons) customIcons = JSON.parse(savedIcons);
     if (savedDMS) dmsConfig = JSON.parse(savedDMS);
-
     renderSkrytki();
     renderHeirs();
     setupDMS();
-    setTimeout(() => loadCertificates(), 800); // opóźnienie
-  updateRecoveryPasswordStatus();  
+    setTimeout(() => loadCertificates(), 800);
+    updateRecoveryPasswordStatus();
 }
 
 // ==================== TIMER ====================
@@ -115,24 +110,20 @@ function startInactivityTimer() {
 function resetInactivityTimer() {
     startInactivityTimer();
 }
+
 // ==================== WYLOGOWANIE ====================
 function handleLogout() {
     if (confirm("Wylogować się z MyHeredo?")) {
-        // Czyszczenie wszystkich danych sesji
         sessionStorage.clear();
         localStorage.removeItem('myheredo_user_email');
         localStorage.removeItem('myheredo_encrypted_vault');
         localStorage.removeItem('myheredo_heirs');
         localStorage.removeItem('myheredo_dms_config');
-        
-        console.log("Wylogowano - przekierowanie na stronę główną");
         window.location.href = "index.html";
     }
 }
-
-// Rejestracja globalna
 window.handleLogout = handleLogout;
-window.logout = handleLogout;   // na wszelki wypadek
+window.logout = handleLogout;
 
 // ==================== SZYFROWANIE ====================
 async function deriveKey(password, salt) {
@@ -173,14 +164,12 @@ async function saveAllData() {
     localStorage.setItem('myheredo_encrypted_vault', encrypted);
 }
 
-// ==================== SKRYTKI ====================
+// ==================== SKRYTKI (NOWA WERSJA - Z FIRESTORE) ====================
 let currentVaults = [];
 
-// Główna funkcja renderująca skrytki
 function renderSkrytki(vaults = currentVaults) {
     const grid = document.getElementById('skrytkiGrid');
     if (!grid) return;
-
     grid.innerHTML = '';
     currentVaults = vaults;
 
@@ -196,13 +185,10 @@ function renderSkrytki(vaults = currentVaults) {
     vaults.forEach((vault) => {
         const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
         const isCustom = vault.type === 'custom';
-
         const card = document.createElement('div');
         card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'}
                           rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
-
         const icon = getIcon(vault.type || 'custom');
-
         card.innerHTML = `
             <div class="flex items-start gap-4">
                 <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
@@ -218,7 +204,6 @@ function renderSkrytki(vaults = currentVaults) {
                         class="absolute top-4 right-4 text-red-400 hover:text-red-500 text-2xl">✕</button>
             ` : ''}
         `;
-
         card.onclick = () => openVaultModal(vault);
         grid.appendChild(card);
     });
@@ -227,25 +212,17 @@ function renderSkrytki(vaults = currentVaults) {
 // Otwieranie modalu edycji
 function openVaultModal(vault) {
     const content = vault.encryptedContent || '';
-    
     const modalHTML = `
         <div id="vaultModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
             <div class="bg-slate-900 rounded-3xl p-8 max-w-lg w-full mx-4">
                 <h2 class="text-2xl font-semibold mb-6">${vault.title}</h2>
                 <textarea id="vaultContent" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-2xl p-5 text-slate-200">${content}</textarea>
                 <div class="flex gap-4 mt-6">
-                    <button onclick="saveVault('${vault.id}')" 
-                            class="flex-1 bg-amber-400 text-slate-950 font-semibold py-4 rounded-2xl hover:bg-amber-300">
-                        Zapisz
-                    </button>
-                    <button onclick="closeVaultModal()" 
-                            class="flex-1 border border-slate-700 font-semibold py-4 rounded-2xl">
-                        Anuluj
-                    </button>
+                    <button onclick="saveVault('${vault.id}')" class="flex-1 bg-amber-400 text-slate-950 font-semibold py-4 rounded-2xl hover:bg-amber-300">Zapisz</button>
+                    <button onclick="closeVaultModal()" class="flex-1 border border-slate-700 font-semibold py-4 rounded-2xl">Anuluj</button>
                 </div>
             </div>
         </div>`;
-
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -254,52 +231,19 @@ function closeVaultModal() {
     if (modal) modal.remove();
 }
 
-// Zapisywanie skrytki do Firestore
-async function saveVault(vaultId) {
-    const content = document.getElementById('vaultContent').value.trim();
-    const user = auth.currentUser;
-    if (!user) return alert("Musisz być zalogowany.");
-
-    try {
-        const vaultRef = doc(db, "vaults", vaultId);
-        await updateDoc(vaultRef, {
-            encryptedContent: content,
-            updatedAt: serverTimestamp()
-        });
-
-        // Aktualizujemy lokalną listę
-        const index = currentVaults.findIndex(v => v.id === vaultId);
-        if (index !== -1) {
-            currentVaults[index].encryptedContent = content;
-        }
-
-        closeVaultModal();
-        renderSkrytki(currentVaults);
-
-    } catch (error) {
-        console.error("Błąd zapisu skrytki:", error);
-        alert("Nie udało się zapisać skrytki.");
-    }
-}
-
-// Dodawanie własnej skrytki (zapis do Firestore)
+// ==================== DODATKOWE FUNKCJE (z modułu) ====================
 function addCustomVault() {
-    // Tymczasowe rozwiązanie - przekierowujemy do nowej funkcji z modułu
     if (typeof window.addCustomVault === 'function') {
         window.addCustomVault();
     } else {
         alert("Funkcja dodawania skrytki jest w trakcie aktualizacji.");
     }
-}}
+}
 
-// Usuwanie własnej skrytki
 async function deleteCustomVault(vaultId) {
     if (!confirm("Czy na pewno chcesz usunąć tę skrytkę?")) return;
-
     try {
         await deleteDoc(doc(db, "vaults", vaultId));
-        
-        // Odświeżamy listę
         const user = auth.currentUser;
         if (user) {
             const vaults = await getUserVaults(user.uid);
@@ -311,7 +255,6 @@ async function deleteCustomVault(vaultId) {
     }
 }
 
-// Prosta funkcja zwracająca ikonę
 function getIcon(type) {
     const icons = {
         bank: "🏦",
@@ -373,6 +316,11 @@ function setupDMS() {
         });
     }
 }
+
+// ==================== POZOSTAŁE FUNKCJE (bez zmian) ====================
+// ... (cała reszta Twojego kodu pozostaje bez zmian)
+
+console.log("✅ app.js załadowany (po audycie)");
 
 // ==================== CERTYFIKAT ====================
 async function showCertificate() {
