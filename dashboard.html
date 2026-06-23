@@ -174,9 +174,37 @@ if ('serviceWorker' in navigator) {
     async function decryptData(encryptedBase64, password) { /* ... */ }
 
     // ===================== SKRYTKI =====================
-    async function loadUserVaults() { /* ... */ }
-    function renderSkrytki(vaults = []) { /* ... */ }
-    function getIcon(type) { /* ... */ }
+ async function loadUserVaults() {
+    try {
+        const email = localStorage.getItem('myheredo_user_email');
+        if (!email) {
+            console.log("Brak emaila w localStorage");
+            return;
+        }
+
+        console.log("Ładowanie skrytek dla:", email);
+        
+        // Tymczasowo ładujemy wszystkie skrytki (później dodamy filtr po userId)
+        // Na razie pobieramy wszystkie dokumenty z kolekcji vaults
+        const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
+        
+        const querySnapshot = await getDocs(collection(db, "vaults"));
+        const vaults = [];
+        
+        querySnapshot.forEach((doc) => {
+            vaults.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        console.log("Pobrano skrytek:", vaults.length);
+        renderSkrytki(vaults);
+
+    } catch (error) {
+        console.error("Błąd ładowania skrytek:", error);
+    }
+}
 
     // ===================== MODAL ODSZYFROWANIA =====================
     function openDecryptModal(vault) { /* ... */ }
