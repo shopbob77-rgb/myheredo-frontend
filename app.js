@@ -233,8 +233,9 @@ function closeVaultModal() {
 
 // ==================== DODATKOWE FUNKCJE (z modułu) ====================
 function addCustomVault() {
-    if (typeof window.addCustomVault === 'function') {
-        window.addCustomVault();
+    // Przekierowanie do nowej funkcji z modułu (bez rekurencji)
+    if (window.addCustomVaultFromModule) {
+        window.addCustomVaultFromModule();
     } else {
         alert("Funkcja dodawania skrytki jest w trakcie aktualizacji.");
     }
@@ -1021,5 +1022,8 @@ window.closeChangeRecoveryModal = closeChangeRecoveryModal;
 window.confirmChangeRecoveryPassword = confirmChangeRecoveryPassword;
 window.changeRecoveryPassword = changeRecoveryPassword;
 
+// ==================== REJESTRACJA FUNKCJI Z MODUŁU ====================
+window.saveVault = saveVault;
+window.addCustomVaultFromModule = addCustomVault; // nowa nazwa, żeby uniknąć rekurencji
 
 console.log("✅ Wszystkie funkcje zostały pomyślnie zarejestrowane globalnie");
