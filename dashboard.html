@@ -535,6 +535,13 @@ function renderSkrytki(vaults = []) {
     window.closeDecryptModal = closeDecryptModal;
     window.decryptAndShowVault = decryptAndShowVault;
     window.saveVault = saveVault;
+    <script type="module">
+    // ... cały Twój kod modułu ...
+
+    // ==================== REJESTRACJA GLOBALNA ====================
+    window.saveVault = saveVault;
+    window.addCustomVaultFromModule = addCustomVault;
+
 </script>
 
 </body>
