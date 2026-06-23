@@ -173,18 +173,18 @@ async function saveAllData() {
     localStorage.setItem('myheredo_encrypted_vault', encrypted);
 }
 
-// ==================== SKRYTKI - PEŁNA INTEGRACJA Z FIRESTORE ====================
+// ==================== SKRYTKI ====================
 let currentVaults = [];
 
-// Główna funkcja renderująca skrytki (stara wersja - zostawiamy na razie)
-function renderSkrytki() {
+// Główna funkcja renderująca skrytki
+function renderSkrytki(vaults = currentVaults) {
     const grid = document.getElementById('skrytkiGrid');
     if (!grid) return;
 
     grid.innerHTML = '';
+    currentVaults = vaults;
 
-    // Jeśli nie ma danych z Firestore, pokazujemy komunikat
-    if (!currentVaults || currentVaults.length === 0) {
+    if (!vaults || vaults.length === 0) {
         grid.innerHTML = `
             <div class="col-span-full text-center py-8 text-slate-400">
                 Nie masz jeszcze żadnych skrytek.
@@ -193,7 +193,7 @@ function renderSkrytki() {
         return;
     }
 
-    currentVaults.forEach((vault) => {
+    vaults.forEach((vault) => {
         const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
         const isCustom = vault.type === 'custom';
 
@@ -221,7 +221,7 @@ function renderSkrytki() {
 
         card.onclick = () => openVaultModal(vault);
         grid.appendChild(card);
-    );
+    });
 }
 
 // Otwieranie modalu edycji
