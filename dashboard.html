@@ -205,19 +205,27 @@ if ('serviceWorker' in navigator) {
     }
 
     // ===================== INICJALIZACJA =====================
-   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-// Na samym końcu modułu dodaj:
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log("Zalogowany użytkownik:", user.email);
+        console.log("✅ Zalogowany jako:", user.email);
         loadUserVaults();
     } else {
-        console.log("Użytkownik nie jest zalogowany");
-        window.location.href = "login.html";
+        console.log("❌ Użytkownik nie jest zalogowany według Firebase");
+        
+        // Sprawdź czy jest email w localStorage (stara metoda)
+        const email = localStorage.getItem('myheredo_user_email');
+        if (email) {
+            console.log("ℹ️ Jest email w localStorage:", email);
+            // Na razie nie przekierowuj — tylko ładuj skrytki
+            loadUserVaults();
+        } else {
+            console.log("❌ Brak emaila w localStorage — przekierowanie do logowania");
+            // window.location.href = "login.html";  // ← zakomentowane na razie
+        }
     }
 });
-
     // ===================== REJESTRACJA GLOBALNA =====================
     window.handleLogout = handleLogout;
     window.addHeir = addHeir;
