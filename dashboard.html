@@ -406,13 +406,14 @@ if ('serviceWorker' in navigator) {
         }
     }
 
- function renderSkrytki(vaults = []) {
+function renderSkrytki(vaults = []) {
     const grid = document.getElementById('skrytkiGrid');
     if (!grid) return;
-    
+
     grid.innerHTML = '';
-    
-    if (!vaults || vaults.length === 0) {
+
+    // Zabezpieczenie przed undefined
+    if (!vaults || !Array.isArray(vaults) || vaults.length === 0) {
         grid.innerHTML = `
             <div class="col-span-full text-center py-8 text-slate-400">
                 Nie masz jeszcze żadnych skrytek.
@@ -420,34 +421,33 @@ if ('serviceWorker' in navigator) {
         `;
         return;
     }
-    
-    // reszta kodu...
-}
 
-        vaults.forEach(vault => {
-            const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
-            const card = document.createElement('div');
-            card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
-                              rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
-            
-            const icon = getIcon(vault.type || 'custom');
-            
-            card.innerHTML = `
-                <div class="flex items-start gap-4">
-                    <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
-                        <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
-                            ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
-                        </p>
-                    </div>
+    currentVaults = vaults;
+
+    vaults.forEach(vault => {
+        const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
+        const card = document.createElement('div');
+        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
+                          rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
+        
+        const icon = getIcon(vault.type || 'custom');
+        
+        card.innerHTML = `
+            <div class="flex items-start gap-4">
+                <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
+                    <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
+                        ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
+                    </p>
                 </div>
-            `;
-            
-            card.onclick = () => openDecryptModal(vault);
-            grid.appendChild(card);
-        });
-    }
+            </div>
+        `;
+        
+        card.onclick = () => openDecryptModal(vault);
+        grid.appendChild(card);
+    });
+}
 
     function getIcon(type) {
         const icons = {
