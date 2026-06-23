@@ -20,7 +20,9 @@ import {
     orderBy
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// ===================== REJESTRACJA UŻYTKOWNIKA =====================
+// ============================================================
+// REJESTRACJA UŻYTKOWNIKA
+// ============================================================
 export async function registerUser(email, password) {
     try {
         // 1. Tworzymy użytkownika w Firebase Auth
@@ -39,7 +41,7 @@ export async function registerUser(email, password) {
             emailVerified: false
         });
 
-        // 4. Tworzymy przykładowe puste skrytki dla nowego użytkownika
+        // 4. Tworzymy przykładowe skrytki w kolekcji `vaults` (główna kolekcja skrytek)
         const defaultVaults = [
             {
                 title: "Konta bankowe i finansowe",
@@ -65,7 +67,7 @@ export async function registerUser(email, password) {
 
         for (const vault of defaultVaults) {
             await addDoc(collection(db, "vaults"), {
-                userId: user.uid,
+                userId: user.uid,                    // ← ważne dla dashboardu
                 title: vault.title,
                 type: vault.type,
                 encryptedContent: vault.encryptedContent,
@@ -75,7 +77,7 @@ export async function registerUser(email, password) {
             });
         }
 
-        console.log("✅ Użytkownik zarejestrowany z przykładowymi skrytkami:", user.email);
+        console.log("✅ Użytkownik zarejestrowany z skrytkami:", user.email);
         return user;
 
     } catch (error) {
@@ -84,7 +86,9 @@ export async function registerUser(email, password) {
     }
 }
 
-// ===================== POBIERANIE SKRYTEK UŻYTKOWNIKA =====================
+// ============================================================
+// POBIERANIE SKRYTEK UŻYTKOWNIKA (z kolekcji vaults)
+// ============================================================
 export async function getUserVaults(userId) {
     try {
         const q = query(
@@ -112,7 +116,9 @@ export async function getUserVaults(userId) {
     }
 }
 
-// ===================== LOGOWANIE =====================
+// ============================================================
+// LOGOWANIE
+// ============================================================
 export async function loginUser(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -127,7 +133,9 @@ export async function loginUser(email, password) {
     }
 }
 
-// ===================== WYLOGOWANIE =====================
+// ============================================================
+// WYLOGOWANIE
+// ============================================================
 export async function logoutUser() {
     try {
         await signOut(auth);
