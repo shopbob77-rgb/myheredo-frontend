@@ -174,7 +174,7 @@ if ('serviceWorker' in navigator) {
     async function decryptData(encryptedBase64, password) { /* ... */ }
 
     // ===================== SKRYTKI =====================
- async function loadUserVaults() {
+async function loadUserVaults() {
     try {
         const email = localStorage.getItem('myheredo_user_email');
         if (!email) {
@@ -184,8 +184,6 @@ if ('serviceWorker' in navigator) {
 
         console.log("Ładowanie skrytek dla:", email);
         
-        // Tymczasowo ładujemy wszystkie skrytki (później dodamy filtr po userId)
-        // Na razie pobieramy wszystkie dokumenty z kolekcji vaults
         const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
         
         const querySnapshot = await getDocs(collection(db, "vaults"));
@@ -199,7 +197,13 @@ if ('serviceWorker' in navigator) {
         });
 
         console.log("Pobrano skrytek:", vaults.length);
-        renderSkrytki(vaults);
+        
+        // Używamy window.renderSkrytki
+        if (window.renderSkrytki) {
+            window.renderSkrytki(vaults);
+        } else {
+            console.error("renderSkrytki nie jest dostępne");
+        }
 
     } catch (error) {
         console.error("Błąd ładowania skrytek:", error);
@@ -261,6 +265,7 @@ onAuthStateChanged(auth, (user) => {
     window.removeHeir = removeHeir;
     window.addCustomVault = addCustomVault;
     window.saveVault = saveVault;
+    window.renderSkrytki = renderSkrytki;
 </script>
 
 </body>
