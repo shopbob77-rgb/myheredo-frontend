@@ -68,7 +68,7 @@
                 <p class="text-xs sm:text-sm text-slate-400 -mt-1">Cyfrowy Sejf Sukcesyjny</p>
             </div>
         </div>
-      
+     
         <div class="flex items-center gap-3 sm:gap-6">
             <div id="userEmail" class="text-xs sm:text-sm text-slate-400 text-right"></div>
             <button onclick="handleLogout()"
@@ -80,19 +80,19 @@
 
     <!-- Główna zawartość -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-       
+      
         <!-- Lewa kolumna - Skrytki -->
         <div class="lg:col-span-7">
             <h2 class="text-2xl font-bold mb-5">Twoje Skrytki Sukcesyjne</h2>
-           
+          
             <div id="skrytkiGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Skrytki generowane dynamicznie -->
             </div>
-           
+          
             <div class="mt-8">
-               <button onclick="window.addCustomVault ? window.addCustomVault() : alert('Funkcja w trakcie aktualizacji')">
-    + Dodaj własną skrytkę
-</button>
+                <button onclick="window.addCustomVaultFromModule ? window.addCustomVaultFromModule() : alert('Funkcja w trakcie aktualizacji')">
+                    + Dodaj własną skrytkę
+                </button>
             </div>
         </div>
 
@@ -293,13 +293,13 @@ if ('serviceWorker' in navigator) {
     // ===================== IMPORTY =====================
     import { auth, db } from './firebase.js';
     import { getUserVaults } from './auth.js';
-    import { 
-        doc, 
-        updateDoc, 
-        addDoc, 
-        deleteDoc, 
-        collection, 
-        serverTimestamp 
+    import {
+        doc,
+        updateDoc,
+        addDoc,
+        deleteDoc,
+        collection,
+        serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     // ===================== ZMIENNE GLOBALNE =====================
@@ -310,7 +310,7 @@ if ('serviceWorker' in navigator) {
     async function encryptData(text, password) {
         const encoder = new TextEncoder();
         const data = encoder.encode(text);
-        
+       
         const keyMaterial = await crypto.subtle.importKey(
             "raw",
             encoder.encode(password),
@@ -318,7 +318,7 @@ if ('serviceWorker' in navigator) {
             false,
             ["deriveBits", "deriveKey"]
         );
-        
+       
         const salt = crypto.getRandomValues(new Uint8Array(16));
         const key = await crypto.subtle.deriveKey(
             {
@@ -332,31 +332,31 @@ if ('serviceWorker' in navigator) {
             false,
             ["encrypt"]
         );
-        
+       
         const iv = crypto.getRandomValues(new Uint8Array(12));
         const encrypted = await crypto.subtle.encrypt(
             { name: "AES-GCM", iv: iv },
             key,
             data
         );
-        
+       
         const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
         result.set(salt, 0);
         result.set(iv, salt.length);
         result.set(new Uint8Array(encrypted), salt.length + iv.length);
-        
+       
         return btoa(String.fromCharCode(...result));
     }
 
     async function decryptData(encryptedBase64, password) {
         if (!encryptedBase64) return "";
-        
+       
         try {
             const data = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
             const salt = data.slice(0, 16);
             const iv = data.slice(16, 28);
             const encrypted = data.slice(28);
-            
+           
             const encoder = new TextEncoder();
             const keyMaterial = await crypto.subtle.importKey(
                 "raw",
@@ -365,7 +365,7 @@ if ('serviceWorker' in navigator) {
                 false,
                 ["deriveBits", "deriveKey"]
             );
-            
+           
             const key = await crypto.subtle.deriveKey(
                 {
                     name: "PBKDF2",
@@ -378,13 +378,13 @@ if ('serviceWorker' in navigator) {
                 false,
                 ["decrypt"]
             );
-            
+           
             const decrypted = await crypto.subtle.decrypt(
                 { name: "AES-GCM", iv: iv },
                 key,
                 encrypted
             );
-            
+           
             return new TextDecoder().decode(decrypted);
         } catch (error) {
             throw new Error("Nieprawidłowe hasło lub uszkodzone dane");
@@ -396,7 +396,6 @@ if ('serviceWorker' in navigator) {
         try {
             const user = auth.currentUser;
             if (!user) return;
-
             const vaults = await getUserVaults(user.uid);
             currentVaults = vaults;
             renderSkrytki(vaults);
@@ -405,48 +404,46 @@ if ('serviceWorker' in navigator) {
         }
     }
 
-function renderSkrytki(vaults = []) {
-    const grid = document.getElementById('skrytkiGrid');
-    if (!grid) return;
+    function renderSkrytki(vaults = []) {
+        const grid = document.getElementById('skrytkiGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
 
-    grid.innerHTML = '';
-
-    // Zabezpieczenie przed undefined
-    if (!vaults || !Array.isArray(vaults) || vaults.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-8 text-slate-400">
-                Nie masz jeszcze żadnych skrytek.
-            </div>
-        `;
-        return;
-    }
-
-    currentVaults = vaults;
-
-    vaults.forEach(vault => {
-        const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
-        const card = document.createElement('div');
-        card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} 
-                          rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
-        
-        const icon = getIcon(vault.type || 'custom');
-        
-        card.innerHTML = `
-            <div class="flex items-start gap-4">
-                <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
-                <div class="flex-1 min-w-0">
-                    <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
-                    <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
-                        ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
-                    </p>
+        if (!vaults || !Array.isArray(vaults) || vaults.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-8 text-slate-400">
+                    Nie masz jeszcze żadnych skrytek.
                 </div>
-            </div>
-        `;
-        
-        card.onclick = () => openDecryptModal(vault);
-        grid.appendChild(card);
-    });
-}
+            `;
+            return;
+        }
+
+        currentVaults = vaults;
+
+        vaults.forEach(vault => {
+            const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
+            const card = document.createElement('div');
+            card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'}
+                              rounded-3xl p-5 sm:p-6 cursor-pointer relative transition-all hover:-translate-y-1`;
+           
+            const icon = getIcon(vault.type || 'custom');
+           
+            card.innerHTML = `
+                <div class="flex items-start gap-4">
+                    <div class="text-4xl flex-shrink-0 mt-0.5">${icon}</div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-base sm:text-lg leading-tight break-words">${vault.title}</h3>
+                        <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
+                            ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
+                        </p>
+                    </div>
+                </div>
+            `;
+           
+            card.onclick = () => openDecryptModal(vault);
+            grid.appendChild(card);
+        });
+    }
 
     function getIcon(type) {
         const icons = {
@@ -481,7 +478,6 @@ function renderSkrytki(vaults = []) {
             alert("Podaj hasło główne.");
             return;
         }
-
         try {
             const decrypted = await decryptData(currentVault.encryptedContent, password);
             document.getElementById('decryptedText').textContent = decrypted;
@@ -499,25 +495,54 @@ function renderSkrytki(vaults = []) {
 
         try {
             const encrypted = await encryptData(content, password);
-            
+           
             const vaultRef = doc(db, "vaults", vaultId);
             await updateDoc(vaultRef, {
                 encryptedContent: encrypted,
                 updatedAt: serverTimestamp()
             });
 
-            // Odśwież listę
             const user = auth.currentUser;
             if (user) {
                 const vaults = await getUserVaults(user.uid);
                 renderSkrytki(vaults);
             }
-            
+           
             closeVaultModal();
-            
+           
         } catch (error) {
             console.error("Błąd zapisu skrytki:", error);
             alert("Nie udało się zapisać skrytki.");
+        }
+    }
+
+    // ===================== DODAWANIE WŁASNEJ SKRYTKI =====================
+    async function addCustomVault() {
+        const name = prompt("Podaj nazwę nowej skrytki:");
+        if (!name || name.trim() === "") return;
+
+        const user = auth.currentUser;
+        if (!user) return alert("Musisz być zalogowany.");
+
+        try {
+            const newVault = {
+                userId: user.uid,
+                title: name.trim(),
+                type: "custom",
+                encryptedContent: "",
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                isActive: true
+            };
+
+            await addDoc(collection(db, "vaults"), newVault);
+            
+            const vaults = await getUserVaults(user.uid);
+            renderSkrytki(vaults);
+
+        } catch (error) {
+            console.error("Błąd dodawania skrytki:", error);
+            alert("Nie udało się dodać skrytki.");
         }
     }
 
@@ -528,20 +553,14 @@ function renderSkrytki(vaults = []) {
         }
     });
 
-    // Eksport funkcji globalnie
+    // ===================== REJESTRACJA GLOBALNA =====================
     window.loadUserVaults = loadUserVaults;
     window.renderSkrytki = renderSkrytki;
     window.openDecryptModal = openDecryptModal;
     window.closeDecryptModal = closeDecryptModal;
     window.decryptAndShowVault = decryptAndShowVault;
     window.saveVault = saveVault;
-    <script type="module">
-    // ... cały Twój kod modułu ...
-
-    // ==================== REJESTRACJA GLOBALNA ====================
-    window.saveVault = saveVault;
-    window.addCustomVaultFromModule = addCustomVault;
-
+    window.addCustomVault = addCustomVault;
 </script>
 
 </body>
