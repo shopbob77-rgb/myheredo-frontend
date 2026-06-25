@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyHeredo • Dashboard v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body { background-color: #0a0a0a; color: #e2e8f0; }
+        .skrytka-card { transition: all 0.2s ease; }
+        .skrytka-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="max-w-6xl mx-auto p-6">
+        <!-- Nagłówek -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="MyHeredo" class="h-9">
+                <div>
+                    <h1 class="text-3xl font-bold text-amber-400">MyHeredo</h1>
+                    <p class="text-sm text-slate-400 -mt-1">Dashboard v2 (testowa)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="userEmail" class="text-sm text-slate-400"></span>
+                <button onclick="logout()" 
+                        class="px-5 py-2 text-sm border border-slate-700 hover:border-red-500 hover:text-red-400 rounded-2xl">
+                    Wyloguj się
+                </button>
+            </div>
+        </div>
+
+        <!-- Skrytki -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold">Twoje Skrytki</h2>
+                <button onclick="addNewVault()" 
+                        class="flex items-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-2xl text-sm">
+                    <i class="fas fa-plus"></i>
+                    <span>Dodaj skrytkę</span>
+                </button>
+            </div>
+
+            <div id="vaultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Skrytki renderowane dynamicznie -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal odszyfrowania -->
+    <div id="decryptModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div class="bg-slate-900 rounded-3xl p-8 w-full max-w-md mx-4 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-1" id="modalVaultTitle"></h3>
+            <p class="text-sm text-slate-400 mb-6">Podaj hasło główne, aby odszyfrować zawartość</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Hasło Główne</label>
+                    <input id="masterPassword" type="password" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-white">
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeDecryptModal()" 
+                        class="flex-1 py-3 border border-slate-600 rounded-2xl font-semibold hover:bg-slate-800">
+                    Anuluj
+                </button>
+                <button onclick="decryptVault()" 
+                        class="flex-1 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-2xl">
+                    Odszyfruj
+                </button>
+            </div>
+
+            <div id="decryptedContent" class="hidden mt-6">
+                <div class="text-sm text-slate-400 mb-2">Zawartość skrytki:</div>
+                <pre id="decryptedText" 
+                     class="bg-slate-950 p-4 rounded-2xl text-sm whitespace-pre-wrap border border-slate-700 max-h-64 overflow-auto"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './firebase.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+        let currentUser = null;
+        let currentVaults = [];
+
+        // ===================== INICJALIZACJA =====================
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userEmail').textContent = user.email;
+                loadVaults();
+            } else {
+                // Fallback na localStorage
+                const savedEmail = localStorage.getItem('myheredo_user_email');
+                if (savedEmail) {
+                    document.getElementById('userEmail').textContent = savedEmail;
+                    // Na razie ładujemy bez filtrowania (później dodamy userId)
+                    loadAllVaults();
+                } else {
+                    window.location.href = "login.html";
+                }
+            }
+        });
+
+        // ===================== ŁADOWANIE SKRYTEK =====================
+        async function loadVaults() {
+            if (!currentUser) return;
+
+            try {
+                const q = query(
+                    collection(db, "vaults"),
+                    where("userId", "==", currentUser.uid)
+                );
+
+                const snapshot = await getDocs(q);
+                currentVaults = [];
+                snapshot.forEach(doc => {
+                    currentVaults.push({ id: doc.id, ...doc.data() });
+                });
+
+                renderVaults();
+            } catch (error) {
+                console.error("Błąd ładowania skrytek:", error);
+            }
+        }
+
+        async function loadAllVaults() {
+            // Tymczasowa funkcja na czas testów
+            try {
+                const snapshot = await getDocs(collection(db, "vaults"));
+                currentVaults = [];
+                snapshot.forEach(doc => {
+                    currentVaults.push({ id: doc.id, ...doc.data() });
+                });
+                renderVaults();
+            } catch (error) {
+                console.error("Błąd ładowania skrytek:", error);
+            }
+        }
+
+        function renderVaults() {
+            const grid = document.getElementById('vaultsGrid');
+            grid.innerHTML = '';
+
+            if (currentVaults.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-400">
+                        Nie masz jeszcze żadnych skrytek.
+                    </div>
+                `;
+                return;
+            }
+
+            currentVaults.forEach(vault => {
+                const isFilled = vault.encryptedContent && vault.encryptedContent.trim() !== '';
+                const card = document.createElement('div');
+                card.className = `skrytka-card bg-slate-900 border ${isFilled ? 'border-emerald-500' : 'border-slate-700'} rounded-3xl p-6 cursor-pointer`;
+                
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="text-4xl">${getIcon(vault.type)}</div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-lg">${vault.title}</h3>
+                            <p class="text-sm mt-1 ${isFilled ? 'text-emerald-400' : 'text-slate-500'}">
+                                ${isFilled ? '✓ Zaszyfrowane' : 'Pusta skrytka'}
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                card.onclick = () => openDecryptModal(vault);
+                grid.appendChild(card);
+            });
+        }
+
+        function getIcon(type) {
+            const icons = {
+                bank: "🏦",
+                crypto: "₿",
+                social: "📱",
+                instructions: "📜",
+                custom: "📁"
+            };
+            return icons[type] || "📁";
+        }
+
+        // ===================== MODAL ODSZYFROWANIA =====================
+        let currentDecryptVault = null;
+
+        function openDecryptModal(vault) {
+            currentDecryptVault = vault;
+            document.getElementById('modalVaultTitle').textContent = vault.title;
+            document.getElementById('masterPassword').value = '';
+            document.getElementById('decryptedContent').classList.add('hidden');
+            document.getElementById('decryptModal').classList.remove('hidden');
+            document.getElementById('decryptModal').classList.add('flex');
+        }
+
+        function closeDecryptModal() {
+            document.getElementById('decryptModal').classList.remove('flex');
+            document.getElementById('decryptModal').classList.add('hidden');
+            currentDecryptVault = null;
+        }
+
+        async function decryptVault() {
+            const password = document.getElementById('masterPassword').value.trim();
+            if (!password || !currentDecryptVault) return;
+
+            try {
+                // Tymczasowe odszyfrowanie (placeholder)
+                const decrypted = currentDecryptVault.encryptedContent 
+                    ? atob(currentDecryptVault.encryptedContent) 
+                    : "Brak zawartości";
+
+                document.getElementById('decryptedText').textContent = decrypted;
+                document.getElementById('decryptedContent').classList.remove('hidden');
+            } catch (error) {
+                alert("Błąd odszyfrowania. Sprawdź hasło.");
+            }
+        }
+
+        // ===================== DODAWANIE NOWEJ SKRYTKI =====================
+        async function addNewVault() {
+            const title = prompt("Podaj nazwę nowej skrytki:");
+            if (!title || title.trim() === "") return;
+
+            if (!currentUser) {
+                alert("Musisz być zalogowany, żeby dodać skrytkę.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "vaults"), {
+                    userId: currentUser.uid,
+                    title: title.trim(),
+                    type: "custom",
+                    encryptedContent: "",
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+
+                // Odśwież listę
+                await loadVaults();
+                alert("Skrytka została dodana.");
+            } catch (error) {
+                console.error("Błąd dodawania skrytki:", error);
+                alert("Nie udało się dodać skrytki.");
+            }
+        }
+
+        // ===================== WYLOGOWANIE =====================
+        function logout() {
+            if (confirm("Na pewno chcesz się wylogować?")) {
+                sessionStorage.clear();
+                localStorage.removeItem('myheredo_user_email');
+                window.location.href = "login.html";
+            }
+        }
+
+        // Eksportujemy funkcje globalnie (na wypadek potrzeby)
+        window.addNewVault = addNewVault;
+        window.logout = logout;
+    </script>
+</body>
+</html>
